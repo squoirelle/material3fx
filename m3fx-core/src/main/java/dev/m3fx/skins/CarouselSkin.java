@@ -64,6 +64,9 @@ public class CarouselSkin extends SkinBase<Carousel> {
         for (Node item : getSkinnable().getItems()) {
             StackPane wrapper = new StackPane(item);
             wrapper.getStyleClass().add("carousel-item");
+            // Positioned by layoutChildren: unmanaged, so item positions never feed back into
+            // the carousel's own size (which would make it re-layout endlessly).
+            wrapper.setManaged(false);
             Rectangle itemClip = new Rectangle();
             itemClip.setArcWidth(RADIUS * 2);
             itemClip.setArcHeight(RADIUS * 2);
@@ -183,6 +186,16 @@ public class CarouselSkin extends SkinBase<Carousel> {
     @Override
     protected double computePrefHeight(double width, double top, double right, double bottom, double left) {
         return 200 + top + bottom;
+    }
+
+    @Override
+    protected double computeMinWidth(double height, double top, double right, double bottom, double left) {
+        return left + getSkinnable().getSmallItemWidth() * 2 + getSkinnable().getSpacing() + right;
+    }
+
+    @Override
+    protected double computeMinHeight(double width, double top, double right, double bottom, double left) {
+        return top + 40 + bottom;
     }
 
     @Override
