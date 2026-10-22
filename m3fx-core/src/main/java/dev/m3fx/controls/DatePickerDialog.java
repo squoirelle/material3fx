@@ -1,6 +1,8 @@
 package dev.m3fx.controls;
 
 import javafx.scene.Node;
+import javafx.scene.control.ButtonBar.ButtonData;
+import javafx.scene.control.ButtonType;
 import javafx.scene.control.DatePicker;
 import javafx.scene.control.Label;
 import javafx.scene.control.skin.DatePickerSkin;
@@ -12,8 +14,8 @@ import java.util.Locale;
 import java.util.concurrent.CompletableFuture;
 
 /**
- * Material modal date picker: the JavaFX calendar (styled by m3fx) in a dialog with the
- * Material header showing the selected date.
+ * Material modal date picker: the JavaFX calendar (styled by m3fx) in a {@link MaterialDialog}
+ * with the Material header showing the selected date.
  *
  * <pre>{@code
  * DatePickerDialog.show(owner, LocalDate.now()).thenAccept(date -> ...);
@@ -33,8 +35,7 @@ public final class DatePickerDialog {
 
     public static CompletableFuture<LocalDate> show(Node owner, LocalDate initial, String title) {
         DatePicker picker = new DatePicker(initial == null ? LocalDate.now() : initial);
-        DatePickerSkin skin = new DatePickerSkin(picker);
-        Node calendar = skin.getPopupContent();
+        Node calendar = new DatePickerSkin(picker).getPopupContent();
         calendar.getStyleClass().add("date-picker-dialog-calendar");
 
         Label supporting = new Label(title);
@@ -48,11 +49,12 @@ public final class DatePickerDialog {
         VBox content = new VBox(header, new Divider(), calendar);
         content.getStyleClass().add("date-picker-dialog-content");
 
-        MaterialDialog dialog = new MaterialDialog();
+        MaterialDialog<LocalDate> dialog = new MaterialDialog<>();
         dialog.getStyleClass().add("date-picker-dialog");
         dialog.setContent(content);
-        dialog.addAction("Cancel");
-        dialog.addPrimaryAction("OK");
-        return dialog.show(owner).thenApply(result -> "OK".equals(result) ? picker.getValue() : null);
+        ButtonType ok = new ButtonType("OK", ButtonData.OK_DONE);
+        dialog.getButtonTypes().addAll(ButtonType.CANCEL, ok);
+        dialog.setResultConverter(button -> button == ok ? picker.getValue() : null);
+        return dialog.show(owner);
     }
 }

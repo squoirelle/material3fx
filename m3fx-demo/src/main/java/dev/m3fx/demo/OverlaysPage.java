@@ -15,6 +15,8 @@ import dev.m3fx.controls.Tooltips;
 import javafx.geometry.Insets;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
+import javafx.scene.control.ButtonBar.ButtonData;
+import javafx.scene.control.ButtonType;
 import javafx.scene.control.CheckBox;
 import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.VBox;
@@ -31,12 +33,11 @@ final class OverlaysPage {
     static Node page() {
         Button basic = Buttons.tonal("Basic dialog", "chat_bubble");
         basic.setOnAction(e -> {
-            MaterialDialog dialog = new MaterialDialog("Reset settings?",
+            MaterialDialog<ButtonType> dialog = new MaterialDialog<>("Reset settings?",
                     "This will reset your app preferences back to their default settings. The following accounts will also be signed out.");
             dialog.setIcon("restart_alt");
-            dialog.addAction("Cancel");
-            dialog.addPrimaryAction("Accept");
-            dialog.show(basic).thenAccept(result -> Snackbar.show(basic, "Dialog result: " + result));
+            dialog.getButtonTypes().addAll(ButtonType.CANCEL, new ButtonType("Accept", ButtonData.OK_DONE));
+            dialog.show(basic).thenAccept(result -> Snackbar.show(basic, "Dialog result: " + (result == null ? "dismissed" : result.getText())));
         });
 
         Button confirm = Buttons.tonal("Confirm", "help");
@@ -47,19 +48,24 @@ final class OverlaysPage {
         form.setOnAction(e -> {
             MaterialTextField name = new MaterialTextField("Mission name");
             MaterialTextField code = new MaterialTextField("Code");
-            MaterialDialog dialog = new MaterialDialog("New mission", null);
+            MaterialDialog<String> dialog = new MaterialDialog<>("New mission", null);
             dialog.setContent(new VBox(16, name, code));
-            dialog.addAction("Cancel");
-            dialog.addPrimaryAction("Create");
-            dialog.show(form);
+            ButtonType create = new ButtonType("Create", ButtonData.OK_DONE);
+            dialog.getButtonTypes().addAll(ButtonType.CANCEL, create);
+            dialog.setResultConverter(button -> button == create ? name.getText() + " (" + code.getText() + ")" : null);
+            dialog.show(form).thenAccept(mission -> {
+                if (mission != null) {
+                    Snackbar.show(form, "Created " + mission);
+                }
+            });
         });
 
         Button fullScreen = Buttons.tonal("Full-screen dialog", "open_in_full");
         fullScreen.setOnAction(e -> {
-            MaterialDialog dialog = new MaterialDialog("New event", null);
+            MaterialDialog<ButtonType> dialog = new MaterialDialog<>("New event", null);
             dialog.setFullScreen(true);
             dialog.setContent(new VBox(16, new MaterialTextField("Title"), new MaterialTextField("Location"), new CheckBox("All day")));
-            dialog.addPrimaryAction("Save");
+            dialog.getButtonTypes().add(new ButtonType("Save", ButtonData.OK_DONE));
             dialog.show(fullScreen);
         });
 
@@ -107,11 +113,10 @@ final class OverlaysPage {
                 modalDrawer, date, time);
 
         // Static renderings, so the components also show up in screenshots.
-        MaterialDialog staticDialog = new MaterialDialog("Reset settings?",
+        MaterialDialog<ButtonType> staticDialog = new MaterialDialog<>("Reset settings?",
                 "This will reset your app preferences back to their default settings.");
         staticDialog.setIcon("restart_alt");
-        staticDialog.addAction("Cancel");
-        staticDialog.addPrimaryAction("Accept");
+        staticDialog.getButtonTypes().addAll(ButtonType.CANCEL, new ButtonType("Accept", ButtonData.OK_DONE));
         Snackbar staticSnackbar = Snackbar.make(basic, "Waypoint deleted").action("Undo", () -> { });
         BottomSheet staticSheet = new BottomSheet(sheetContent());
         staticSheet.setPrefWidth(420);

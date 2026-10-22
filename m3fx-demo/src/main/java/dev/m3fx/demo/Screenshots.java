@@ -44,6 +44,9 @@ public class Screenshots extends Application {
         dir.mkdirs();
         Motion.setEnabled(false);
         MaterialTheme theme = new MaterialTheme();
+        // Same custom colors as the demo app (used by the color scheme page).
+        theme.getCustomColors().put("success", Color.web("#2E7D32"));
+        theme.getCustomColors().put("warning", Color.web("#F9A825"));
         for (ThemeMode mode : new ThemeMode[] {ThemeMode.LIGHT, ThemeMode.DARK}) {
             theme.setMode(mode);
             for (Gallery.Page page : Gallery.pages()) {
@@ -86,11 +89,11 @@ public class Screenshots extends Application {
         shoot(scene, dir, "app-theme-sheet");
         closeOverlays(scaffold);
 
-        MaterialDialog dialog = new MaterialDialog("Reset settings?",
+        MaterialDialog<javafx.scene.control.ButtonType> dialog = new MaterialDialog<>("Reset settings?",
                 "This will reset your app preferences back to their default settings.");
         dialog.setIcon("restart_alt");
-        dialog.addAction("Cancel");
-        dialog.addPrimaryAction("Accept");
+        dialog.getButtonTypes().addAll(javafx.scene.control.ButtonType.CANCEL,
+                new javafx.scene.control.ButtonType("Accept", javafx.scene.control.ButtonBar.ButtonData.OK_DONE));
         dialog.show(scaffold);
         shoot(scene, dir, "app-dialog");
         dialog.close(null);

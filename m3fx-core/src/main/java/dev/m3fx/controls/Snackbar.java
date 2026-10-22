@@ -1,12 +1,19 @@
 package dev.m3fx.controls;
 
+import dev.m3fx.skins.SnackbarSkin;
 import javafx.animation.PauseTransition;
-import javafx.geometry.Pos;
+import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.SimpleBooleanProperty;
+import javafx.beans.property.SimpleObjectProperty;
+import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.property.StringProperty;
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
+import javafx.scene.AccessibleRole;
 import javafx.scene.Node;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.Priority;
+import javafx.scene.control.Control;
+import javafx.scene.control.Skin;
 import javafx.scene.layout.StackPane;
 import javafx.util.Duration;
 
@@ -20,9 +27,14 @@ import java.util.Deque;
  * <pre>{@code
  * Snackbar.make(owner, "Track deleted").action("Undo", this::undo).show();
  * Snackbar.show(owner, "Saved");
+ *
+ * Snackbar snackbar = new Snackbar("Saved");      // or as a regular control
+ * snackbar.setActionText("Open");
+ * snackbar.setOnAction(e -> open());
+ * snackbar.show(owner);
  * }</pre>
  */
-public class Snackbar extends HBox {
+public class Snackbar extends Control {
 
     public static final Duration SHORT = Duration.seconds(4);
     public static final Duration LONG = Duration.seconds(10);
@@ -31,102 +43,116 @@ public class Snackbar extends HBox {
 
     private static final String QUEUE_KEY = "m3fx.snackbar.queue";
 
-    private final Node owner;
-    private final Label message = new Label();
-    private Duration duration = SHORT;
+    private final StringProperty message = new SimpleStringProperty(this, "message");
+    private final StringProperty actionText = new SimpleStringProperty(this, "actionText");
+    private final ObjectProperty<EventHandler<ActionEvent>> onAction = new SimpleObjectProperty<>(this, "onAction");
+    private final BooleanProperty closeable = new SimpleBooleanProperty(this, "closeable");
+    private final ObjectProperty<Duration> duration = new SimpleObjectProperty<>(this, "duration", SHORT);
+    private final ObjectProperty<EventHandler<ActionEvent>> onDismissed = new SimpleObjectProperty<>(this, "onDismissed");
+    private Node owner;
     private Overlay overlay;
-    private Runnable onDismissed;
 
-    private Snackbar(Node owner, String text) {
-        this.owner = owner;
-        getStyleClass().add("snackbar");
-        setMaxHeight(USE_PREF_SIZE);
-        message.getStyleClass().add("snackbar-text");
-        message.setText(text);
-        message.setWrapText(true);
-        message.setMaxWidth(Double.MAX_VALUE);
-        HBox.setHgrow(message, Priority.ALWAYS);
-        setAlignment(Pos.CENTER_LEFT);
-        getChildren().add(message);
+    public Snackbar() {
+        this(null);
     }
 
-    public static Snackbar make(Node owner, String text) {
-        return new Snackbar(owner, text);
+    public Snackbar(String message) {
+        getStyleClass().add("snackbar");
+        setFocusTraversable(false);
+        setAccessibleRole(AccessibleRole.TEXT);
+        accessibleTextProperty().bind(this.message);
+        this.message.set(message);
+    }
+
+    /** Creates a snackbar for {@code owner}'s window; call {@link #show()} to queue it. */
+    public static Snackbar make(Node owner, String message) {
+        Snackbar snackbar = new Snackbar(message);
+        snackbar.owner = owner;
+        return snackbar;
     }
 
     /** Shows a simple snackbar for {@link #SHORT}. */
-    public static Snackbar show(Node owner, String text) {
-        Snackbar snackbar = make(owner, text);
+    public static Snackbar show(Node owner, String message) {
+        Snackbar snackbar = make(owner, message);
         snackbar.show();
         return snackbar;
     }
 
-    /** Adds an action button; clicking it runs {@code handler} and dismisses the snackbar. */
+    /** Fluent: adds an action button running {@code handler}; clicking it also dismisses the snackbar. */
     public Snackbar action(String text, Runnable handler) {
-        Button button = Buttons.text(text);
-        button.getStyleClass().add("snackbar-action");
-        button.setOnAction(e -> {
-            handler.run();
-            dismiss();
-        });
-        getChildren().add(button);
+        setActionText(text);
+        setOnAction(e -> handler.run());
         return this;
     }
 
-    /** Adds a close icon button. */
+    /** Fluent: adds a close icon button. */
     public Snackbar closeable() {
-        IconButton close = new IconButton("close");
-        close.getStyleClass().add("snackbar-close");
-        close.setOnAction(e -> dismiss());
-        getChildren().add(close);
+        setCloseable(true);
         return this;
     }
 
+    /** Fluent: sets the display duration. */
     public Snackbar duration(Duration value) {
-        this.duration = value;
+        setDuration(value);
         return this;
     }
 
-    /** Called when the snackbar has been dismissed (by timeout, action or close). */
+    /** Fluent: called once the snackbar is dismissed (timeout, action or close). */
     public Snackbar onDismissed(Runnable callback) {
-        this.onDismissed = callback;
+        setOnDismissed(e -> callback.run());
         return this;
     }
 
-    /** Queues the snackbar; it shows as soon as the previous one is gone. */
+    /** Runs the action and dismisses the snackbar, as a click on the action button does. */
+    public void fireAction() {
+        if (getOnAction() != null) {
+            getOnAction().handle(new ActionEvent(this, this));
+        }
+        dismiss();
+    }
+
+    /** Queues the snackbar in the window of the owner given to {@link #make(Node, String)}. */
     public void show() {
-        StackPane host = Overlay.findHost(owner);
-        @SuppressWarnings("unchecked")
-        Deque<Snackbar> queue = (Deque<Snackbar>) host.getProperties().computeIfAbsent(QUEUE_KEY, k -> new ArrayDeque<Snackbar>());
+        if (owner == null) {
+            throw new IllegalStateException("No owner: use show(Node) or Snackbar.make(owner, text)");
+        }
+        show(owner);
+    }
+
+    /** Queues the snackbar in the window of {@code owner}; it shows once the previous one is gone. */
+    public void show(Node owner) {
+        this.owner = owner;
+        Deque<Snackbar> queue = queue(Overlay.findHost(owner));
         queue.addLast(this);
         if (queue.size() == 1) {
             display();
         }
     }
 
+    @SuppressWarnings("unchecked")
+    private static Deque<Snackbar> queue(StackPane host) {
+        return (Deque<Snackbar>) host.getProperties().computeIfAbsent(QUEUE_KEY, k -> new ArrayDeque<Snackbar>());
+    }
+
     private void display() {
         StackPane.setMargin(this, new javafx.geometry.Insets(16));
         overlay = Overlay.show(owner, this, Overlay.Position.BOTTOM, false, false);
         overlay.setOnHidden(this::next);
-        if (!duration.isIndefinite()) {
-            PauseTransition pause = new PauseTransition(duration);
+        if (getDuration() != null && !getDuration().isIndefinite()) {
+            PauseTransition pause = new PauseTransition(getDuration());
             pause.setOnFinished(e -> dismiss());
             pause.play();
         }
     }
 
     private void next() {
-        StackPane host = Overlay.findHost(owner);
-        @SuppressWarnings("unchecked")
-        Deque<Snackbar> queue = (Deque<Snackbar>) host.getProperties().get(QUEUE_KEY);
-        if (onDismissed != null) {
-            onDismissed.run();
+        if (getOnDismissed() != null) {
+            getOnDismissed().handle(new ActionEvent(this, this));
         }
-        if (queue != null) {
-            queue.remove(this);
-            if (!queue.isEmpty()) {
-                queue.peekFirst().display();
-            }
+        Deque<Snackbar> queue = queue(Overlay.findHost(owner));
+        queue.remove(this);
+        if (!queue.isEmpty()) {
+            queue.peekFirst().display();
         }
     }
 
@@ -136,4 +162,80 @@ public class Snackbar extends HBox {
         }
     }
 
+    @Override
+    protected Skin<?> createDefaultSkin() {
+        return new SnackbarSkin(this);
+    }
+
+    public final StringProperty messageProperty() {
+        return message;
+    }
+
+    public final String getMessage() {
+        return message.get();
+    }
+
+    public final void setMessage(String value) {
+        message.set(value);
+    }
+
+    public final StringProperty actionTextProperty() {
+        return actionText;
+    }
+
+    public final String getActionText() {
+        return actionText.get();
+    }
+
+    public final void setActionText(String value) {
+        actionText.set(value);
+    }
+
+    public final ObjectProperty<EventHandler<ActionEvent>> onActionProperty() {
+        return onAction;
+    }
+
+    public final EventHandler<ActionEvent> getOnAction() {
+        return onAction.get();
+    }
+
+    public final void setOnAction(EventHandler<ActionEvent> value) {
+        onAction.set(value);
+    }
+
+    public final BooleanProperty closeableProperty() {
+        return closeable;
+    }
+
+    public final boolean isCloseable() {
+        return closeable.get();
+    }
+
+    public final void setCloseable(boolean value) {
+        closeable.set(value);
+    }
+
+    public final ObjectProperty<Duration> durationProperty() {
+        return duration;
+    }
+
+    public final Duration getDuration() {
+        return duration.get();
+    }
+
+    public final void setDuration(Duration value) {
+        duration.set(value);
+    }
+
+    public final ObjectProperty<EventHandler<ActionEvent>> onDismissedProperty() {
+        return onDismissed;
+    }
+
+    public final EventHandler<ActionEvent> getOnDismissed() {
+        return onDismissed.get();
+    }
+
+    public final void setOnDismissed(EventHandler<ActionEvent> value) {
+        onDismissed.set(value);
+    }
 }

@@ -1,118 +1,101 @@
 package dev.m3fx.controls;
 
+import dev.m3fx.skins.SegmentedButtonSkin;
 import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleBooleanProperty;
+import javafx.beans.property.SimpleObjectProperty;
+import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
-import javafx.scene.Node;
+import javafx.scene.control.Control;
+import javafx.scene.control.Skin;
 import javafx.scene.control.ToggleButton;
 import javafx.scene.control.ToggleGroup;
-import javafx.scene.layout.HBox;
-
-import java.util.List;
 
 /**
- * Material segmented button: 2 to 5 connected toggle buttons for single or multi selection.
- * Selected segments show a check mark in place of their icon.
+ * Material segmented button: 2 to 5 connected {@link ToggleButton}s for single or multi
+ * selection. Selected segments show a check mark in place of their icon.
+ * <p>
+ * Single selection (the default) uses the {@link #toggleGroupProperty() toggle group}: arrow keys
+ * move the selection like in any JavaFX toggle group, and one segment always stays selected. With
+ * {@link #multiSelectProperty() multi select} the buttons are independent toggles.
  *
  * <pre>{@code
  * SegmentedButton view = new SegmentedButton("Day", "Week", "Month");
- * view.getSegments().get(1).setSelected(true);
+ * view.getButtons().get(1).setSelected(true);
  * }</pre>
  */
-public class SegmentedButton extends HBox {
+public class SegmentedButton extends Control {
 
-    private static final String ORIGINAL_GRAPHIC = "m3fx.segment.graphic";
-
-    private final ToggleGroup group = new ToggleGroup();
+    private final ObservableList<ToggleButton> buttons = FXCollections.observableArrayList();
+    private final ObjectProperty<ToggleGroup> toggleGroup = new SimpleObjectProperty<>(this, "toggleGroup", new ToggleGroup());
     private final BooleanProperty multiSelect = new SimpleBooleanProperty(this, "multiSelect");
     private final BooleanProperty showCheck = new SimpleBooleanProperty(this, "showCheck", true);
 
+    /** Single select segmented buttons always keep one segment selected. */
+    private final javafx.beans.value.ChangeListener<javafx.scene.control.Toggle> keepSelected = (obs, old, toggle) -> {
+        if (toggle == null && old != null && !isMultiSelect()) {
+            old.setSelected(true);
+        }
+    };
+
     public SegmentedButton(String... labels) {
         getStyleClass().add("segmented-button");
-        setFillHeight(true);
-        getChildren().addListener((ListChangeListener<Node>) c -> {
+        setFocusTraversable(false);
+        buttons.addListener((ListChangeListener<ToggleButton>) c -> {
             while (c.next()) {
-                for (Node added : c.getAddedSubList()) {
-                    if (added instanceof ToggleButton button) {
-                        setup(button);
-                    }
-                }
-                for (Node removed : c.getRemoved()) {
-                    if (removed instanceof ToggleButton button) {
-                        button.setToggleGroup(null);
-                    }
-                }
-            }
-            updatePositions();
-        });
-        // Single select segmented buttons always keep one segment selected.
-        group.selectedToggleProperty().addListener((obs, old, toggle) -> {
-            if (toggle == null && old != null && !isMultiSelect()) {
-                old.setSelected(true);
+                c.getRemoved().forEach(b -> b.setToggleGroup(null));
+                c.getAddedSubList().forEach(this::assignGroup);
             }
         });
-        multiSelect.addListener((obs, old, multi) -> getSegments().forEach(b -> b.setToggleGroup(multi ? null : group)));
-        showCheck.addListener(o -> getSegments().forEach(this::updateGraphic));
+        toggleGroup.addListener((obs, old, group) -> {
+            if (old != null) {
+                old.selectedToggleProperty().removeListener(keepSelected);
+            }
+            if (group != null) {
+                group.selectedToggleProperty().addListener(keepSelected);
+            }
+            buttons.forEach(this::assignGroup);
+        });
+        toggleGroup.get().selectedToggleProperty().addListener(keepSelected);
+        multiSelect.addListener(o -> buttons.forEach(this::assignGroup));
         for (String label : labels) {
-            getChildren().add(new ToggleButton(label));
+            buttons.add(new ToggleButton(label));
         }
     }
 
-    /** Adds a segment with a label and an icon. */
+    private void assignGroup(ToggleButton button) {
+        button.setToggleGroup(isMultiSelect() ? null : getToggleGroup());
+    }
+
+    /** Adds a segment with a label and an optional icon. */
     public ToggleButton addSegment(String text, String icon) {
         ToggleButton button = new ToggleButton(text, icon == null ? null : new Icon(icon, 18));
-        getChildren().add(button);
+        buttons.add(button);
         return button;
     }
 
-    /** The segments; equivalent to the toggle buttons among the children. */
-    public List<ToggleButton> getSegments() {
-        return getChildren().stream()
-                .filter(ToggleButton.class::isInstance)
-                .map(ToggleButton.class::cast)
-                .toList();
+    @Override
+    protected Skin<?> createDefaultSkin() {
+        return new SegmentedButtonSkin(this);
     }
 
-    public ToggleGroup getToggleGroup() {
-        return group;
+    /** The segments. */
+    public ObservableList<ToggleButton> getButtons() {
+        return buttons;
     }
 
-    private void setup(ToggleButton button) {
-        button.getStyleClass().add("segment");
-        button.setMaxHeight(Double.MAX_VALUE);
-        if (!isMultiSelect()) {
-            button.setToggleGroup(group);
-        }
-        if (!button.getProperties().containsKey(ORIGINAL_GRAPHIC)) {
-            button.getProperties().put(ORIGINAL_GRAPHIC, button.getGraphic() == null ? "" : button.getGraphic());
-            button.selectedProperty().addListener(o -> updateGraphic(button));
-        }
-        updateGraphic(button);
+    public final ObjectProperty<ToggleGroup> toggleGroupProperty() {
+        return toggleGroup;
     }
 
-    private void updateGraphic(ToggleButton button) {
-        Object original = button.getProperties().get(ORIGINAL_GRAPHIC);
-        if (button.isSelected() && isShowCheck()) {
-            button.setGraphic(new Icon("check", 18));
-        } else {
-            button.setGraphic(original instanceof Node node ? node : null);
-        }
+    public final ToggleGroup getToggleGroup() {
+        return toggleGroup.get();
     }
 
-    private void updatePositions() {
-        List<ToggleButton> segments = getSegments();
-        for (int i = 0; i < segments.size(); i++) {
-            ObservableList<String> classes = segments.get(i).getStyleClass();
-            classes.removeAll("first", "last", "only");
-            if (segments.size() == 1) {
-                classes.add("only");
-            } else if (i == 0) {
-                classes.add("first");
-            } else if (i == segments.size() - 1) {
-                classes.add("last");
-            }
-        }
+    public final void setToggleGroup(ToggleGroup value) {
+        toggleGroup.set(value);
     }
 
     public final BooleanProperty multiSelectProperty() {

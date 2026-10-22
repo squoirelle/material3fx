@@ -1,28 +1,23 @@
 package dev.m3fx.controls;
 
+import dev.m3fx.skins.BottomSheetSkin;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleObjectProperty;
-import javafx.geometry.Pos;
 import javafx.scene.Node;
-import javafx.scene.input.MouseEvent;
-import javafx.scene.layout.Region;
-import javafx.scene.layout.StackPane;
-import javafx.scene.layout.VBox;
+import javafx.scene.control.Control;
+import javafx.scene.control.Skin;
 
 /**
- * Material bottom sheet: slides up from the bottom, over a scrim when modal. It can be dragged
- * down by its handle to dismiss it.
+ * Material bottom sheet: slides up from the bottom, over a scrim when modal. Dragging its handle
+ * down dismisses it, as do Escape and a click on the scrim.
  */
-public class BottomSheet extends VBox {
+public class BottomSheet extends Control {
 
-    private final Region handle = new Region();
-    private final StackPane handleArea = new StackPane(handle);
     private final ObjectProperty<Node> content = new SimpleObjectProperty<>(this, "content");
     private final BooleanProperty modal = new SimpleBooleanProperty(this, "modal", true);
     private Overlay overlay;
-    private double dragStartY;
 
     public BottomSheet() {
         this(null);
@@ -30,29 +25,8 @@ public class BottomSheet extends VBox {
 
     public BottomSheet(Node content) {
         getStyleClass().add("bottom-sheet");
-        handle.getStyleClass().add("bottom-sheet-handle");
-        handleArea.getStyleClass().add("bottom-sheet-handle-area");
-        handleArea.setAlignment(Pos.CENTER);
-        getChildren().add(handleArea);
-        this.content.addListener((obs, old, node) -> {
-            getChildren().remove(old);
-            if (node != null) {
-                getChildren().add(node);
-            }
-        });
+        setFocusTraversable(false);
         this.content.set(content);
-
-        // Dragged by its handle area, so content (lists, sliders) keeps its own mouse handling.
-        handleArea.setCursor(javafx.scene.Cursor.OPEN_HAND);
-        handleArea.addEventHandler(MouseEvent.MOUSE_PRESSED, e -> dragStartY = e.getSceneY());
-        handleArea.addEventHandler(MouseEvent.MOUSE_DRAGGED, e -> setTranslateY(Math.max(0, e.getSceneY() - dragStartY)));
-        handleArea.addEventHandler(MouseEvent.MOUSE_RELEASED, e -> {
-            if (getTranslateY() > getHeight() * 0.3) {
-                hide();
-            } else {
-                setTranslateY(0);
-            }
-        });
     }
 
     /** Shows the sheet at the bottom of {@code owner}'s window. */
@@ -66,6 +40,15 @@ public class BottomSheet extends VBox {
         if (overlay != null) {
             overlay.hide();
         }
+    }
+
+    public boolean isShowing() {
+        return overlay != null && overlay.isShowing();
+    }
+
+    @Override
+    protected Skin<?> createDefaultSkin() {
+        return new BottomSheetSkin(this);
     }
 
     public final ObjectProperty<Node> contentProperty() {

@@ -1,55 +1,65 @@
 package dev.m3fx.controls;
 
+import dev.m3fx.skins.MaterialDialogSkin;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
-import javafx.geometry.Pos;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
+import javafx.css.PseudoClass;
 import javafx.scene.Node;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.Priority;
-import javafx.scene.layout.Region;
-import javafx.scene.layout.VBox;
+import javafx.scene.control.ButtonBar.ButtonData;
+import javafx.scene.control.ButtonType;
+import javafx.scene.control.Control;
+import javafx.scene.control.Skin;
+import javafx.util.Callback;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
 /**
- * Material dialog, shown in-window over a scrim (see {@link Overlay} for where it is hosted).
+ * Material dialog, shown inside the window over a scrim (see {@link Overlay} for where it is
+ * hosted). Modeled on {@link javafx.scene.control.Dialog}: {@link ButtonType}s define the actions
+ * ({@link ButtonData} decides the default and cancel buttons), and a
+ * {@link #resultConverterProperty() result converter} turns the chosen button into the result.
+ * {@link #show(Node)} returns a future instead of blocking.
  *
  * <pre>{@code
- * MaterialDialog dialog = new MaterialDialog("Delete mission?", "This permanently removes the plan.");
+ * MaterialDialog<ButtonType> dialog = new MaterialDialog<>("Delete mission?", "This permanently removes the plan.");
  * dialog.setIcon("delete");
- * dialog.addAction("Cancel");
- * dialog.addPrimaryAction("Delete");
- * dialog.show(ownerNode).thenAccept(result -> { if ("Delete".equals(result)) ... });
+ * dialog.getButtonTypes().addAll(ButtonType.CANCEL, new ButtonType("Delete", ButtonData.OK_DONE));
+ * dialog.show(ownerNode).thenAccept(button -> ...);
  *
- * MaterialDialog.confirm(owner, "Discard draft?", null, "Discard", "Cancel")
- *         .thenAccept(confirmed -> ...);
+ * MaterialDialog.confirm(owner, "Discard draft?", null, "Discard", "Cancel").thenAccept(confirmed -> ...);
  * }</pre>
- * Setting {@link #fullScreenProperty() full screen} turns it into a full-screen dialog with a
- * close button and the primary action in its top bar.
+ * Escape and a click on the scrim dismiss the dialog when {@link #dismissableProperty() dismissable};
+ * the result is then that of the cancel button if there is one, or null.
+ *
+ * @param <R> result type; {@code ButtonType} unless a result converter is set
  */
-public class MaterialDialog extends VBox {
+public class MaterialDialog<R> extends Control {
 
-    private final Icon iconNode = new Icon(null, 24);
-    private final Label headlineLabel = new Label();
-    private final Label textLabel = new Label();
-    private final HBox actionsBox = new HBox(8);
-    private final VBox body = new VBox();
+    private static final PseudoClass FULL_SCREEN = PseudoClass.getPseudoClass("full-screen");
+
+    private final StringProperty headline = new SimpleStringProperty(this, "headline");
+    private final StringProperty supportingText = new SimpleStringProperty(this, "supportingText");
     private final StringProperty icon = new SimpleStringProperty(this, "icon");
     private final ObjectProperty<Node> content = new SimpleObjectProperty<>(this, "content");
+    private final ObservableList<ButtonType> buttonTypes = FXCollections.observableArrayList();
+    @SuppressWarnings("unchecked")
+    private final ObjectProperty<Callback<ButtonType, R>> resultConverter =
+            new SimpleObjectProperty<>(this, "resultConverter", button -> (R) button);
     private final BooleanProperty dismissable = new SimpleBooleanProperty(this, "dismissable", true);
-    private final BooleanProperty fullScreen = new SimpleBooleanProperty(this, "fullScreen");
-    private final List<Button> actions = new ArrayList<>();
-    private Button primaryAction;
+    private final BooleanProperty fullScreen = new SimpleBooleanProperty(this, "fullScreen") {
+        @Override
+        protected void invalidated() {
+            pseudoClassStateChanged(FULL_SCREEN, get());
+        }
+    };
     private Overlay overlay;
-    private CompletableFuture<String> result;
+    private CompletableFuture<R> result;
 
     public MaterialDialog() {
         this(null, null);
@@ -57,183 +67,101 @@ public class MaterialDialog extends VBox {
 
     public MaterialDialog(String headline, String supportingText) {
         getStyleClass().add("material-dialog");
-        setMaxHeight(USE_PREF_SIZE);
-        iconNode.getStyleClass().add("dialog-icon");
-        headlineLabel.getStyleClass().add("dialog-headline");
-        textLabel.getStyleClass().add("dialog-text");
-        actionsBox.getStyleClass().add("dialog-actions");
-        body.getStyleClass().add("dialog-body");
-        headlineLabel.setWrapText(true);
-        textLabel.setWrapText(true);
-        actionsBox.setAlignment(Pos.CENTER_RIGHT);
-        headlineLabel.setText(headline);
-        textLabel.setText(supportingText);
-        iconNode.nameProperty().bind(icon);
-        icon.addListener(o -> rebuild());
-        content.addListener(o -> rebuild());
-        fullScreen.addListener((obs, old, value) -> {
-            pseudoClassStateChanged(FULL_SCREEN, value);
-            rebuild();
-        });
-        headlineLabel.textProperty().addListener(o -> rebuild());
-        textLabel.textProperty().addListener(o -> rebuild());
-        rebuild();
+        setFocusTraversable(false);
+        accessibleTextProperty().bind(this.headline);
+        this.headline.set(headline);
+        this.supportingText.set(supportingText);
     }
 
-    private static final javafx.css.PseudoClass FULL_SCREEN = javafx.css.PseudoClass.getPseudoClass("full-screen");
-    private static final javafx.css.PseudoClass WITH_ICON = javafx.css.PseudoClass.getPseudoClass("with-icon");
-
-    /** Shows a confirmation dialog; completes with true when the confirm action is chosen. */
+    /** Shows a confirmation dialog; completes with true when the confirm button is chosen. */
     public static CompletableFuture<Boolean> confirm(Node owner, String headline, String text, String confirm, String cancel) {
-        MaterialDialog dialog = new MaterialDialog(headline, text);
-        dialog.addAction(cancel);
-        dialog.addPrimaryAction(confirm);
-        return dialog.show(owner).thenApply(confirm::equals);
+        ButtonType yes = new ButtonType(confirm, ButtonData.OK_DONE);
+        ButtonType no = new ButtonType(cancel, ButtonData.CANCEL_CLOSE);
+        MaterialDialog<Boolean> dialog = new MaterialDialog<>(headline, text);
+        dialog.getButtonTypes().addAll(no, yes);
+        dialog.setResultConverter(yes::equals);
+        return dialog.show(owner).thenApply(Boolean.TRUE::equals);
     }
 
-    /** Shows an informational dialog with a single OK action. */
-    public static CompletableFuture<String> alert(Node owner, String headline, String text) {
-        MaterialDialog dialog = new MaterialDialog(headline, text);
-        dialog.addPrimaryAction("OK");
+    /** Shows an informational dialog with a single OK button. */
+    public static CompletableFuture<ButtonType> alert(Node owner, String headline, String text) {
+        MaterialDialog<ButtonType> dialog = new MaterialDialog<>(headline, text);
+        dialog.getButtonTypes().add(ButtonType.OK);
         return dialog.show(owner);
     }
 
-    /** Adds a text action that closes the dialog with its text as result. */
-    public Button addAction(String text) {
-        Button button = Buttons.text(text);
-        button.setOnAction(e -> close(text));
-        actions.add(button);
-        rebuild();
-        return button;
-    }
-
     /**
-     * Adds the primary action. In a basic dialog it is a text button like the others; in a
-     * full-screen dialog it moves to the top bar.
+     * Shows the dialog in the window of {@code owner}. Completes with the converted result of the
+     * chosen button, or of the cancel button / null when dismissed.
      */
-    public Button addPrimaryAction(String text) {
-        Button button = addAction(text);
-        button.setDefaultButton(true);
-        primaryAction = button;
-        rebuild();
-        return button;
-    }
-
-    private void rebuild() {
-        getChildren().clear();
-        body.getChildren().clear();
-        boolean hasIcon = getIcon() != null && !getIcon().isEmpty();
-        pseudoClassStateChanged(WITH_ICON, hasIcon);
-        if (isFullScreen()) {
-            IconButton close = new IconButton("close");
-            close.setOnAction(e -> close(null));
-            Region spacer = new Region();
-            HBox.setHgrow(spacer, Priority.ALWAYS);
-            HBox bar = new HBox(8, close, headlineLabel, spacer);
-            bar.getStyleClass().add("dialog-top-bar");
-            bar.setAlignment(Pos.CENTER_LEFT);
-            if (primaryAction != null) {
-                bar.getChildren().add(primaryAction);
-            }
-            getChildren().add(bar);
-            if (textLabel.getText() != null) {
-                body.getChildren().add(textLabel);
-            }
-            if (getContent() != null) {
-                body.getChildren().add(getContent());
-                VBox.setVgrow(getContent(), Priority.ALWAYS);
-            }
-            VBox.setVgrow(body, Priority.ALWAYS);
-            getChildren().add(body);
-            return;
-        }
-        if (hasIcon) {
-            getChildren().add(iconNode);
-        }
-        if (headlineLabel.getText() != null) {
-            getChildren().add(headlineLabel);
-        }
-        if (textLabel.getText() != null) {
-            body.getChildren().add(textLabel);
-        }
-        if (getContent() != null) {
-            body.getChildren().add(getContent());
-        }
-        if (!body.getChildren().isEmpty()) {
-            getChildren().add(body);
-        }
-        actionsBox.getChildren().setAll(actions);
-        if (!actions.isEmpty()) {
-            getChildren().add(actionsBox);
-        }
-        setAlignment(hasIcon ? Pos.TOP_CENTER : Pos.TOP_LEFT);
-    }
-
-    /** Shows the dialog in the window of {@code owner}. Completes with the chosen action's text, or null when dismissed. */
-    public CompletableFuture<String> show(Node owner) {
-        if (overlay != null && overlay.isShowing()) {
+    public CompletableFuture<R> show(Node owner) {
+        if (isShowing()) {
             return result;
         }
         result = new CompletableFuture<>();
         overlay = Overlay.show(owner, this, isFullScreen() ? Overlay.Position.FILL : Overlay.Position.CENTER,
                 true, isDismissable());
-        // Focus the primary action, unless the dialog contains a form the user should type into.
-        if (primaryAction != null && !containsTextInput(getContent())) {
-            primaryAction.requestFocus();
-        }
         overlay.setOnHidden(() -> {
             if (!result.isDone()) {
-                result.complete(null);
+                result.complete(convert(cancelButton()));
             }
         });
+        applyCss();   // creates the skin if needed
+        if (getSkin() instanceof MaterialDialogSkin<?> skin) {
+            skin.focusInitialNode();
+        }
         return result;
     }
 
-    private static boolean containsTextInput(Node node) {
-        if (node == null || node instanceof TimePicker) {
-            return false;
-        }
-        if (node instanceof javafx.scene.control.TextInputControl || node instanceof MaterialTextField) {
-            return true;
-        }
-        if (node instanceof javafx.scene.Parent parent) {
-            return parent.getChildrenUnmodifiable().stream().anyMatch(MaterialDialog::containsTextInput);
-        }
-        return false;
-    }
-
-    /** Closes the dialog with the given result. */
-    public void close(String value) {
+    /** Closes the dialog as if {@code button} had been clicked (null: dismissed without result). */
+    public void close(ButtonType button) {
         if (result != null && !result.isDone()) {
-            result.complete(value);
+            result.complete(convert(button));
         }
         if (overlay != null) {
             overlay.hide();
         }
     }
 
-    public final void setHeadline(String value) {
-        headlineLabel.setText(value);
+    public boolean isShowing() {
+        return overlay != null && overlay.isShowing();
     }
 
-    public final String getHeadline() {
-        return headlineLabel.getText();
+    private R convert(ButtonType button) {
+        return button == null || getResultConverter() == null ? null : getResultConverter().call(button);
+    }
+
+    private ButtonType cancelButton() {
+        return buttonTypes.stream().filter(b -> b.getButtonData().isCancelButton()).findFirst().orElse(null);
+    }
+
+    @Override
+    protected Skin<?> createDefaultSkin() {
+        return new MaterialDialogSkin<>(this);
     }
 
     public final StringProperty headlineProperty() {
-        return headlineLabel.textProperty();
+        return headline;
     }
 
-    public final void setSupportingText(String value) {
-        textLabel.setText(value);
+    public final String getHeadline() {
+        return headline.get();
     }
 
-    public final String getSupportingText() {
-        return textLabel.getText();
+    public final void setHeadline(String value) {
+        headline.set(value);
     }
 
     public final StringProperty supportingTextProperty() {
-        return textLabel.textProperty();
+        return supportingText;
+    }
+
+    public final String getSupportingText() {
+        return supportingText.get();
+    }
+
+    public final void setSupportingText(String value) {
+        supportingText.set(value);
     }
 
     /** Optional hero icon, shown centered above the headline. */
@@ -262,6 +190,23 @@ public class MaterialDialog extends VBox {
         content.set(value);
     }
 
+    /** The action buttons, as with {@link javafx.scene.control.DialogPane#getButtonTypes()}. */
+    public final ObservableList<ButtonType> getButtonTypes() {
+        return buttonTypes;
+    }
+
+    public final ObjectProperty<Callback<ButtonType, R>> resultConverterProperty() {
+        return resultConverter;
+    }
+
+    public final Callback<ButtonType, R> getResultConverter() {
+        return resultConverter.get();
+    }
+
+    public final void setResultConverter(Callback<ButtonType, R> value) {
+        resultConverter.set(value);
+    }
+
     /** Whether Escape and a click on the scrim close the dialog (default true). */
     public final BooleanProperty dismissableProperty() {
         return dismissable;
@@ -275,6 +220,7 @@ public class MaterialDialog extends VBox {
         dismissable.set(value);
     }
 
+    /** Full-screen dialog: close button, headline and default button in a top bar; content fills the window. */
     public final BooleanProperty fullScreenProperty() {
         return fullScreen;
     }

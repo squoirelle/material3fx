@@ -57,8 +57,8 @@ class ComponentsSmokeTest {
         bottomBar.setFab(new Fab("add"));
         ListView<String> list = new ListView<>(FXCollections.observableArrayList("a", "b"));
         list.setCellFactory(ListItem.cellFactory(ListItem::new));
-        MaterialDialog dialog = new MaterialDialog("Title", "Text");
-        dialog.addAction("OK");
+        MaterialDialog<javafx.scene.control.ButtonType> dialog = new MaterialDialog<>("Title", "Text");
+        dialog.getButtonTypes().add(javafx.scene.control.ButtonType.OK);
         Carousel carousel = new Carousel();
         carousel.getItems().addAll(new StackPane(), new StackPane());
         return List.of(
@@ -170,7 +170,7 @@ class ComponentsSmokeTest {
     }
 
     @Test
-    void dialogCompletesWithChosenAction() throws Exception {
+    void dialogCompletesWithConvertedResult() throws Exception {
         String result = FxTestSupport.onFx(() -> {
             StackPane root = new StackPane();
             Scene scene = new Scene(root, 400, 300);
@@ -178,16 +178,39 @@ class ComponentsSmokeTest {
             Stage stage = new Stage();
             stage.setScene(scene);
             stage.show();
-            MaterialDialog dialog = new MaterialDialog("Delete?", null);
-            dialog.addAction("Cancel");
-            Button delete = dialog.addPrimaryAction("Delete");
+            javafx.scene.control.ButtonType delete = new javafx.scene.control.ButtonType("Delete",
+                    javafx.scene.control.ButtonBar.ButtonData.OK_DONE);
+            MaterialDialog<String> dialog = new MaterialDialog<>("Delete?", null);
+            dialog.getButtonTypes().addAll(javafx.scene.control.ButtonType.CANCEL, delete);
+            dialog.setResultConverter(b -> b == delete ? "deleted" : "kept");
             var future = dialog.show(root);
-            assertTrue(root.getChildren().size() > 0 && root.lookup(".material-dialog") != null);
-            delete.fire();
+            Button deleteButton = (Button) dialog.lookupAll(".button").stream()
+                    .filter(n -> n instanceof Button b && "Delete".equals(b.getText())).findFirst().orElseThrow();
+            assertTrue(deleteButton.isDefaultButton(), "OK_DONE button must be the default button");
+            deleteButton.fire();
             stage.close();
             return future.getNow("not completed");
         });
-        assertEquals("Delete", result);
+        assertEquals("deleted", result);
+    }
+
+    @Test
+    void dismissedDialogReturnsCancelResult() throws Exception {
+        String result = FxTestSupport.onFx(() -> {
+            StackPane root = new StackPane();
+            Scene scene = new Scene(root, 400, 300);
+            Stage stage = new Stage();
+            stage.setScene(scene);
+            stage.show();
+            MaterialDialog<String> dialog = new MaterialDialog<>("Leave?", null);
+            dialog.getButtonTypes().addAll(javafx.scene.control.ButtonType.CANCEL, javafx.scene.control.ButtonType.OK);
+            dialog.setResultConverter(b -> b.getText());
+            var future = dialog.show(root);
+            dialog.close(null);   // e.g. Escape: the overlay hides without a button
+            stage.close();
+            return future.getNow("not completed");
+        });
+        assertNull(result, "closing without a button gives null");
     }
 
     @Test
@@ -203,8 +226,10 @@ class ComponentsSmokeTest {
             field.setText("abc");
             assertTrue(field.validate());
             assertFalse(field.isError());
-            field.getEditor().setText("abcdef");
-            assertEquals("abc", field.getText(), "max length must reject longer input");
+            field.replaceText(0, field.getLength(), "abcdef");
+            assertEquals("abcd", field.getText(), "typing / pasting is cut at max length");
+            field.appendText("xyz");
+            assertEquals("abcd", field.getText());
             return null;
         });
     }

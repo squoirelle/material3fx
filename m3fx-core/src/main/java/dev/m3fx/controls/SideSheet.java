@@ -1,27 +1,31 @@
 package dev.m3fx.controls;
 
+import dev.m3fx.skins.SideSheetSkin;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
-import javafx.geometry.Pos;
+import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.property.StringProperty;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
-import javafx.scene.control.Label;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.Priority;
-import javafx.scene.layout.Region;
-import javafx.scene.layout.VBox;
+import javafx.scene.control.Control;
+import javafx.scene.control.Skin;
 
 /**
- * Material modal side sheet: supplementary content (filters, details) sliding in from the end
- * of the window, with a headline, close button and optional actions.
+ * Material modal side sheet: supplementary content (filters, details) sliding in from the end of
+ * the window, with a title, close button and optional actions at the bottom.
  */
-public class SideSheet extends VBox {
+public class SideSheet extends Control {
 
-    private final Label headline = new Label();
-    private final HBox header = new HBox();
-    private final HBox actions = new HBox(8);
+    private final StringProperty title = new SimpleStringProperty(this, "title");
     private final ObjectProperty<Node> content = new SimpleObjectProperty<>(this, "content");
+    private final ObservableList<Node> actions = FXCollections.observableArrayList();
     private Overlay overlay;
+
+    public SideSheet() {
+        this(null, null);
+    }
 
     public SideSheet(String title) {
         this(title, null);
@@ -29,41 +33,16 @@ public class SideSheet extends VBox {
 
     public SideSheet(String title, Node content) {
         getStyleClass().add("side-sheet");
-        headline.getStyleClass().add("side-sheet-headline");
-        header.getStyleClass().add("side-sheet-header");
-        actions.getStyleClass().add("side-sheet-actions");
-        headline.setText(title);
-        Region spacer = new Region();
-        HBox.setHgrow(spacer, Priority.ALWAYS);
-        IconButton close = new IconButton("close");
-        close.setOnAction(e -> hide());
-        header.getChildren().addAll(headline, spacer, close);
-        header.setAlignment(Pos.CENTER_LEFT);
-        actions.setAlignment(Pos.CENTER_LEFT);
-        getChildren().add(header);
-        this.content.addListener((obs, old, node) -> {
-            getChildren().remove(old);
-            if (node != null) {
-                getChildren().add(1, node);
-                VBox.setVgrow(node, Priority.ALWAYS);
-            }
-        });
+        setFocusTraversable(false);
+        this.title.set(title);
         this.content.set(content);
     }
 
-    /** Adds an action button at the bottom of the sheet; the first one added is filled. */
+    /** Convenience: adds an action button; the first one added is filled, the others outlined. */
     public Button addAction(String text, Runnable handler) {
-        Button button = actions.getChildren().isEmpty() ? Buttons.filled(text) : Buttons.outlined(text);
+        Button button = actions.isEmpty() ? Buttons.filled(text) : Buttons.outlined(text);
         button.setOnAction(e -> handler.run());
-        actions.getChildren().add(button);
-        if (!getChildren().contains(actions)) {
-            Region spacer = new Region();
-            VBox.setVgrow(spacer, Priority.ALWAYS);
-            if (getContent() == null) {
-                getChildren().add(spacer);
-            }
-            getChildren().add(actions);
-        }
+        actions.add(button);
         return button;
     }
 
@@ -78,6 +57,27 @@ public class SideSheet extends VBox {
         }
     }
 
+    public boolean isShowing() {
+        return overlay != null && overlay.isShowing();
+    }
+
+    @Override
+    protected Skin<?> createDefaultSkin() {
+        return new SideSheetSkin(this);
+    }
+
+    public final StringProperty titleProperty() {
+        return title;
+    }
+
+    public final String getTitle() {
+        return title.get();
+    }
+
+    public final void setTitle(String value) {
+        title.set(value);
+    }
+
     public final ObjectProperty<Node> contentProperty() {
         return content;
     }
@@ -90,11 +90,8 @@ public class SideSheet extends VBox {
         content.set(value);
     }
 
-    public final void setTitle(String value) {
-        headline.setText(value);
-    }
-
-    public final String getTitle() {
-        return headline.getText();
+    /** Buttons shown at the bottom of the sheet. */
+    public ObservableList<Node> getActions() {
+        return actions;
     }
 }

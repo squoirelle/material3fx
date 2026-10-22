@@ -73,16 +73,27 @@ Style classes add the Material variants: `.button.tonal`, `.elevated`, `.outline
 
 ### 4. Components (`dev.m3fx.controls`)
 
-| Area | Components |
+Every component follows the JavaFX control model: a `Control` (or the JavaFX control it
+specializes) with its look and behavior in a `Skin` (`dev.m3fx.skins`), created by
+`createDefaultSkin()` and replaceable with `setSkin` or `-fx-skin` in CSS. Where JavaFX has an
+equivalent, the component *is* that control:
+
+| Component | Model |
 |---|---|
-| Actions | `Buttons` (factories), `IconButton` (4 variants, toggle), `Fab` (3 sizes, 4 colors, extended), `SegmentedButton` (single / multi) |
-| Selection & display | `Chip` (assist, filter, input, suggestion, elevated), `Switch` (with icons), `Badge`, `Avatar`, `Card` (elevated, filled, outlined, clickable), `Divider`, `Icon` (2,000+ Material icons, outlined / filled) |
-| Text input | `MaterialTextField` (filled / outlined, floating label, leading / trailing icons, prefix / suffix, counter, validator, password toggle, clearable), `SearchBar` (with suggestions) |
-| Navigation | `NavigationBar`, `NavigationRail`, `NavigationDrawer` (standard + modal, headlines, dividers, badges), sharing one `NavigationItem` model; `TopAppBar` (small, center-aligned, medium, large, scroll-aware), `BottomAppBar` |
-| Layout | `Scaffold` (top bar, navigation, content, bottom bar, FAB, overlay host), `ListItem` (1–3 lines, leading / trailing, clickable, `ListView` cell factory), `Carousel` (multi-browse) |
-| Overlays | `MaterialDialog` (basic, icon, custom content, full-screen; `confirm` / `alert` helpers returning `CompletableFuture`), `Snackbar` (queued, action, close), `BottomSheet`, `SideSheet`, `Tooltips` (plain / rich) |
-| Pickers | `TimePicker` (dial, 12h / 24h, keyboard entry, `showDialog`), `DatePickerDialog` |
-| Infrastructure | `StateLayer` (hover / focus / press overlay + ripple for your own controls), `Overlay`, `Motion` |
+| `Switch` | `ToggleButton`: `selected`, `onAction`, toggle groups |
+| `Chip` (assist, filter, input, suggestion, elevated) | `ToggleButton`: filter chips toggle, the others fire like buttons; leading icon = `graphic` |
+| `MaterialTextField` (filled / outlined, floating label, icons, prefix / suffix, counter, validator, password) | `TextField`: `TextFormatter`, `onAction`, prompt text, selection, context menu all work |
+| `SearchBar` (with suggestions) | `TextField`: submitting fires `onAction` |
+| `MaterialDialog<R>` (basic, icon, custom content, full screen; `confirm` / `alert`) | like `Dialog<R>`: `getButtonTypes()`, `ButtonData`, `resultConverter`; `show(owner)` returns a `CompletableFuture<R>` |
+| `NavigationBar`, `NavigationRail`, `NavigationDrawer` (standard + modal, headlines, dividers, badges) | like `TabPane`: `SingleSelectionModel<NavigationItem>` |
+| `SegmentedButton` (single / multi) | a `Control` holding `ToggleButton`s and a `ToggleGroup` |
+| `TimePicker` (dial, 12h / 24h, `showDialog`) | like `DatePicker`: `ObjectProperty<LocalTime> value` |
+| `Divider` | `Separator` |
+| `IconButton` (4 variants, toggle), `Fab` (3 sizes, 4 colors, extended), `Buttons` factories | `Button` |
+| `Badge` | `Label` |
+| `Card`, `ListItem`, `Avatar`, `TopAppBar`, `BottomAppBar`, `Carousel`, `Snackbar`, `BottomSheet`, `SideSheet` | `Control` + `Skin` |
+| `Scaffold` | a layout pane, like `BorderPane`; also hosts the overlays |
+| `Icon` (2,000+ Material icons), `StateLayer`, `Overlay`, `Tooltips`, `DatePickerDialog` | building blocks and helpers |
 
 Overlays (dialogs, sheets, snackbars, modal drawer) open inside the window, above a scrim. They
 need a `Scaffold` ancestor, or a `StackPane` as the scene root.
@@ -91,12 +102,34 @@ need a `Scaffold` ancestor, or a `StackPane` as the scene root.
 MaterialDialog.confirm(node, "Delete mission?", "This can't be undone.", "Delete", "Cancel")
         .thenAccept(confirmed -> { if (confirmed) delete(); });
 
+MaterialDialog<ButtonType> dialog = new MaterialDialog<>("Reset settings?", "Preferences go back to defaults.");
+dialog.getButtonTypes().addAll(ButtonType.CANCEL, new ButtonType("Reset", ButtonData.OK_DONE));
+dialog.show(node).thenAccept(button -> ...);
+
 Snackbar.make(node, "Waypoint deleted").action("Undo", this::undo).show();
 
 MaterialTextField callsign = new MaterialTextField("Callsign");
 callsign.setMaxLength(8);
 callsign.setValidator(text -> text.length() < 3 ? "At least three letters" : null);
+callsign.setOnAction(e -> submit());     // it is a TextField
 ```
+
+### 5. Keyboard and accessibility
+
+| Component | Keys |
+|---|---|
+| Navigation bar / rail / drawer | arrows move focus, Home / End, Enter / Space select |
+| Segmented button | Left / Right move between segments (toggle group arrows in single select) |
+| Switch, chips, buttons | Space / Enter (standard button behavior); Delete / Backspace remove input chips |
+| Clickable `ListItem`s in a list, clickable `Card`s | Up / Down between list items, Enter / Space activate |
+| Time picker | editable hour / minute boxes; on the dial, arrows, Page Up / Down, Enter (hours to minutes) |
+| Carousel | Left / Right, Home / End |
+| Dialogs, sheets, modal drawer | Escape dismisses; Tab and Shift+Tab stay inside the overlay (focus trap) |
+| Search bar | Down opens / enters suggestions, Escape closes them |
+
+Components report accessible roles and states to screen readers: switches and filter chips are
+toggle buttons, navigation destinations are selectable tab items, clickable cards and list items
+are buttons, password fields hide their text, icon buttons take their name from their tooltip.
 
 ## Troubleshooting
 

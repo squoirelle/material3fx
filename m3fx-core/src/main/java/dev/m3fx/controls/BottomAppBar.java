@@ -1,44 +1,23 @@
 package dev.m3fx.controls;
 
+import dev.m3fx.skins.BottomAppBarSkin;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
-import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
-import javafx.geometry.Pos;
 import javafx.scene.Node;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.Priority;
-import javafx.scene.layout.Region;
+import javafx.scene.control.Control;
+import javafx.scene.control.Skin;
 
-/**
- * Material bottom app bar: up to four actions on the leading side and an optional FAB at the end.
- */
-public class BottomAppBar extends HBox {
+/** Material bottom app bar: up to four actions on the leading side and an optional FAB at the end. */
+public class BottomAppBar extends Control {
 
-    private final HBox actionsBox = new HBox();
-    private final Region spacer = new Region();
     private final ObservableList<Node> actions = FXCollections.observableArrayList();
     private final ObjectProperty<Fab> fab = new SimpleObjectProperty<>(this, "fab");
 
     public BottomAppBar() {
         getStyleClass().add("bottom-app-bar");
-        actionsBox.getStyleClass().add("bottom-app-bar-actions");
-        actionsBox.setAlignment(Pos.CENTER_LEFT);
-        setAlignment(Pos.CENTER_LEFT);
-        HBox.setHgrow(spacer, Priority.ALWAYS);
-        getChildren().addAll(actionsBox, spacer);
-        actions.addListener((ListChangeListener<Node>) c -> actionsBox.getChildren().setAll(actions));
-        fab.addListener((obs, old, value) -> {
-            if (old != null) {
-                getChildren().remove(old);
-                old.getStyleClass().remove("lowered");
-            }
-            if (value != null) {
-                value.getStyleClass().add("lowered");
-                getChildren().add(value);
-            }
-        });
+        setFocusTraversable(false);
     }
 
     public IconButton addAction(String icon, String tooltip) {
@@ -47,10 +26,16 @@ public class BottomAppBar extends HBox {
         return button;
     }
 
+    @Override
+    protected Skin<?> createDefaultSkin() {
+        return new BottomAppBarSkin(this);
+    }
+
     public ObservableList<Node> getActions() {
         return actions;
     }
 
+    /** The FAB, shown without elevation at the trailing end. */
     public final ObjectProperty<Fab> fabProperty() {
         return fab;
     }

@@ -82,6 +82,8 @@ public class DemoApp extends Application {
         show(drawer.getSelectedItem());
 
         stage.setTitle("m3fx - Material Design 3 for JavaFX");
+        // Themed before setScene: the window may already be showing (e.g. in the screenshot runner).
+        theme.apply(scene);
         stage.setScene(scene);
         stage.show();
     }

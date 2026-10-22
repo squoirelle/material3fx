@@ -63,15 +63,15 @@ final class ComponentsPage {
         extendedTertiary.setColor(Fab.Color.TERTIARY);
 
         SegmentedButton single = new SegmentedButton("Day", "Week", "Month", "Year");
-        single.getSegments().get(1).setSelected(true);
+        single.getButtons().get(1).setSelected(true);
         SegmentedButton icons = new SegmentedButton();
         icons.addSegment("Map", "map");
         icons.addSegment("Satellite", "satellite_alt").setSelected(true);
         icons.addSegment("Terrain", "terrain");
         SegmentedButton multi = new SegmentedButton("$", "$$", "$$$", "$$$$");
         multi.setMultiSelect(true);
-        multi.getSegments().get(0).setSelected(true);
-        multi.getSegments().get(1).setSelected(true);
+        multi.getButtons().get(0).setSelected(true);
+        multi.getButtons().get(1).setSelected(true);
 
         return Gallery.page("Buttons", "Common buttons, icon buttons, FABs and segmented buttons.",
                 Gallery.section("Common buttons (Buttons factory)", Gallery.row(
@@ -118,8 +118,7 @@ final class ComponentsPage {
         Card clickable = card(Card.Variant.ELEVATED, "Clickable card", "Hover it: state layer and ripple.");
         clickable.setOnAction(e -> System.out.println("Card clicked"));
 
-        Card media = new Card(Card.Variant.OUTLINED);
-        media.getStyleClass().add("flush");
+
         Region image = new Region();
         image.setPrefSize(300, 140);
         image.setBackground(new javafx.scene.layout.Background(new javafx.scene.layout.BackgroundFill(
@@ -134,7 +133,8 @@ final class ComponentsPage {
         VBox body = new VBox(4, title, sub, actions);
         body.setPadding(new Insets(16));
         VBox.setMargin(actions, new Insets(12, 0, 0, 0));
-        media.getChildren().addAll(image, body);
+        Card media = new Card(Card.Variant.OUTLINED, image, body);
+        media.getStyleClass().add("flush");
         media.setPrefWidth(300);
 
         return Gallery.page("Chips and cards", "Assist, filter, input and suggestion chips; elevated, filled, outlined and clickable cards.",

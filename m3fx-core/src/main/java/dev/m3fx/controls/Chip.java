@@ -1,50 +1,45 @@
 package dev.m3fx.controls;
 
+import dev.m3fx.skins.ChipSkin;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleObjectProperty;
-import javafx.beans.property.SimpleStringProperty;
-import javafx.beans.property.StringProperty;
+import javafx.css.PseudoClass;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
-import javafx.geometry.Pos;
+import javafx.scene.AccessibleRole;
 import javafx.scene.Node;
-import javafx.scene.control.Label;
-import javafx.scene.input.KeyCode;
-import javafx.scene.input.KeyEvent;
-import javafx.scene.input.MouseButton;
-import javafx.scene.input.MouseEvent;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.Region;
+import javafx.scene.control.Skin;
+import javafx.scene.control.ToggleButton;
 
 /**
- * Material chip: compact element representing an input, attribute or action.
+ * Material chip: compact element representing an input, attribute or action. A
+ * {@link ToggleButton}, so chips work with {@code onAction}, toggle groups (single-select filter
+ * chips) and keyboard navigation like any JavaFX button.
  * <ul>
  *     <li>{@link Variant#ASSIST}: a smart action, like a button</li>
  *     <li>{@link Variant#FILTER}: toggles on/off, shows a check mark when selected</li>
- *     <li>{@link Variant#INPUT}: a piece of user input (e.g. a recipient), removable with its close icon</li>
+ *     <li>{@link Variant#INPUT}: a piece of user input (e.g. a recipient), removable with its close
+ *     icon or the Delete / Backspace keys</li>
  *     <li>{@link Variant#SUGGESTION}: a dynamically generated suggestion</li>
  * </ul>
+ * The leading icon is the {@link #graphicProperty() graphic}: an {@link Icon} (see
+ * {@link #setIcon(String)}) or an {@link Avatar}.
  */
-public class Chip extends HBox {
+public class Chip extends ToggleButton {
 
     public enum Variant { ASSIST, FILTER, INPUT, SUGGESTION }
 
-    private final Label label = new Label();
-    private final Icon leadingIcon = new Icon(null, 18);
-    private final Icon closeIcon = new Icon("close", 18);
-    private final HBox closeTarget = new HBox(closeIcon);
-    private final StateLayer stateLayer = new StateLayer(this);
+    private static final PseudoClass ELEVATED = PseudoClass.getPseudoClass("elevated");
 
-    private final StringProperty text = label.textProperty();
-    private final StringProperty icon = new SimpleStringProperty(this, "icon");
-    private final ObjectProperty<Node> avatar = new SimpleObjectProperty<>(this, "avatar");
-    private final ObjectProperty<Variant> variant = new SimpleObjectProperty<>(this, "variant", Variant.ASSIST);
-    private final BooleanProperty selected = new SimpleBooleanProperty(this, "selected");
+    private final ObjectProperty<Variant> variant = new SimpleObjectProperty<>(this, "variant");
     private final BooleanProperty elevated = new SimpleBooleanProperty(this, "elevated");
-    private final ObjectProperty<EventHandler<ActionEvent>> onAction = new SimpleObjectProperty<>(this, "onAction");
     private final ObjectProperty<EventHandler<ActionEvent>> onClose = new SimpleObjectProperty<>(this, "onClose");
+
+    public Chip() {
+        this(null);
+    }
 
     public Chip(String text) {
         this(text, Variant.ASSIST);
@@ -55,73 +50,44 @@ public class Chip extends HBox {
     }
 
     public Chip(String text, String icon, Variant variant) {
-        getStyleClass().add("chip");
-        setAlignment(Pos.CENTER_LEFT);
-        setFocusTraversable(true);
-        label.getStyleClass().add("chip-label");
-        leadingIcon.getStyleClass().add("chip-icon");
-        closeIcon.getStyleClass().add("chip-close-icon");
-        closeTarget.getStyleClass().add("chip-close");
-        closeTarget.setAlignment(Pos.CENTER);
-        getChildren().add(stateLayer);
-
-        label.setMinWidth(Region.USE_PREF_SIZE);
-        this.text.set(text);
-        this.icon.set(icon);
-        this.variant.set(variant);
-
-        this.icon.addListener(o -> rebuild());
-        this.avatar.addListener(o -> rebuild());
+        super(text);
+        getStyleClass().setAll("chip");
+        setMnemonicParsing(false);
         this.variant.addListener((obs, old, value) -> {
             if (old != null) {
                 getStyleClass().remove(old.name().toLowerCase());
             }
-            getStyleClass().add(value.name().toLowerCase());
-            rebuild();
-        });
-        getStyleClass().add(variant.name().toLowerCase());
-        this.selected.addListener((obs, old, value) -> {
-            pseudoClassStateChanged(PseudoClasses.SELECTED, value);
-            rebuild();
-        });
-        this.elevated.addListener((obs, old, value) -> pseudoClassStateChanged(ELEVATED, value));
-
-        addEventHandler(MouseEvent.MOUSE_CLICKED, e -> {
-            if (e.getButton() == MouseButton.PRIMARY && !isDisabled()) {
-                if (closeTarget.isVisible() && closeTarget.localToScene(closeTarget.getBoundsInLocal())
-                        .contains(e.getSceneX(), e.getSceneY())) {
-                    close();
-                } else {
-                    activate();
-                }
-                requestFocus();
+            if (value != null) {
+                getStyleClass().add(value.name().toLowerCase());
+            }
+            setAccessibleRole(value == Variant.FILTER ? AccessibleRole.TOGGLE_BUTTON : AccessibleRole.BUTTON);
+            if (value != Variant.FILTER) {
+                setSelected(false);
             }
         });
-        addEventHandler(KeyEvent.KEY_PRESSED, e -> {
-            if (e.getCode() == KeyCode.SPACE || e.getCode() == KeyCode.ENTER) {
-                activate();
-                e.consume();
-            } else if ((e.getCode() == KeyCode.BACK_SPACE || e.getCode() == KeyCode.DELETE) && getVariant() == Variant.INPUT) {
-                close();
-                e.consume();
-            }
-        });
-        rebuild();
+        this.variant.set(variant);
+        elevated.addListener((obs, old, value) -> pseudoClassStateChanged(ELEVATED, value));
+        setIcon(icon);
     }
 
-    private static final javafx.css.PseudoClass ELEVATED = javafx.css.PseudoClass.getPseudoClass("elevated");
-
-    private void activate() {
+    /** Filter chips toggle; the other variants only fire their action. */
+    @Override
+    public void fire() {
+        if (isDisabled()) {
+            return;
+        }
         if (getVariant() == Variant.FILTER) {
-            setSelected(!isSelected());
-        }
-        EventHandler<ActionEvent> handler = getOnAction();
-        if (handler != null) {
-            handler.handle(new ActionEvent(this, this));
+            super.fire();
+        } else {
+            fireEvent(new ActionEvent());
         }
     }
 
-    private void close() {
+    /**
+     * Removes the chip: calls {@link #onCloseProperty() onClose}, or, if there is none, removes
+     * the chip from its parent pane. Triggered by the close icon of input chips.
+     */
+    public void close() {
         EventHandler<ActionEvent> handler = getOnClose();
         if (handler != null) {
             handler.handle(new ActionEvent(this, this));
@@ -130,79 +96,27 @@ public class Chip extends HBox {
         }
     }
 
-    private void rebuild() {
-        getChildren().retainAll(stateLayer);
-        boolean hasLeading = false;
-        if (getVariant() == Variant.FILTER && isSelected()) {
-            leadingIcon.setName("check");
-            getChildren().add(leadingIcon);
-            hasLeading = true;
-        } else if (getAvatar() != null) {
-            getChildren().add(getAvatar());
-            hasLeading = true;
-        } else if (getIcon() != null) {
-            leadingIcon.setName(getIcon());
-            getChildren().add(leadingIcon);
-            hasLeading = true;
-        }
-        getChildren().add(label);
-        boolean hasClose = getVariant() == Variant.INPUT;
-        closeTarget.setVisible(hasClose);
-        if (hasClose) {
-            getChildren().add(closeTarget);
-        }
-        pseudoClassStateChanged(LEADING, hasLeading);
-        pseudoClassStateChanged(TRAILING, hasClose);
-        pseudoClassStateChanged(AVATAR, getAvatar() != null && !(getVariant() == Variant.FILTER && isSelected()));
-    }
-
-    private static final javafx.css.PseudoClass LEADING = javafx.css.PseudoClass.getPseudoClass("leading");
-    private static final javafx.css.PseudoClass TRAILING = javafx.css.PseudoClass.getPseudoClass("trailing");
-    private static final javafx.css.PseudoClass AVATAR = javafx.css.PseudoClass.getPseudoClass("avatar");
-
     @Override
-    protected void layoutChildren() {
-        super.layoutChildren();
-        stateLayer.resizeRelocate(0, 0, getWidth(), getHeight());
-        stateLayer.toBack();
+    protected Skin<?> createDefaultSkin() {
+        return new ChipSkin(this);
     }
 
-    public final StringProperty textProperty() {
-        return text;
+    /** Convenience: sets the graphic to a Material {@link Icon}, or removes it for null. */
+    public final void setIcon(String icon) {
+        if (icon == null) {
+            setGraphic(null);
+            return;
+        }
+        // Chip icons have their own color role (primary for assist chips), set by the stylesheet.
+        Icon node = new Icon(icon, 18);
+        node.setFollowTextFill(false);
+        node.getStyleClass().add("chip-icon");
+        setGraphic(node);
     }
 
-    public final String getText() {
-        return text.get();
-    }
-
-    public final void setText(String value) {
-        text.set(value);
-    }
-
-    /** Leading icon name. */
-    public final StringProperty iconProperty() {
-        return icon;
-    }
-
-    public final String getIcon() {
-        return icon.get();
-    }
-
-    public final void setIcon(String value) {
-        icon.set(value);
-    }
-
-    /** Leading avatar, typically an {@link Avatar}, used by input chips. */
-    public final ObjectProperty<Node> avatarProperty() {
-        return avatar;
-    }
-
-    public final Node getAvatar() {
-        return avatar.get();
-    }
-
-    public final void setAvatar(Node value) {
-        avatar.set(value);
+    /** Convenience: sets the graphic to an avatar (input chips). */
+    public final void setAvatar(Node avatar) {
+        setGraphic(avatar);
     }
 
     public final ObjectProperty<Variant> variantProperty() {
@@ -215,18 +129,6 @@ public class Chip extends HBox {
 
     public final void setVariant(Variant value) {
         variant.set(value);
-    }
-
-    public final BooleanProperty selectedProperty() {
-        return selected;
-    }
-
-    public final boolean isSelected() {
-        return selected.get();
-    }
-
-    public final void setSelected(boolean value) {
-        selected.set(value);
     }
 
     /** Elevated chips have a shadow and no outline, for use over images or busy backgrounds. */
@@ -242,19 +144,7 @@ public class Chip extends HBox {
         elevated.set(value);
     }
 
-    public final ObjectProperty<EventHandler<ActionEvent>> onActionProperty() {
-        return onAction;
-    }
-
-    public final EventHandler<ActionEvent> getOnAction() {
-        return onAction.get();
-    }
-
-    public final void setOnAction(EventHandler<ActionEvent> value) {
-        onAction.set(value);
-    }
-
-    /** Called when an input chip's close icon is clicked. By default the chip removes itself from its parent. */
+    /** Called when an input chip is closed. By default the chip removes itself from its parent. */
     public final ObjectProperty<EventHandler<ActionEvent>> onCloseProperty() {
         return onClose;
     }

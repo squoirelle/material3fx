@@ -129,8 +129,13 @@ public final class Overlay {
             previousFocus = scene.getFocusOwner();
             escapeFilter = e -> {
                 List<Overlay> s = stack();
-                if (e.getCode() == KeyCode.ESCAPE && dismissable && !s.isEmpty() && s.getLast() == this) {
+                boolean topmost = !s.isEmpty() && s.getLast() == this;
+                if (e.getCode() == KeyCode.ESCAPE && dismissable && topmost) {
                     hide();
+                    e.consume();
+                } else if (e.getCode() == KeyCode.TAB && modal && topmost) {
+                    // Focus trap: Tab cycles through the overlay, never the window behind it.
+                    moveFocus(e.isShiftDown() ? -1 : 1);
                     e.consume();
                 }
             };
@@ -223,6 +228,32 @@ public final class Overlay {
                 new KeyFrame(duration, end.toArray(KeyValue[]::new)));
         animation.setOnFinished(in ? null : e -> finishHide());
         animation.playFromStart();
+    }
+
+    private void moveFocus(int direction) {
+        List<Node> focusable = new ArrayList<>();
+        collectFocusable(content, focusable);
+        if (focusable.isEmpty()) {
+            return;
+        }
+        Node current = scene == null ? null : scene.getFocusOwner();
+        int index = focusable.indexOf(current);
+        int next = index < 0 ? 0 : Math.floorMod(index + direction, focusable.size());
+        focusable.get(next).requestFocus();
+    }
+
+    private static void collectFocusable(Node node, List<Node> result) {
+        if (!node.isVisible() || node.isDisabled()) {
+            return;
+        }
+        if (node.isFocusTraversable()) {
+            result.add(node);
+        }
+        if (node instanceof Parent parent) {
+            for (Node child : parent.getChildrenUnmodifiable()) {
+                collectFocusable(child, result);
+            }
+        }
     }
 
     private static boolean focusFirst(Node node) {

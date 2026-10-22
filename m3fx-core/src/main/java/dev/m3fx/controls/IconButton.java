@@ -46,7 +46,10 @@ public class IconButton extends Button {
             pseudoClassStateChanged(PseudoClasses.SELECTED, value);
             updateIcon();
         });
-        this.toggle.addListener((obs, old, value) -> pseudoClassStateChanged(TOGGLE, value));
+        this.toggle.addListener((obs, old, value) -> {
+            pseudoClassStateChanged(TOGGLE, value);
+            setAccessibleRole(value ? javafx.scene.AccessibleRole.TOGGLE_BUTTON : javafx.scene.AccessibleRole.BUTTON);
+        });
         this.variant.addListener((obs, old, value) -> updateVariant(old, value));
         setIconName(iconName);
         setVariant(variant);
@@ -55,10 +58,21 @@ public class IconButton extends Button {
 
     private static final javafx.css.PseudoClass TOGGLE = javafx.css.PseudoClass.getPseudoClass("toggle");
 
-    /** Convenience: sets a tooltip, which icon-only buttons should always have. */
+    /** Convenience: sets a tooltip, which icon-only buttons should always have. Also the accessible name. */
     public IconButton tooltip(String text) {
         setTooltip(new Tooltip(text));
+        setAccessibleText(text);
         return this;
+    }
+
+    @Override
+    public Object queryAccessibleAttribute(javafx.scene.AccessibleAttribute attribute, Object... parameters) {
+        return switch (attribute) {
+            case SELECTED -> isToggle() && isSelected();
+            // Icon-only: without an explicit accessible text, fall back to the icon name.
+            case TEXT -> getAccessibleText() != null ? getAccessibleText() : getIconName();
+            default -> super.queryAccessibleAttribute(attribute, parameters);
+        };
     }
 
     @Override

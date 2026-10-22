@@ -191,6 +191,11 @@ public final class MaterialTheme {
     /**
      * Applies the theme to every current and future window: stages, dialogs, alerts, menus,
      * tooltips and other popups.
+     * <p>
+     * A scene is themed when it is set on a window. When you replace the scene of a window that
+     * is <em>already showing</em>, JavaFX styles the new scene during {@code setScene}, before the
+     * theme is added, and logs warnings about unresolved {@code -md-*} colors for that first pass.
+     * Call {@link #apply(Scene)} on the scene before setting it to avoid this.
      */
     public void applyGlobally() {
         if (windowListener != null) {

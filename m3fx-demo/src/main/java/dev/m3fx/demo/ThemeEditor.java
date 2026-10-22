@@ -73,13 +73,13 @@ final class ThemeEditor {
         });
 
         SegmentedButton mode = new SegmentedButton("Light", "Dark", "System");
-        mode.getSegments().get(theme.getMode().ordinal()).setSelected(true);
+        mode.getButtons().get(theme.getMode().ordinal()).setSelected(true);
         mode.getToggleGroup().selectedToggleProperty().addListener((obs, old, toggle) -> {
             if (toggle != null) {
-                theme.setMode(ThemeMode.values()[mode.getSegments().indexOf((ToggleButton) toggle)]);
+                theme.setMode(ThemeMode.values()[mode.getButtons().indexOf((ToggleButton) toggle)]);
             }
         });
-        theme.modeProperty().addListener((obs, old, value) -> mode.getSegments().get(value.ordinal()).setSelected(true));
+        theme.modeProperty().addListener((obs, old, value) -> mode.getButtons().get(value.ordinal()).setSelected(true));
 
         FlowPane variants = new FlowPane(8, 8);
         for (Variant variant : Variant.values()) {
@@ -92,18 +92,18 @@ final class ThemeEditor {
         }
 
         SegmentedButton contrast = new SegmentedButton("Standard", "Medium", "High");
-        contrast.getSegments().getFirst().setSelected(true);
+        contrast.getButtons().getFirst().setSelected(true);
         contrast.getToggleGroup().selectedToggleProperty().addListener((obs, old, toggle) -> {
             if (toggle != null) {
-                theme.setContrast(contrast.getSegments().indexOf((ToggleButton) toggle) * 0.5);
+                theme.setContrast(contrast.getButtons().indexOf((ToggleButton) toggle) * 0.5);
             }
         });
 
         SegmentedButton density = new SegmentedButton("0", "-1", "-2", "-3");
-        density.getSegments().get(theme.getDensity().ordinal()).setSelected(true);
+        density.getButtons().get(theme.getDensity().ordinal()).setSelected(true);
         density.getToggleGroup().selectedToggleProperty().addListener((obs, old, toggle) -> {
             if (toggle != null) {
-                theme.setDensity(Density.values()[density.getSegments().indexOf((ToggleButton) toggle)]);
+                theme.setDensity(Density.values()[density.getButtons().indexOf((ToggleButton) toggle)]);
             }
         });
 
