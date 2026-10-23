@@ -299,6 +299,9 @@ public final class MaterialTheme {
     }
 
     private void rebuild() {
+        if (getMode() == ThemeMode.SYSTEM || isUseSystemAccent()) {
+            SystemPreferences.watch();
+        }
         boolean isDark = switch (getMode()) {
             case LIGHT -> false;
             case DARK -> true;

@@ -107,11 +107,13 @@ final class ThemeEditor {
             }
         });
 
+        Switch systemAccent = new Switch("Use system accent color");
+        systemAccent.selectedProperty().bindBidirectional(theme.useSystemAccentProperty());
         Switch harmonize = new Switch("Harmonize custom colors");
         harmonize.selectedProperty().bindBidirectional(theme.harmonizeCustomColorsProperty());
 
         VBox content = new VBox(8,
-                heading("Seed color"), seeds, fromImage,
+                heading("Seed color"), seeds, fromImage, systemAccent,
                 heading("Mode"), mode,
                 heading("Scheme variant"), variants,
                 heading("Contrast"), contrast,
