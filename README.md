@@ -11,9 +11,10 @@ theme.applyGlobally();                  // every window: stages, dialogs, menus,
 ```
 
 Requires **Java 21+ and JavaFX 21+** (both LTS). No dependencies; Roboto and the Material Icons
-fonts are bundled. Following the system dark mode (`ThemeMode.SYSTEM`) and accent color works on Linux through the
-XDG desktop portal (COSMIC, GNOME, KDE), read over the session bus by a small built-in D-Bus
-client (pure Java, no external process or native code) that also follows changes live, and elsewhere through `Platform.getPreferences()`, which needs JavaFX 22+. JavaFX's own
+fonts are bundled. Following the system dark mode (`ThemeMode.SYSTEM`) and accent color works on
+Linux through the XDG desktop portal (COSMIC, GNOME, KDE), read over the session bus by a small
+built-in D-Bus client (pure Java, no external process or native code) that also follows changes
+live, and elsewhere through `Platform.getPreferences()`, which needs JavaFX 22+. JavaFX's own
 detection is not used on Linux: it derives dark mode from the GTK theme, which is wrong on some
 desktops (COSMIC reports a light theme while the desktop is dark).
 
@@ -25,6 +26,36 @@ The whole test suite passes on every combination the JavaFX releases themselves 
 | **JDK 25** | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
 
 To test a combination: `./gradlew :material3fx:test -Pjdk=21 -Pjavafx=22.0.2`.
+
+## Installation
+
+Not released yet. Once on Maven Central:
+
+```kotlin
+// build.gradle.kts
+dependencies {
+    implementation("io.github.squoirelle:material3fx:0.1.0")
+}
+```
+
+```xml
+<dependency>
+    <groupId>io.github.squoirelle</groupId>
+    <artifactId>material3fx</artifactId>
+    <version>0.1.0</version>
+</dependency>
+```
+
+JavaFX is not pulled in: the application declares its own (`javafx.controls`, any version from
+21), with the platform artifacts it ships, as usual with the
+[JavaFX Gradle plugin](https://github.com/openjfx/javafx-gradle-plugin) or the
+[JavaFX Maven plugin](https://github.com/openjfx/javafx-maven-plugin). With JPMS:
+
+```java
+module my.app {
+    requires io.github.squoirelle.material3fx;
+}
+```
 
 ## Run the demo
 
@@ -196,11 +227,31 @@ popups inside their window on Wayland sessions: a menu or dropdown that would ex
 window opens above its control, or is shifted to fit. `theme.setKeepPopupsInWindow(false)`
 turns it off; it is off by default outside Wayland.
 
+## Releasing
+
+1. Set a release version in `build.gradle.kts` (drop `-SNAPSHOT`).
+2. Build the signed bundle:
+   `./gradlew :material3fx:publishAllPublicationsToStagingRepository -PsigningKey="$(cat key.asc)" -PsigningPassword=...`
+   (an ASCII-armored GPG key; the public key must be on a key server).
+3. Zip the contents of `build/staging-deploy` and upload it at
+   [central.sonatype.com](https://central.sonatype.com) (namespace `io.github.squoirelle`, verified
+   through the GitHub account).
+
+CI (`.github/workflows/ci.yml`) runs the tests on Linux, Windows and macOS with the minimum
+versions, plus Java 21 + JavaFX 23 and Java 25 + JavaFX 25, and builds an unsigned bundle.
+
 ## Project layout
 
 - `material3fx`: the library (JPMS module `io.github.squoirelle.material3fx`)
 - `material3fx-demo`: the showcase app and the screenshot renderer
 
-## Licenses
+## License
 
-Material3FX bundles Roboto (Apache 2.0 / OFL) and the Material Icons fonts (Apache 2.0) from Google.
+Material3FX is licensed under the [Apache License 2.0](LICENSE). It bundles, from Google:
+
+- the Material Icons and Material Icons Outlined fonts (Apache 2.0),
+- the Roboto fonts (SIL Open Font License 1.1, text included next to the fonts),
+
+and its color science is a modified port of
+[material-color-utilities](https://github.com/material-foundation/material-color-utilities)
+(Apache 2.0). See [NOTICE](NOTICE).

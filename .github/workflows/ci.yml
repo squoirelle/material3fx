@@ -1,0 +1,65 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    name: ${{ matrix.os }} / JDK ${{ matrix.jdk }} / JavaFX ${{ matrix.javafx }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          # The minimum supported versions, on every platform.
+          - { os: ubuntu-latest, jdk: 21, javafx: 21.0.13 }
+          - { os: windows-latest, jdk: 21, javafx: 21.0.13 }
+          - { os: macos-latest, jdk: 21, javafx: 21.0.13 }
+          # The newest JavaFX that still runs on Java 21.
+          - { os: ubuntu-latest, jdk: 21, javafx: 23.0.2 }
+          # Current releases.
+          - { os: ubuntu-latest, jdk: 25, javafx: 25.0.5 }
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          # The last one runs Gradle; the first builds and tests (-Pjdk).
+          java-version: |
+            ${{ matrix.jdk }}
+            25
+      - uses: gradle/actions/setup-gradle@v4
+      - name: Test (Linux, virtual display)
+        if: runner.os == 'Linux'
+        run: xvfb-run -a ./gradlew build -Pjdk=${{ matrix.jdk }} -Pjavafx=${{ matrix.javafx }} --console=plain
+      - name: Test
+        if: runner.os != 'Linux'
+        run: ./gradlew build -Pjdk=${{ matrix.jdk }} -Pjavafx=${{ matrix.javafx }} --console=plain
+      - name: Test reports
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-reports-${{ matrix.os }}-${{ matrix.jdk }}-${{ matrix.javafx }}
+          path: material3fx/build/reports/tests/
+
+  publication:
+    name: Maven Central bundle (unsigned dry run)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: 25
+      - uses: gradle/actions/setup-gradle@v4
+      - run: ./gradlew :material3fx:publishAllPublicationsToStagingRepository --console=plain
+      - uses: actions/upload-artifact@v4
+        with:
+          name: staging-deploy
+          path: build/staging-deploy/
