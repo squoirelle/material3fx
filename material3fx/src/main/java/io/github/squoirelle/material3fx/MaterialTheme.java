@@ -81,7 +81,6 @@ public final class MaterialTheme {
     private final StringProperty fontFamily = new SimpleStringProperty(this, "fontFamily", "Roboto");
     private final ObservableMap<String, Color> customColors = FXCollections.observableHashMap();
     private final BooleanProperty harmonizeCustomColors = new SimpleBooleanProperty(this, "harmonizeCustomColors", true);
-    private final BooleanProperty keepPopupsInWindow = new SimpleBooleanProperty(this, "keepPopupsInWindow", isWaylandSession());
 
     private final ReadOnlyObjectWrapper<ColorScheme> scheme = new ReadOnlyObjectWrapper<>(this, "scheme");
     private final ReadOnlyBooleanWrapper dark = new ReadOnlyBooleanWrapper(this, "dark");
@@ -224,78 +223,11 @@ public final class MaterialTheme {
         if (window.getScene() != null) {
             apply(window.getScene());
         }
-        if (window instanceof javafx.stage.PopupWindow popup) {
-            boolean[] adjusting = {false};
-            InvalidationListener keepInside = o -> {
-                // Moving the popup fires these listeners again: ignore our own moves.
-                if (isKeepPopupsInWindow() && popup.isShowing() && !adjusting[0]) {
-                    adjusting[0] = true;
-                    try {
-                        keepInsideOwnerWindow(popup);
-                    } finally {
-                        adjusting[0] = false;
-                    }
-                }
-            };
-            popup.addEventHandler(javafx.stage.WindowEvent.WINDOW_SHOWN, e -> keepInside.invalidated(null));
-            popup.yProperty().addListener(keepInside);
-            popup.heightProperty().addListener(keepInside);
-            popup.xProperty().addListener(keepInside);
-            popup.widthProperty().addListener(keepInside);
-            keepInside.invalidated(null);
-        }
         window.sceneProperty().addListener((obs, old, scene) -> {
             if (scene != null && windowListener != null) {
                 apply(scene);
             }
         });
-    }
-
-    /** Whether the application runs in a Wayland session (directly or through XWayland). */
-    private static boolean isWaylandSession() {
-        return System.getenv("WAYLAND_DISPLAY") != null || "wayland".equalsIgnoreCase(System.getenv("XDG_SESSION_TYPE"));
-    }
-
-    /**
-     * Moves a popup that extends outside its application window back inside: above its owner
-     * node when it does not fit below, and shifted horizontally if needed. On some Wayland
-     * compositors (e.g. COSMIC, through XWayland) the parts of a popup outside its parent window
-     * do not receive clicks: they go to the window behind, which then comes to the front.
-     */
-    private static void keepInsideOwnerWindow(javafx.stage.PopupWindow popup) {
-        Window owner = popup.getOwnerWindow();
-        while (owner instanceof javafx.stage.PopupWindow p && p.getOwnerWindow() != null) {
-            owner = p.getOwnerWindow();
-        }
-        if (owner == null || owner instanceof javafx.stage.PopupWindow || owner.getScene() == null) {
-            return;
-        }
-        javafx.scene.Scene scene = owner.getScene();
-        double top = owner.getY() + scene.getY();
-        double left = owner.getX() + scene.getX();
-        double bottom = top + scene.getHeight();
-        double right = left + scene.getWidth();
-        double x = popup.getX();
-        double y = popup.getY();
-        double w = popup.getWidth();
-        double h = popup.getHeight();
-        if (Double.isNaN(w) || Double.isNaN(h) || w <= 0 || h <= 0 || h > scene.getHeight()) {
-            return;
-        }
-        double newY = y;
-        if (y + h > bottom) {
-            javafx.scene.Node anchor = popup.getOwnerNode();
-            javafx.geometry.Bounds b = anchor == null ? null : anchor.localToScreen(anchor.getLayoutBounds());
-            newY = b != null && b.getMinY() - h >= top ? b.getMinY() - h : bottom - h;
-        }
-        newY = Math.max(top, newY);
-        double newX = Math.max(left, Math.min(x, right - w));
-        if (Math.abs(newY - y) > 0.5) {
-            popup.setY(newY);
-        }
-        if (Math.abs(newX - x) > 0.5 && w <= scene.getWidth()) {
-            popup.setX(newX);
-        }
     }
 
     private void rebuild() {
@@ -501,24 +433,6 @@ public final class MaterialTheme {
 
     public void setHarmonizeCustomColors(boolean value) {
         harmonizeCustomColors.set(value);
-    }
-
-    /**
-     * Keeps popups (menus, dropdowns, the color picker palette...) inside their application
-     * window. On by default in Wayland sessions, where some compositors do not deliver clicks to
-     * the parts of a popup outside its window; off elsewhere. Only applies to windows themed with
-     * {@link #applyGlobally()}.
-     */
-    public BooleanProperty keepPopupsInWindowProperty() {
-        return keepPopupsInWindow;
-    }
-
-    public boolean isKeepPopupsInWindow() {
-        return keepPopupsInWindow.get();
-    }
-
-    public void setKeepPopupsInWindow(boolean value) {
-        keepPopupsInWindow.set(value);
     }
 
     /** The current color scheme. */

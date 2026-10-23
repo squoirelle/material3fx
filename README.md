@@ -225,10 +225,10 @@ Other diagnostics: `-Pprism=sw` (software renderer), `-Pdirtyopts=false`.
 **Clicks on a menu or dropdown go to the window behind it (Linux, Wayland).**
 On some Wayland compositors (seen on COSMIC, through XWayland), the parts of a JavaFX popup
 that extend outside its window do not receive clicks: the click reaches the window behind,
-which comes to the front. Plain JavaFX behaves the same. With `applyGlobally()`, Material3FX keeps
-popups inside their window on Wayland sessions: a menu or dropdown that would extend below the
-window opens above its control, or is shifted to fit. `theme.setKeepPopupsInWindow(false)`
-turns it off; it is off by default outside Wayland.
+which comes to the front. This is a JavaFX / XWayland limitation that every JavaFX application
+has there, and Material3FX does not work around it: JavaFX positions its popups itself, and
+moving them from outside fights that positioning. Leave room below controls that open popups
+near the bottom of a window, or make the window taller.
 
 ## Releasing
 
