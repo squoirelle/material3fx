@@ -80,7 +80,10 @@ A Java port of Material's color science: CAM16, HCT, tonal palettes.
 ### 2. Theme (`io.github.squoirelle.material3fx`)
 `MaterialTheme` turns a scheme into CSS looked-up colors and applies them with the stylesheet.
 Every property can change at runtime: seed, mode (light / dark / system), variant, contrast,
-density, font family and custom colors.
+density, font family and custom colors. `setUseSystemAccent(true)` takes the seed from the OS
+accent color, following it live (falls back to the seed when the OS has none), and
+`setHarmonizeCustomColors(false)` keeps custom colors exactly as given instead of shifting their
+hue towards the primary.
 
 In your own CSS, use the role names, plus translucent variants for overlays:
 
