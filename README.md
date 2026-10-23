@@ -175,6 +175,14 @@ java -Dprism.vsync=false ...          # and/or the environment variable __GL_SYN
 The demo does this by default on Linux (`./gradlew :m3fx-demo:run -Pvsync=true` to compare).
 Other diagnostics: `-Pprism=sw` (software renderer), `-Pdirtyopts=false`.
 
+**Clicks on a menu or dropdown go to the window behind it (Linux, Wayland).**
+On some Wayland compositors (seen on COSMIC, through XWayland), the parts of a JavaFX popup
+that extend outside its window do not receive clicks: the click reaches the window behind,
+which comes to the front. Plain JavaFX behaves the same. With `applyGlobally()`, m3fx keeps
+popups inside their window on Wayland sessions: a menu or dropdown that would extend below the
+window opens above its control, or is shifted to fit. `theme.setKeepPopupsInWindow(false)`
+turns it off; it is off by default outside Wayland.
+
 ## Project layout
 
 - `m3fx-core`: the library (JPMS module `dev.m3fx`)
