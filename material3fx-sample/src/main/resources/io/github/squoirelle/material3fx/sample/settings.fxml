@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import io.github.squoirelle.material3fx.controls.Card?>
+<?import io.github.squoirelle.material3fx.controls.Divider?>
+<?import io.github.squoirelle.material3fx.controls.FormPane?>
+<?import io.github.squoirelle.material3fx.controls.FormRow?>
+<?import io.github.squoirelle.material3fx.controls.SegmentedButton?>
+<?import io.github.squoirelle.material3fx.controls.Switch?>
+<?import javafx.scene.control.CheckBox?>
+<?import javafx.scene.control.ColorPicker?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.RadioButton?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.Slider?>
+<?import javafx.scene.control.ToggleButton?>
+<?import javafx.scene.control.ToggleGroup?>
+<?import javafx.scene.layout.VBox?>
+
+<ScrollPane fitToWidth="true" hbarPolicy="NEVER"
+            xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="io.github.squoirelle.material3fx.sample.SettingsController">
+    <VBox styleClass="page, form-page">
+        <Label text="Settings" styleClass="headline-small"/>
+
+        <Card variant="OUTLINED">
+            <VBox styleClass="panel-content">
+                <Label text="Appearance" styleClass="title-medium"/>
+                <FormPane>
+                    <FormRow label="Theme">
+                        <SegmentedButton fx:id="mode">
+                            <ToggleButton text="Light" userData="LIGHT"/>
+                            <ToggleButton text="Dark" userData="DARK"/>
+                            <ToggleButton text="System" userData="SYSTEM"/>
+                        </SegmentedButton>
+                    </FormRow>
+                    <FormRow label="Accent color">
+                        <ColorPicker fx:id="seed"/>
+                    </FormRow>
+                    <FormRow>
+                        <Switch fx:id="systemAccent" text="Use the system accent color"/>
+                    </FormRow>
+                    <FormRow label="Contrast">
+                        <SegmentedButton fx:id="contrast">
+                            <ToggleButton text="Standard" userData="0"/>
+                            <ToggleButton text="Medium" userData="0.5"/>
+                            <ToggleButton text="High" userData="1"/>
+                        </SegmentedButton>
+                    </FormRow>
+                    <FormRow label="Density">
+                        <ComboBox fx:id="density"/>
+                    </FormRow>
+                </FormPane>
+            </VBox>
+        </Card>
+
+        <Card variant="OUTLINED">
+            <VBox styleClass="panel-content">
+                <Label text="Inventory" styleClass="title-medium"/>
+                <fx:define>
+                    <ToggleGroup fx:id="countGroup"/>
+                </fx:define>
+                <Label text="Stock counts" styleClass="label-large"/>
+                <RadioButton text="Weekly" toggleGroup="$countGroup" selected="true"/>
+                <RadioButton text="Monthly" toggleGroup="$countGroup"/>
+                <RadioButton text="Quarterly" toggleGroup="$countGroup"/>
+                <Divider/>
+                <CheckBox text="Confirm before deleting items" selected="true"/>
+                <CheckBox text="Include out of stock items in exports" selected="true"/>
+                <Switch text="Email a daily low stock report"/>
+                <Label text="Low stock threshold (% of reorder level)" styleClass="label-large"/>
+                <Slider min="50" max="150" value="100" majorTickUnit="25" showTickMarks="true" showTickLabels="true"/>
+            </VBox>
+        </Card>
+    </VBox>
+</ScrollPane>

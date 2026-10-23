@@ -55,13 +55,45 @@ module my.app {
 }
 ```
 
-## Run the demo
+## Run the demo and the sample app
 
 ```
 ./gradlew :material3fx-demo:run           # the showcase app, with a live theme editor
 ./gradlew :material3fx-demo:screenshots   # renders every page, light and dark, to material3fx-demo/build/screenshots
+./gradlew :material3fx-sample:run         # Stockroom, a small inventory app written in FXML
 ./gradlew :material3fx:test
 ```
+
+## Using FXML
+
+Every control works in FXML (the helpers `Buttons`, `Tooltips`, `Snackbar.make` and the dialog
+launchers are for code): no-arg or `@NamedArg` constructors, and a default property for
+nested children (`content` for cards and scaffolds, `items` for navigation and carousels,
+`actions` for app bars and banners, `field` for form rows, `buttons` for segmented buttons).
+The sample app, `material3fx-sample`, builds all its screens this way:
+
+```xml
+<AdaptiveScaffold navigationTitle="Stockroom">
+    <navigationItems>
+        <NavigationItem text="Inventory" icon="inventory_2"/>
+        <NavigationItem kind="DIVIDER"/>
+        <NavigationItem text="Settings" icon="settings"/>
+    </navigationItems>
+    <StackPane fx:id="pageHost"/>
+</AdaptiveScaffold>
+
+<FormPane fx:id="form">
+    <FormRow label="Name" required="true">
+        <MaterialTextField fx:id="name" maxLength="40"/>
+    </FormRow>
+    <ValidationSummary form="$form"/>
+</FormPane>
+```
+
+The sample shows the usual pieces of a desktop application: a menu bar with accelerators, pages
+loaded from FXML with a controller factory, background loading with `Task` and progress
+indicators, a filterable table with a context menu, a validated form, dialogs and snackbars,
+and settings bound to the theme.
 
 ## What's in it
 
@@ -245,6 +277,7 @@ versions, plus Java 21 + JavaFX 23 and Java 25 + JavaFX 25, and builds an unsign
 
 - `material3fx`: the library (JPMS module `io.github.squoirelle.material3fx`)
 - `material3fx-demo`: the showcase app and the screenshot renderer
+- `material3fx-sample`: Stockroom, a sample application built with FXML
 
 ## License
 

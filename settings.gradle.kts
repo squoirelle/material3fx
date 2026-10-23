@@ -5,3 +5,4 @@ plugins {
 rootProject.name = "material3fx"
 include("material3fx")
 include("material3fx-demo")
+include("material3fx-sample")

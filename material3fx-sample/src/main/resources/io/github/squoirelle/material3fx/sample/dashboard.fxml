@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import io.github.squoirelle.material3fx.controls.Banner?>
+<?import io.github.squoirelle.material3fx.controls.Card?>
+<?import io.github.squoirelle.material3fx.controls.Divider?>
+<?import io.github.squoirelle.material3fx.controls.Icon?>
+<?import io.github.squoirelle.material3fx.controls.ListItem?>
+<?import io.github.squoirelle.material3fx.controls.StatusLight?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ProgressBar?>
+<?import javafx.scene.control.ProgressIndicator?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.layout.FlowPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.VBox?>
+
+<ScrollPane fitToWidth="true" hbarPolicy="NEVER"
+            xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="io.github.squoirelle.material3fx.sample.DashboardController">
+    <VBox styleClass="page">
+        <HBox styleClass="page-header">
+            <VBox HBox.hgrow="ALWAYS">
+                <Label text="Good morning" styleClass="headline-small"/>
+                <Label fx:id="subtitle" text="Loading the inventory..." styleClass="body-medium, on-surface-variant"/>
+            </VBox>
+            <Button fx:id="refreshButton" text="Refresh" styleClass="tonal" onAction="#refresh">
+                <graphic><Icon name="refresh"/></graphic>
+            </Button>
+        </HBox>
+
+        <!-- Shown only when items need reordering. The nested button is one of the banner's actions. -->
+        <Banner fx:id="lowStockBanner" severity="WARNING" icon="inventory" showing="false">
+            <Button text="Review" styleClass="text" onAction="#reviewLowStock"/>
+        </Banner>
+
+        <FlowPane styleClass="stat-cards">
+            <Card variant="FILLED" styleClass="stat-card">
+                <StackPane>
+                    <VBox fx:id="totalBox">
+                        <Label text="Items" styleClass="label-large, on-surface-variant"/>
+                        <Label fx:id="totalLabel" styleClass="display-small"/>
+                    </VBox>
+                    <ProgressIndicator fx:id="totalLoading" styleClass="small"/>
+                </StackPane>
+            </Card>
+            <Card variant="FILLED" styleClass="stat-card">
+                <StackPane>
+                    <VBox fx:id="unitsBox">
+                        <Label text="Units in stock" styleClass="label-large, on-surface-variant"/>
+                        <Label fx:id="unitsLabel" styleClass="display-small"/>
+                    </VBox>
+                    <ProgressIndicator fx:id="unitsLoading" styleClass="small"/>
+                </StackPane>
+            </Card>
+            <Card variant="FILLED" styleClass="stat-card">
+                <StackPane>
+                    <VBox fx:id="lowBox">
+                        <Label text="To reorder" styleClass="label-large, on-surface-variant"/>
+                        <Label fx:id="lowLabel" styleClass="display-small"/>
+                    </VBox>
+                    <ProgressIndicator fx:id="lowLoading" styleClass="small"/>
+                </StackPane>
+            </Card>
+        </FlowPane>
+
+        <FlowPane styleClass="panels">
+            <Card variant="OUTLINED" styleClass="panel">
+                <VBox styleClass="panel-content">
+                    <Label text="Warehouse capacity" styleClass="title-medium"/>
+                    <ProgressBar fx:id="capacityBar" maxWidth="Infinity"/>
+                    <Label fx:id="capacityLabel" styleClass="body-small, on-surface-variant"/>
+                    <Divider/>
+                    <Label text="Services" styleClass="title-medium"/>
+                    <StatusLight status="SUCCESS" text="Inventory sync"/>
+                    <StatusLight status="WARNING" text="Label printer: paper low"/>
+                    <StatusLight status="ERROR" text="Carrier API: unreachable" pulsing="true"/>
+                </VBox>
+            </Card>
+            <Card variant="OUTLINED" styleClass="panel">
+                <VBox styleClass="panel-content">
+                    <Label text="Recent activity" styleClass="title-medium"/>
+                    <ListItem headline="Received 40 safety gloves" supportingText="Aisle C, from Northwind" leadingIcon="move_to_inbox" trailingText="9:42"/>
+                    <ListItem headline="Shipped order #1042" supportingText="12 items, carrier pickup" leadingIcon="local_shipping" trailingText="9:15"/>
+                    <ListItem headline="Stock count, aisle A" supportingText="2 differences corrected" leadingIcon="fact_check" trailingText="Yesterday"/>
+                    <Region VBox.vgrow="ALWAYS"/>
+                </VBox>
+            </Card>
+        </FlowPane>
+    </VBox>
+</ScrollPane>

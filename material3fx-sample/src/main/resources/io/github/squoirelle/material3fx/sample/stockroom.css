@@ -1,0 +1,60 @@
+/* Stockroom's own layout. Colors and type come from the Material3FX theme (-md-sys-color-*). */
+
+.page {
+    -fx-padding: 24;
+    -fx-spacing: 16;
+}
+
+.page.fill-page {
+    -fx-fill-width: true;
+}
+
+.page.form-page {
+    -fx-max-width: 880;
+}
+
+.page-header {
+    -fx-alignment: center-left;
+    -fx-spacing: 16;
+}
+
+.stat-cards,
+.panels {
+    -fx-hgap: 16;
+    -fx-vgap: 16;
+}
+
+.stat-card {
+    -fx-pref-width: 220;
+    -fx-min-height: 112;
+}
+
+.stat-card > * {
+    -fx-alignment: center-left;
+}
+
+.panel {
+    -fx-pref-width: 420;
+}
+
+.panel-content {
+    -fx-spacing: 12;
+}
+
+.filters {
+    -fx-hgap: 8;
+    -fx-vgap: 8;
+    -fx-alignment: center-left;
+}
+
+.loading-overlay {
+    -fx-alignment: center;
+    -fx-spacing: 16;
+    -fx-background-color: -md-sys-color-surface;
+    -fx-background-radius: 12;
+}
+
+.form-actions {
+    -fx-spacing: 8;
+    -fx-alignment: center-right;
+}

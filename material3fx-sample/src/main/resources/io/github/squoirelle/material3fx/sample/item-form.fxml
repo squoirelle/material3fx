@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import io.github.squoirelle.material3fx.controls.FormPane?>
+<?import io.github.squoirelle.material3fx.controls.FormRow?>
+<?import io.github.squoirelle.material3fx.controls.MaterialTextField?>
+<?import io.github.squoirelle.material3fx.controls.NumberField?>
+<?import io.github.squoirelle.material3fx.controls.SegmentedButton?>
+<?import io.github.squoirelle.material3fx.controls.Switch?>
+<?import io.github.squoirelle.material3fx.controls.ValidationSummary?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ChoiceBox?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.DatePicker?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ProgressIndicator?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.TextArea?>
+<?import javafx.scene.control.ToggleButton?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.VBox?>
+
+<ScrollPane fitToWidth="true" hbarPolicy="NEVER"
+            xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="io.github.squoirelle.material3fx.sample.ItemFormController">
+    <VBox styleClass="page, form-page">
+        <Label fx:id="title" text="New item" styleClass="headline-small"/>
+        <Label text="Fields marked with * are required." styleClass="body-medium, on-surface-variant"/>
+
+        <!-- Labels sit beside the fields on wide windows and above them on narrow ones. -->
+        <FormPane fx:id="form">
+            <Label text="Item" styleClass="form-section-title"/>
+            <FormRow label="Name" required="true">
+                <MaterialTextField fx:id="name" promptText="e.g. Cordless drill" maxLength="40"/>
+            </FormRow>
+            <FormRow label="SKU" required="true">
+                <MaterialTextField fx:id="sku" promptText="e.g. TOO-007" maxLength="12"/>
+            </FormRow>
+            <FormRow label="Category">
+                <ComboBox fx:id="category" maxWidth="Infinity"/>
+            </FormRow>
+            <FormRow label="Unit">
+                <SegmentedButton fx:id="unit">
+                    <ToggleButton text="Pieces" userData="Pieces" selected="true"/>
+                    <ToggleButton text="Boxes" userData="Boxes"/>
+                    <ToggleButton text="Pallets" userData="Pallets"/>
+                </SegmentedButton>
+            </FormRow>
+
+            <Label text="Stock" styleClass="form-section-title"/>
+            <FormRow label="Quantity">
+                <NumberField fx:id="quantity" min="0" max="100000" step="1" decimals="0"/>
+            </FormRow>
+            <FormRow label="Reorder level">
+                <NumberField fx:id="reorderLevel" min="0" max="10000" step="5" decimals="0"/>
+            </FormRow>
+            <FormRow label="Location">
+                <ChoiceBox fx:id="locationChoice" maxWidth="Infinity"/>
+            </FormRow>
+            <FormRow label="Received">
+                <DatePicker fx:id="received" maxWidth="Infinity"/>
+            </FormRow>
+            <FormRow label="Notifications">
+                <Switch fx:id="notify" text="Warn me when this item runs low" selected="true"/>
+            </FormRow>
+            <FormRow label="Notes">
+                <TextArea fx:id="notes" prefRowCount="3" wrapText="true" promptText="Supplier, storage instructions..."/>
+            </FormRow>
+
+            <ValidationSummary form="$form"/>
+        </FormPane>
+
+        <HBox styleClass="form-actions">
+            <Region HBox.hgrow="ALWAYS"/>
+            <Button text="Reset" styleClass="text" onAction="#reset"/>
+            <Button fx:id="saveButton" text="Save" defaultButton="true" onAction="#save">
+                <graphic><ProgressIndicator fx:id="saving" styleClass="small" visible="false" managed="false"/></graphic>
+            </Button>
+        </HBox>
+    </VBox>
+</ScrollPane>

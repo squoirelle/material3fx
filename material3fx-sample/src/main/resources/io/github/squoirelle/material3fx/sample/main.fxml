@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import io.github.squoirelle.material3fx.controls.AdaptiveScaffold?>
+<?import io.github.squoirelle.material3fx.controls.IconButton?>
+<?import io.github.squoirelle.material3fx.controls.MenuHeader?>
+<?import io.github.squoirelle.material3fx.controls.NavigationItem?>
+<?import io.github.squoirelle.material3fx.controls.TopAppBar?>
+<?import javafx.scene.control.Menu?>
+<?import javafx.scene.control.MenuBar?>
+<?import javafx.scene.control.MenuItem?>
+<?import javafx.scene.control.RadioMenuItem?>
+<?import javafx.scene.control.SeparatorMenuItem?>
+<?import javafx.scene.control.ToggleGroup?>
+<?import javafx.scene.control.Tooltip?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.VBox?>
+
+<!-- The window: navigation (bar, rail or drawer depending on the width), app bars, and the page. -->
+<AdaptiveScaffold fx:id="scaffold" navigationTitle="Stockroom"
+                  xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml/1"
+                  fx:controller="io.github.squoirelle.material3fx.sample.MainController">
+    <fx:define>
+        <ToggleGroup fx:id="modeGroup"/>
+        <ToggleGroup fx:id="densityGroup"/>
+    </fx:define>
+
+    <topBar>
+        <VBox>
+            <MenuBar fx:id="menuBar">
+                <Menu text="_File">
+                    <MenuItem text="_New item" accelerator="Shortcut+N" onAction="#newItem"/>
+                    <MenuItem text="_Refresh" accelerator="F5" onAction="#refresh"/>
+                    <SeparatorMenuItem/>
+                    <MenuItem text="_Quit" accelerator="Shortcut+Q" onAction="#quit"/>
+                </Menu>
+                <Menu text="_Go">
+                    <MenuItem text="_Dashboard" accelerator="Shortcut+1" onAction="#goDashboard"/>
+                    <MenuItem text="_Inventory" accelerator="Shortcut+2" onAction="#goInventory"/>
+                    <MenuItem text="_Settings" accelerator="Shortcut+COMMA" onAction="#goSettings"/>
+                </Menu>
+                <Menu text="_View">
+                    <MenuHeader title="Theme"/>
+                    <RadioMenuItem text="Light" userData="LIGHT" toggleGroup="$modeGroup"/>
+                    <RadioMenuItem text="Dark" userData="DARK" toggleGroup="$modeGroup"/>
+                    <RadioMenuItem text="Follow the system" userData="SYSTEM" toggleGroup="$modeGroup"/>
+                    <SeparatorMenuItem/>
+                    <MenuHeader title="Density"/>
+                    <RadioMenuItem text="Default" userData="DEFAULT" toggleGroup="$densityGroup"/>
+                    <RadioMenuItem text="Comfortable" userData="COMFORTABLE" toggleGroup="$densityGroup"/>
+                    <RadioMenuItem text="Compact" userData="COMPACT" toggleGroup="$densityGroup"/>
+                    <RadioMenuItem text="Dense" userData="DENSE" toggleGroup="$densityGroup"/>
+                </Menu>
+                <Menu text="_Help">
+                    <MenuItem text="_About Stockroom" onAction="#about"/>
+                </Menu>
+            </MenuBar>
+            <TopAppBar fx:id="topBar" title="Dashboard">
+                <IconButton iconName="refresh" onAction="#refresh">
+                    <tooltip><Tooltip text="Refresh (F5)"/></tooltip>
+                </IconButton>
+                <IconButton iconName="add" onAction="#newItem">
+                    <tooltip><Tooltip text="New item"/></tooltip>
+                </IconButton>
+            </TopAppBar>
+        </VBox>
+    </topBar>
+
+    <navigationItems>
+        <NavigationItem fx:id="dashboardNav" text="Dashboard" icon="dashboard"/>
+        <NavigationItem fx:id="inventoryNav" text="Inventory" icon="inventory_2"/>
+        <NavigationItem fx:id="itemFormNav" text="New item" icon="add_box"/>
+        <NavigationItem kind="DIVIDER"/>
+        <NavigationItem fx:id="settingsNav" text="Settings" icon="settings"/>
+    </navigationItems>
+
+    <!-- The scaffold's content: the current page goes here. -->
+    <StackPane fx:id="pageHost"/>
+</AdaptiveScaffold>
