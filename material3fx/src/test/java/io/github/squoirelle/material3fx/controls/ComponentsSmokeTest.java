@@ -83,6 +83,9 @@ class ComponentsSmokeTest {
                     theme.setVariant(Variant.values()[density.ordinal() % Variant.values().length]);
                     VBox root = new VBox(8);
                     root.getChildren().setAll(allComponents());
+                    // Window managers may shrink the 8000px window to the screen (macOS does):
+                    // keep every component at its preferred height regardless.
+                    root.setMinHeight(Region.USE_PREF_SIZE);
                     Scene scene = new Scene(new StackPane(root), 1200, 8000);
                     theme.apply(scene);
                     Stage stage = new Stage();

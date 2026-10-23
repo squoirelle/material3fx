@@ -13,6 +13,10 @@ jobs:
   test:
     name: ${{ matrix.os }} / JDK ${{ matrix.jdk }} / JavaFX ${{ matrix.javafx }}
     runs-on: ${{ matrix.os }}
+    defaults:
+      run:
+        # PowerShell, the Windows default, splits -Pjavafx=21.0.13 at the dots.
+        shell: bash
     strategy:
       fail-fast: false
       matrix:
