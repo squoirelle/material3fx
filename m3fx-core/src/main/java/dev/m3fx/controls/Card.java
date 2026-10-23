@@ -32,7 +32,13 @@ public class Card extends Control {
     private final ObjectProperty<EventHandler<ActionEvent>> onAction = new SimpleObjectProperty<>(this, "onAction") {
         @Override
         protected void invalidated() {
-            setEventHandler(ActionEvent.ACTION, get());
+            EventHandler<ActionEvent> handler = get();
+            // Only actions fired at this control: not those bubbling up from buttons or switches inside.
+            setEventHandler(ActionEvent.ACTION, handler == null ? null : e -> {
+                if (e.getTarget() == e.getSource()) {
+                    handler.handle(e);
+                }
+            });
             boolean clickable = get() != null;
             pseudoClassStateChanged(CLICKABLE, clickable);
             setFocusTraversable(clickable);

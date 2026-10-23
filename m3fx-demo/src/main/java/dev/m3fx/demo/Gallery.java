@@ -34,7 +34,10 @@ public final class Gallery {
                 new Page("text-fields", "Text fields", "text_fields", InputsPage::textFields, 640),
                 new Page("lists", "Lists", "list", InputsPage::lists, 720),
                 new Page("pickers", "Pickers", "schedule", InputsPage::pickers, 820),
-                new Page("overlays", "Overlays", "layers", OverlaysPage::page, 1100)
+                new Page("overlays", "Overlays", "layers", OverlaysPage::page, 1100),
+                new Page("data-entry", "Data entry", "edit_note", DataEntryPage::page, 1000),
+                new Page("feedback", "Status and feedback", "notifications", FeedbackPage::page, 760),
+                new Page("adaptive", "Adaptive layout", "devices", AdaptivePage::page, 720)
         );
     }
 

@@ -49,6 +49,24 @@ In your own CSS, use the role names, plus translucent variants for overlays:
 .status-ok { -fx-text-fill: -md-custom-success; }   /* theme.getCustomColors().put("success", ...) */
 ```
 
+The theme also generates semantic **success** and **warning** roles (`-md-sys-color-success`,
+`-md-sys-color-warning-container`...), harmonized with the seed, used by `Banner` and `StatusLight`.
+
+### Adaptive layout
+
+`AdaptiveScaffold` follows Material's window size classes (compact &lt; 600, medium &lt; 840, expanded
+&lt; 1200, large &lt; 1600, extra-large): it shows the destinations in a navigation bar, rail or drawer
+(or a modal drawer when there are too many for a bar or rail), and list-detail content in one or
+two panes. All variants share one selection.
+
+```java
+AdaptiveScaffold scaffold = new AdaptiveScaffold();
+scaffold.getNavigationItems().addAll(new NavigationItem("Inbox", "inbox"), new NavigationItem("Map", "map"));
+topBar.setNavigationIcon(scaffold.getNavigationButton());   // shown only when a modal drawer is used
+scaffold.setListPane(messages);
+scaffold.setDetailPane(message);
+```
+
 You also get the type scale (`Typography.TITLE_LARGE.apply(label)` or the `title-large` style
 class), elevation classes (`md-elevation-1` … `5`), surface classes, and motion tokens (`Motion`).
 
@@ -88,10 +106,17 @@ equivalent, the component *is* that control:
 | `NavigationBar`, `NavigationRail`, `NavigationDrawer` (standard + modal, headlines, dividers, badges) | like `TabPane`: `SingleSelectionModel<NavigationItem>` |
 | `SegmentedButton` (single / multi) | a `Control` holding `ToggleButton`s and a `ToggleGroup` |
 | `TimePicker` (dial, 12h / 24h, `showDialog`) | like `DatePicker`: `ObjectProperty<LocalTime> value` |
+| `NumberField` (min / max / step, units, locale-aware) | a `MaterialTextField` with a `Double` `value` |
+| `DateRangePicker` + `DateRangeCalendar` + `DateRangePickerDialog` | like `DatePicker`: `ObjectProperty<DateRange> value` |
+| `RangeSlider` | like `Slider`, with `lowValue` / `highValue` |
+| `SplitButton` (filled, tonal, outlined, elevated) | `SplitMenuButton`: items, `onAction`, `show()` |
+| `MenuHeader` | a `CustomMenuItem`: section titles in any menu |
+| `FormPane` + `FormRow` (labels beside or above fields), `ValidationSummary` | a layout pane like `GridPane`; fields implement `Validatable` |
+| `AdaptiveScaffold` (size classes, bar / rail / drawer, list-detail panes) | a `Scaffold` |
 | `Divider` | `Separator` |
 | `IconButton` (4 variants, toggle), `Fab` (3 sizes, 4 colors, extended), `Buttons` factories | `Button` |
 | `Badge` | `Label` |
-| `Card`, `ListItem`, `Avatar`, `TopAppBar`, `BottomAppBar`, `Carousel`, `Snackbar`, `BottomSheet`, `SideSheet` | `Control` + `Skin` |
+| `Card`, `ListItem`, `Avatar`, `TopAppBar`, `BottomAppBar`, `Carousel`, `Snackbar`, `BottomSheet`, `SideSheet`, `Banner`, `StatusLight` | `Control` + `Skin` |
 | `Scaffold` | a layout pane, like `BorderPane`; also hosts the overlays |
 | `Icon` (2,000+ Material icons), `StateLayer`, `Overlay`, `Tooltips`, `DatePickerDialog` | building blocks and helpers |
 
@@ -126,6 +151,10 @@ callsign.setOnAction(e -> submit());     // it is a TextField
 | Carousel | Left / Right, Home / End |
 | Dialogs, sheets, modal drawer | Escape dismisses; Tab and Shift+Tab stay inside the overlay (focus trap) |
 | Search bar | Down opens / enters suggestions, Escape closes them |
+| Range slider | Tab between the two thumbs; arrows, Page Up / Down, Home / End |
+| Number field | Up / Down one step, Page Up / Down ten steps; Enter commits |
+| Date range calendar | arrows by day / week, Page Up / Down by month, Home / End, Enter selects start then end |
+| Date range picker, split button | Enter / Space / Alt+Down open the dialog or menu |
 
 Components report accessible roles and states to screen readers: switches and filter chips are
 toggle buttons, navigation destinations are selectable tab items, clickable cards and list items

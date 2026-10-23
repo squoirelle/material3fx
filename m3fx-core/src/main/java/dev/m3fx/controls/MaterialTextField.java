@@ -36,7 +36,7 @@ import java.util.function.Function;
  * MaterialTextField password = MaterialTextField.password("Password");
  * }</pre>
  */
-public class MaterialTextField extends TextField {
+public class MaterialTextField extends TextField implements Validatable {
 
     public enum Variant { FILLED, OUTLINED }
 
@@ -175,7 +175,13 @@ public class MaterialTextField extends TextField {
         return super.queryAccessibleAttribute(attribute, parameters);
     }
 
+    @Override
+    public String getValidationLabel() {
+        return getLabel();
+    }
+
     /** Runs the validator now, and marks the field as touched so it re-validates on each change. */
+    @Override
     public boolean validate() {
         touched = true;
         Function<String, String> v = getValidator();
@@ -328,6 +334,7 @@ public class MaterialTextField extends TextField {
         return errorMessage.getReadOnlyProperty();
     }
 
+    @Override
     public final String getErrorMessage() {
         return errorMessage.get();
     }

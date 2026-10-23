@@ -2,10 +2,10 @@ package dev.m3fx.demo;
 
 import dev.m3fx.MaterialTheme;
 import dev.m3fx.ThemeMode;
+import dev.m3fx.controls.AdaptiveScaffold;
 import dev.m3fx.controls.IconButton;
-import dev.m3fx.controls.NavigationDrawer;
+import dev.m3fx.controls.MaterialDialog;
 import dev.m3fx.controls.NavigationItem;
-import dev.m3fx.controls.Scaffold;
 import dev.m3fx.controls.SideSheet;
 import dev.m3fx.controls.TopAppBar;
 import javafx.application.Application;
@@ -16,24 +16,21 @@ import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 /**
- * The m3fx showcase: every component on its own page, with a live theme editor.
- * Run with {@code ./gradlew :m3fx-demo:run}.
+ * The m3fx showcase: every component on its own page, with a live theme editor. The app itself is
+ * an {@link AdaptiveScaffold}: a standard drawer on large windows, a modal drawer behind a menu
+ * button below. Run with {@code ./gradlew :m3fx-demo:run}.
  */
 public class DemoApp extends Application {
-
-    private static final double WIDE = 1000;
 
     private final MaterialTheme theme = new MaterialTheme(MaterialTheme.BASELINE);
     private final Map<NavigationItem, Gallery.Page> pages = new HashMap<>();
     private final Map<Gallery.Page, Node> contents = new HashMap<>();
     private final ScrollPane scroll = new ScrollPane();
     private final TopAppBar topBar = new TopAppBar();
-    private final NavigationDrawer drawer = new NavigationDrawer();
-    private final Scaffold scaffold = new Scaffold(scroll);
+    private final AdaptiveScaffold scaffold = new AdaptiveScaffold();
     private SideSheet themeSheet;
 
     @Override
@@ -42,64 +39,42 @@ public class DemoApp extends Application {
         theme.getCustomColors().put("warning", Color.web("#F9A825"));
         theme.applyGlobally();
 
-        List<Gallery.Page> all = Gallery.pages();
-        drawer.setTitle("m3fx");
-        for (Gallery.Page page : all) {
+        scaffold.setNavigationTitle("m3fx");
+        for (Gallery.Page page : Gallery.pages()) {
+            switch (page.id()) {
+                case "theme" -> scaffold.getNavigationItems().add(NavigationItem.headline("Theme"));
+                case "standard-buttons" -> scaffold.getNavigationItems().add(NavigationItem.headline("Standard JavaFX controls"));
+                case "buttons" -> scaffold.getNavigationItems().add(NavigationItem.headline("m3fx components"));
+                default -> { }
+            }
             NavigationItem item = new NavigationItem(page.title(), page.icon());
             pages.put(item, page);
-            drawer.getItems().add(item);
-            if (page.id().equals("theme")) {
-                drawer.getItems().add(drawer.getItems().size() - 1, NavigationItem.headline("Theme"));
-            } else if (page.id().equals("standard-buttons")) {
-                drawer.getItems().add(drawer.getItems().size() - 1, NavigationItem.headline("Standard JavaFX controls"));
-            } else if (page.id().equals("buttons")) {
-                drawer.getItems().add(drawer.getItems().size() - 1, NavigationItem.headline("m3fx components"));
-            }
+            scaffold.getNavigationItems().add(item);
         }
-        drawer.selectedItemProperty().addListener((obs, old, item) -> show(item));
+        scaffold.getNavigationDrawer().setPrefWidth(300);
+        scaffold.selectedItemProperty().addListener((obs, old, item) -> show(item));
 
         scroll.setFitToWidth(true);
         scroll.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
+        scaffold.setContent(scroll);
         topBar.bindScroll(scroll);
+        topBar.setNavigationIcon(scaffold.getNavigationButton());
         IconButton darkMode = topBar.addAction("dark_mode", "Toggle dark mode");
         darkMode.setOnAction(e -> theme.setMode(theme.isDark() ? ThemeMode.LIGHT : ThemeMode.DARK));
         theme.darkProperty().addListener((obs, old, dark) -> darkMode.setIconName(dark ? "light_mode" : "dark_mode"));
         IconButton palette = topBar.addAction("palette", "Theme");
-        palette.setOnAction(e -> {
-            if (themeSheet == null) {
-                themeSheet = ThemeEditor.create(theme);
-            }
-            themeSheet.show(palette);
-        });
-        topBar.addAction("info", "About").setOnAction(e -> dev.m3fx.controls.MaterialDialog.alert(scaffold,
+        palette.setOnAction(e -> openThemeSheet());
+        topBar.addAction("info", "About").setOnAction(e -> MaterialDialog.alert(scaffold,
                 "m3fx", "Material Design 3 for JavaFX. Every page uses the same theme: change it from the palette button."));
-
         scaffold.setTopBar(topBar);
-        Scene scene = new Scene(scaffold, 1360, 900);
-        scene.widthProperty().addListener((obs, old, width) -> updateLayout(width.doubleValue()));
-        updateLayout(scene.getWidth());
-        // The drawer selects its first destination as soon as items are added.
-        show(drawer.getSelectedItem());
 
+        Scene scene = new Scene(scaffold, 1360, 900);
+        show(scaffold.getSelectedItem());
         stage.setTitle("m3fx - Material Design 3 for JavaFX");
         // Themed before setScene: the window may already be showing (e.g. in the screenshot runner).
         theme.apply(scene);
         stage.setScene(scene);
         stage.show();
-    }
-
-    /** Standard drawer on wide windows; a menu button opening it as a modal drawer otherwise. */
-    private void updateLayout(double width) {
-        boolean wide = width >= WIDE;
-        if (wide && scaffold.getNavigation() != drawer) {
-            drawer.hideModal();
-            topBar.setNavigationIcon((Node) null);
-            scaffold.setNavigation(drawer);
-            drawer.setPrefWidth(300);
-        } else if (!wide && scaffold.getNavigation() == drawer) {
-            scaffold.setNavigation(null);
-            topBar.setNavigationIcon("menu").setOnAction(e -> drawer.showModal(scaffold));
-        }
     }
 
     private void show(NavigationItem item) {
@@ -118,14 +93,14 @@ public class DemoApp extends Application {
         return theme;
     }
 
-    Scaffold scaffold() {
+    AdaptiveScaffold scaffold() {
         return scaffold;
     }
 
     void selectPage(String id) {
         pages.forEach((item, page) -> {
             if (page.id().equals(id)) {
-                drawer.setSelectedItem(item);
+                scaffold.setSelectedItem(item);
             }
         });
     }
@@ -138,7 +113,7 @@ public class DemoApp extends Application {
     }
 
     void openDrawer() {
-        drawer.showModal(scaffold);
+        scaffold.getNavigationDrawer().showModal(scaffold);
     }
 
     public static void main(String[] args) {

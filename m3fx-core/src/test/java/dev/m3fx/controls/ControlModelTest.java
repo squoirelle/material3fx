@@ -51,7 +51,9 @@ class ControlModelTest {
                     new SegmentedButton("a", "b"), new NavigationBar(), new NavigationRail(), new NavigationDrawer(),
                     new TopAppBar("t"), new BottomAppBar(), new MaterialTextField("f"), new SearchBar(), new TimePicker(),
                     new Carousel(), new MaterialDialog<>("d", null), new Snackbar("s"), new BottomSheet(), new SideSheet("s"),
-                    new IconButton("menu"), new Fab("add"), new Badge("1"));
+                    new IconButton("menu"), new Fab("add"), new Badge("1"), new RangeSlider(), new NumberField("n"),
+                    new DateRangePicker("p"), new DateRangeCalendar(), new Banner("b", null), new StatusLight(),
+                    new SplitButton("s", null), new ValidationSummary(new FormPane()));
             themed(controls.toArray(Node[]::new));
             for (Control control : controls) {
                 assertNotNull(control.getSkin(), control.getClass().getSimpleName() + " has no skin");

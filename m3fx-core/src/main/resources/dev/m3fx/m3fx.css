@@ -58,6 +58,11 @@
     -fx-table-header-border-color: -md-sys-color-outline-variant;
 }
 
+/* Popup windows (menus, tooltips, dropdowns) are transparent: their root must not paint a box. */
+.root.popup {
+    -fx-background-color: transparent;
+}
+
 .label {
     -fx-text-fill: -md-sys-color-on-surface;
 }
@@ -786,10 +791,12 @@
     -fx-background-color: transparent;
 }
 
+/* Menus size items to their preferred height, so set it (a min height alone has no effect). */
 .menu-item {
     -fx-background-color: transparent;
     -fx-padding: 0 12 0 12;
     -fx-min-height: 48;
+    -fx-pref-height: 48;
     -fx-alignment: center-left;
 }
 
@@ -849,6 +856,29 @@
     -fx-border-insets: 0;
     -fx-border-width: 1 0 0 0;
     -fx-padding: 0;
+}
+
+/* Section headers (MenuHeader): small, colored, not selectable */
+.menu-item.menu-header,
+.menu-item.menu-header:focused,
+.menu-item.menu-header:disabled {
+    -fx-background-color: transparent;
+    -fx-min-height: 32;
+    -fx-pref-height: 32;
+    -fx-padding: 8 12 4 12;
+    -fx-opacity: 1;
+}
+
+.menu-header .menu-header-label,
+.menu-header:disabled .menu-header-label {
+    -fx-text-fill: -md-sys-color-primary;
+    -fx-font-size: 12px;
+    -fx-font-weight: bold;
+    -fx-opacity: 1;
+}
+
+.context-menu {
+    -fx-min-width: 112;
 }
 
 .menu-bar {
@@ -1565,6 +1595,99 @@
 .progress-bar > .md-progress-stop {
     -fx-background-color: -md-sys-color-primary;
     -fx-background-radius: 100;
+}
+
+/* Color picker popup and custom color dialog */
+.color-palette {
+    -fx-background-color: -md-sys-color-surface-container;
+    -fx-background-insets: 0;
+    -fx-background-radius: 12;
+    -fx-padding: 12;
+    -fx-spacing: 8;
+    -fx-effect: dropshadow(gaussian, -md-sys-color-shadow-a32, 7, 0, 0, 2);
+}
+
+.color-palette > .color-picker-grid {
+    -fx-padding: 0;
+    -fx-hgap: 2;
+    -fx-vgap: 2;
+}
+
+.color-palette > .color-picker-grid > .color-square {
+    -fx-background-color: transparent;
+    -fx-padding: 1;
+}
+
+.color-palette .color-square > .color-rect {
+    -fx-arc-width: 6;
+    -fx-arc-height: 6;
+    -fx-stroke: -md-sys-color-outline-variant;
+    -fx-stroke-width: 0.5;
+}
+
+.color-palette-region > .color-square.hover-square {
+    -fx-background-color: -md-sys-color-surface-container-highest;
+    -fx-background-insets: -3;
+    -fx-background-radius: 6;
+    -fx-border-color: -md-sys-color-primary;
+    -fx-border-width: 2;
+    -fx-border-insets: -3;
+    -fx-border-radius: 6;
+    -fx-scale-x: 1.4;
+    -fx-scale-y: 1.4;
+}
+
+.color-palette > .separator .line {
+    -fx-border-color: -md-sys-color-outline-variant transparent transparent transparent;
+}
+
+.color-palette > .hyperlink {
+    -fx-text-fill: -md-sys-color-primary;
+    -fx-font-weight: 500;
+}
+
+.color-picker > .color-picker-label > .picker-color > .picker-color-rect {
+    -fx-stroke: -md-sys-color-outline-variant;
+    -fx-arc-width: 4;
+    -fx-arc-height: 4;
+}
+
+.custom-color-dialog {
+    -fx-background-color: -md-sys-color-surface-container-high;
+    -fx-padding: 24;
+    -fx-spacing: 24;
+}
+
+.custom-color-dialog .label {
+    -fx-text-fill: -md-sys-color-on-surface-variant;
+}
+
+.custom-color-dialog .controls-pane .customcolor-controls-background {
+    -fx-background-color: -md-sys-color-surface-container-low;
+    -fx-background-insets: 10 0 5 0;
+    -fx-background-radius: 12;
+}
+
+.custom-color-dialog .text-field,
+.custom-color-dialog .text-field:focused {
+    -fx-min-height: 32;
+    -fx-pref-height: 32;
+    -fx-padding: 0 8 0 8;
+    -fx-font-size: 14px;
+}
+
+.custom-color-dialog .color-rect-pane .color-rect-border,
+.custom-color-dialog .controls-pane .current-new-color-grid #current-new-color-border {
+    -fx-border-color: -md-sys-color-outline-variant;
+}
+
+.custom-color-dialog > .color-rect-pane #color-rect-indicator,
+.custom-color-dialog > .color-rect-pane > .color-bar > #color-bar-indicator {
+    -fx-border-color: white, -md-sys-color-shadow-a38;
+}
+
+.custom-color-dialog .controls-pane #buttons-hbox {
+    -fx-spacing: 8;
 }
 
 /* ===================================================================================== */
@@ -2771,7 +2894,8 @@
     -fx-prompt-text-fill: transparent;
 }
 
-.material-text-field:focused {
+.material-text-field:focused,
+.material-text-field:no-label {
     -fx-prompt-text-fill: -md-sys-color-on-surface-variant;
 }
 
@@ -3105,6 +3229,425 @@
     -fx-font-size: 14px;
 }
 
+/* ---------- Status light ---------- */
+
+.status-light {
+    -fx-padding: 0;
+}
+
+.status-light .status-light-dot,
+.status-light .status-light-ring {
+    -fx-background-radius: 100;
+    -fx-background-color: -md-sys-color-outline;
+}
+
+.status-light.info .status-light-dot,
+.status-light.info .status-light-ring {
+    -fx-background-color: -md-sys-color-primary;
+}
+
+.status-light.success .status-light-dot,
+.status-light.success .status-light-ring {
+    -fx-background-color: -md-sys-color-success;
+}
+
+.status-light.warning .status-light-dot,
+.status-light.warning .status-light-ring {
+    -fx-background-color: -md-sys-color-warning;
+}
+
+.status-light.error .status-light-dot,
+.status-light.error .status-light-ring {
+    -fx-background-color: -md-sys-color-error;
+}
+
+.status-light .status-light-label {
+    -fx-text-fill: -md-sys-color-on-surface;
+    -fx-font-size: 14px;
+}
+
+/* ---------- Banner ---------- */
+
+.banner {
+    -fx-background-color: -md-sys-color-surface-container-low;
+    -fx-border-color: transparent transparent -md-sys-color-outline-variant transparent;
+    -fx-border-width: 0 0 1 0;
+    -fx-padding: 12 8 8 16;
+}
+
+.banner .banner-content {
+    -fx-spacing: 16;
+}
+
+.banner .banner-icon-container {
+    -fx-background-color: -md-sys-color-primary;
+    -fx-background-radius: 100;
+    -fx-min-width: 40;
+    -fx-min-height: 40;
+    -fx-max-width: 40;
+    -fx-max-height: 40;
+}
+
+.banner .banner-icon {
+    -fx-fill: -md-sys-color-on-primary;
+}
+
+.banner .banner-text {
+    -fx-text-fill: -md-sys-color-on-surface;
+    -fx-font-size: 14px;
+}
+
+.banner .banner-actions .button {
+    -fx-text-fill: -md-sys-color-primary;
+}
+
+.banner.success {
+    -fx-background-color: -md-sys-color-success-container;
+}
+
+.banner.success .banner-text,
+.banner.success .banner-actions .button {
+    -fx-text-fill: -md-sys-color-on-success-container;
+}
+
+.banner.success .banner-icon-container {
+    -fx-background-color: -md-sys-color-success;
+}
+
+.banner.success .banner-icon {
+    -fx-fill: -md-sys-color-on-success;
+}
+
+.banner.warning {
+    -fx-background-color: -md-sys-color-warning-container;
+}
+
+.banner.warning .banner-text,
+.banner.warning .banner-actions .button {
+    -fx-text-fill: -md-sys-color-on-warning-container;
+}
+
+.banner.warning .banner-icon-container {
+    -fx-background-color: -md-sys-color-warning;
+}
+
+.banner.warning .banner-icon {
+    -fx-fill: -md-sys-color-on-warning;
+}
+
+.banner.error {
+    -fx-background-color: -md-sys-color-error-container;
+}
+
+.banner.error .banner-text,
+.banner.error .banner-actions .button {
+    -fx-text-fill: -md-sys-color-on-error-container;
+}
+
+.banner.error .banner-icon-container {
+    -fx-background-color: -md-sys-color-error;
+}
+
+.banner.error .banner-icon {
+    -fx-fill: -md-sys-color-on-error;
+}
+
+/* ---------- Range slider ---------- */
+
+.range-slider {
+    -fx-padding: 0 10 0 10;
+}
+
+.range-slider .range-slider-track {
+    -fx-background-color: -md-sys-color-secondary-container;
+    -fx-background-radius: 2;
+}
+
+.range-slider .range-slider-active-track {
+    -fx-background-color: -md-sys-color-primary;
+}
+
+.range-slider .range-slider-tick {
+    -fx-background-color: -md-sys-color-on-secondary-container;
+    -fx-background-radius: 100;
+    -fx-opacity: 0.6;
+}
+
+.range-slider .range-slider-thumb {
+    -fx-background-color: -md-sys-color-primary;
+    -fx-background-radius: 100;
+    -fx-effect: dropshadow(gaussian, -md-sys-color-shadow-a32, 3, 0, 0, 1);
+}
+
+.range-slider .range-slider-thumb:focus-visible {
+    -fx-border-color: -md-sys-color-secondary;
+    -fx-border-width: 3;
+    -fx-border-insets: -6;
+    -fx-border-radius: 100;
+}
+
+.range-slider .range-slider-state-layer {
+    -md-state-color: -md-sys-color-primary;
+}
+
+.range-slider .md-value-label {
+    -fx-background-color: -md-sys-color-inverse-surface;
+    -fx-background-radius: 100;
+    -fx-text-fill: -md-sys-color-inverse-on-surface;
+    -fx-font-size: 12px;
+    -fx-font-weight: 500;
+    -fx-padding: 4 8 4 8;
+    -fx-alignment: center;
+}
+
+.range-slider:disabled .range-slider-active-track,
+.range-slider:disabled .range-slider-thumb {
+    -fx-background-color: -md-sys-color-on-surface-a38;
+    -fx-effect: null;
+}
+
+.range-slider:disabled .range-slider-track {
+    -fx-background-color: -md-sys-color-on-surface-a12;
+}
+
+/* ---------- Date range calendar ---------- */
+
+.date-range-calendar {
+    -fx-padding: 0;
+}
+
+.date-range-calendar .date-range-calendar-header {
+    -fx-padding: 4 0 8 8;
+}
+
+.date-range-calendar .date-range-calendar-month {
+    -fx-text-fill: -md-sys-color-on-surface-variant;
+    -fx-font-size: 14px;
+    -fx-font-weight: 500;
+}
+
+.date-range-calendar .date-range-calendar-weekday {
+    -fx-text-fill: -md-sys-color-on-surface;
+    -fx-font-size: 13px;
+    -fx-min-height: 32;
+}
+
+.date-range-calendar .date-range-day {
+    -fx-min-width: 44;
+    -fx-pref-width: 44;
+    -fx-max-width: 44;
+    -fx-min-height: 44;
+    -fx-pref-height: 44;
+    -fx-max-height: 44;
+    -fx-cursor: hand;
+}
+
+.date-range-calendar .date-range-circle {
+    -fx-background-radius: 100;
+    -fx-min-width: 40;
+    -fx-min-height: 40;
+}
+
+.date-range-calendar .date-range-day-label {
+    -fx-text-fill: -md-sys-color-on-surface;
+    -fx-font-size: 14px;
+}
+
+.date-range-calendar .date-range-day:hover .date-range-circle {
+    -fx-background-color: -md-sys-color-on-surface-a08;
+}
+
+.date-range-calendar .date-range-day:other-month .date-range-day-label {
+    -fx-text-fill: -md-sys-color-on-surface-a38;
+}
+
+.date-range-calendar .date-range-day:today .date-range-circle {
+    -fx-border-color: -md-sys-color-primary;
+    -fx-border-width: 1;
+    -fx-border-radius: 100;
+}
+
+.date-range-calendar .date-range-day:today .date-range-day-label {
+    -fx-text-fill: -md-sys-color-primary;
+}
+
+/* The band behind days of the range; half bands on the endpoints. */
+.date-range-calendar .date-range-day:in-range .date-range-band {
+    -fx-background-color: -md-sys-color-secondary-container;
+    -fx-background-insets: 2 0 2 0;
+}
+
+.date-range-calendar .date-range-day:in-range:range-start .date-range-band {
+    -fx-background-insets: 2 0 2 22;
+}
+
+.date-range-calendar .date-range-day:in-range:range-end .date-range-band {
+    -fx-background-insets: 2 22 2 0;
+}
+
+.date-range-calendar .date-range-day:in-range .date-range-day-label {
+    -fx-text-fill: -md-sys-color-on-secondary-container;
+}
+
+.date-range-calendar .date-range-day:range-start .date-range-circle,
+.date-range-calendar .date-range-day:range-end .date-range-circle {
+    -fx-background-color: -md-sys-color-primary;
+}
+
+.date-range-calendar .date-range-day:range-start .date-range-day-label,
+.date-range-calendar .date-range-day:range-end .date-range-day-label {
+    -fx-text-fill: -md-sys-color-on-primary;
+}
+
+.date-range-calendar .date-range-day:focused-day .date-range-circle {
+    -fx-border-color: -md-sys-color-secondary;
+    -fx-border-width: 2;
+    -fx-border-radius: 100;
+}
+
+.material-dialog.date-range-picker-dialog {
+    -fx-pref-width: 360;
+}
+
+/* ---------- Form ---------- */
+
+.form-pane {
+    -fx-padding: 0;
+}
+
+.form-pane .form-section-title {
+    -fx-text-fill: -md-sys-color-primary;
+    -fx-font-size: 14px;
+    -fx-font-weight: bold;
+    -fx-padding: 0 0 4 0;
+}
+
+.form-row .form-row-label {
+    -fx-text-fill: -md-sys-color-on-surface-variant;
+    -fx-font-size: 14px;
+}
+
+.form-row .form-row-label {
+    -fx-graphic-text-gap: 2;
+}
+
+.form-row .form-row-required {
+    -fx-text-fill: -md-sys-color-error;
+    -fx-font-size: 14px;
+}
+
+.validation-summary {
+    -fx-background-color: -md-sys-color-error-container;
+    -fx-background-radius: 12;
+    -fx-padding: 16;
+}
+
+.validation-summary .validation-summary-content {
+    -fx-spacing: 8;
+}
+
+.validation-summary .validation-summary-icon {
+    -fx-fill: -md-sys-color-error;
+}
+
+.validation-summary .validation-summary-title {
+    -fx-text-fill: -md-sys-color-on-error-container;
+    -fx-font-size: 16px;
+    -fx-font-weight: 500;
+}
+
+.validation-summary .validation-summary-links {
+    -fx-padding: 0 0 0 32;
+}
+
+.validation-summary .validation-summary-link {
+    -fx-text-fill: -md-sys-color-on-error-container;
+    -fx-underline: true;
+    -fx-padding: 2 0 2 0;
+}
+
+/* ---------- Split button ---------- */
+
+.split-button {
+    -fx-padding: 0;
+}
+
+.split-button .split-button-leading,
+.split-button .split-button-trailing {
+    -fx-background-color: -md-sys-color-primary;
+    -fx-text-fill: -md-sys-color-on-primary;
+    -fx-effect: null;
+}
+
+.split-button .split-button-leading {
+    -fx-background-radius: 100 4 4 100;
+    -fx-padding: 0 16 0 16;
+}
+
+.split-button .split-button-trailing {
+    -fx-background-radius: 4 100 100 4;
+    -fx-padding: 0 12 0 8;
+    -fx-min-width: 44;
+}
+
+.split-button .split-button-trailing:showing {
+    -fx-background-radius: 100;
+}
+
+.split-button.tonal .split-button-leading,
+.split-button.tonal .split-button-trailing {
+    -fx-background-color: -md-sys-color-secondary-container;
+    -fx-text-fill: -md-sys-color-on-secondary-container;
+}
+
+.split-button.elevated .split-button-leading,
+.split-button.elevated .split-button-trailing {
+    -fx-background-color: -md-sys-color-surface-container-low;
+    -fx-text-fill: -md-sys-color-primary;
+    -fx-effect: dropshadow(gaussian, -md-sys-color-shadow-a32, 4, 0, 0, 1);
+}
+
+.split-button.outlined .split-button-leading,
+.split-button.outlined .split-button-trailing {
+    -fx-background-color: transparent;
+    -fx-text-fill: -md-sys-color-on-surface-variant;
+    -fx-border-color: -md-sys-color-outline-variant;
+    -fx-border-width: 1;
+}
+
+.split-button.outlined .split-button-leading {
+    -fx-border-radius: 100 4 4 100;
+}
+
+.split-button.outlined .split-button-trailing {
+    -fx-border-radius: 4 100 100 4;
+}
+
+.split-button .split-button-leading:focus-visible {
+    -fx-border-color: -md-sys-color-secondary;
+    -fx-border-width: 3;
+    -fx-border-insets: -5;
+    -fx-border-radius: 100 9 9 100;
+}
+
+.split-button .split-button-trailing:focus-visible {
+    -fx-border-color: -md-sys-color-secondary;
+    -fx-border-width: 3;
+    -fx-border-insets: -5;
+    -fx-border-radius: 9 100 100 9;
+}
+
+/* ---------- Adaptive scaffold ---------- */
+
+.adaptive-scaffold .adaptive-panes {
+    -fx-spacing: 0;
+}
+
+.adaptive-scaffold:two-pane .adaptive-list-pane {
+    -fx-border-color: transparent -md-sys-color-outline-variant transparent transparent;
+    -fx-border-width: 0 1 0 0;
+}
+
 /* COMPONENTS-END */
 
 /* ===================================================================================== */
@@ -3179,6 +3722,15 @@
 .md-density-1 .menu-item,
 .md-density-1 .combo-box-popup > .list-view > .virtual-flow > .clipped-container > .sheet > .list-cell {
     -fx-min-height: 44;
+}
+
+.md-density-1 .menu-item {
+    -fx-pref-height: 44;
+}
+
+.md-density-1 .menu-item.menu-header {
+    -fx-min-height: 30;
+    -fx-pref-height: 30;
 }
 
 .md-density-1 .tab-pane > .tab-header-area > .headers-region > .tab {
@@ -3295,6 +3847,15 @@
     -fx-min-height: 40;
 }
 
+.md-density-2 .menu-item {
+    -fx-pref-height: 40;
+}
+
+.md-density-2 .menu-item.menu-header {
+    -fx-min-height: 28;
+    -fx-pref-height: 28;
+}
+
 .md-density-2 .tab-pane > .tab-header-area > .headers-region > .tab {
     -fx-min-height: 40;
     -fx-pref-height: 40;
@@ -3407,6 +3968,15 @@
 .md-density-3 .menu-item,
 .md-density-3 .combo-box-popup > .list-view > .virtual-flow > .clipped-container > .sheet > .list-cell {
     -fx-min-height: 36;
+}
+
+.md-density-3 .menu-item {
+    -fx-pref-height: 36;
+}
+
+.md-density-3 .menu-item.menu-header {
+    -fx-min-height: 26;
+    -fx-pref-height: 26;
 }
 
 .md-density-3 .tab-pane > .tab-header-area > .headers-region > .tab {
@@ -3536,6 +4106,42 @@
 .md-density-3 .time-picker-field {
     -fx-min-height: 80;
     -fx-pref-height: 80;
+}
+
+.md-density-1 .split-button .split-button-leading,
+.md-density-1 .split-button .split-button-trailing {
+    -fx-min-height: 36;
+    -fx-pref-height: 36;
+}
+
+.md-density-1 .date-range-calendar .date-range-day {
+    -fx-min-height: 42;
+    -fx-pref-height: 42;
+    -fx-max-height: 42;
+}
+
+.md-density-2 .split-button .split-button-leading,
+.md-density-2 .split-button .split-button-trailing {
+    -fx-min-height: 32;
+    -fx-pref-height: 32;
+}
+
+.md-density-2 .date-range-calendar .date-range-day {
+    -fx-min-height: 40;
+    -fx-pref-height: 40;
+    -fx-max-height: 40;
+}
+
+.md-density-3 .split-button .split-button-leading,
+.md-density-3 .split-button .split-button-trailing {
+    -fx-min-height: 28;
+    -fx-pref-height: 28;
+}
+
+.md-density-3 .date-range-calendar .date-range-day {
+    -fx-min-height: 38;
+    -fx-pref-height: 38;
+    -fx-max-height: 38;
 }
 
 /* DENSITY-END */

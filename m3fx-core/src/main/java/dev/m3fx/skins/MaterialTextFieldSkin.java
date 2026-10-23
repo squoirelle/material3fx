@@ -39,6 +39,7 @@ public class MaterialTextFieldSkin extends TextFieldSkin {
     private static final PseudoClass FLOATING = PseudoClass.getPseudoClass("floating");
     private static final PseudoClass LEADING = PseudoClass.getPseudoClass("leading");
     private static final PseudoClass TRAILING = PseudoClass.getPseudoClass("trailing");
+    private static final PseudoClass NO_LABEL = PseudoClass.getPseudoClass("no-label");
     private static final double LABEL_SCALE = 0.75;
     private static final double OUTLINE_RADIUS = 4;
     private static final double PADDING = 16;
@@ -58,6 +59,7 @@ public class MaterialTextFieldSkin extends TextFieldSkin {
     private final DoubleProperty floatProgress = new SimpleDoubleProperty(this, "floatProgress");
     private final Timeline floatAnimation = new Timeline();
     private Node trailing;
+    private final javafx.event.EventHandler<javafx.event.ActionEvent> stopAction = javafx.event.Event::consume;
 
     // Where the text area sits, for hit-testing.
     private double textX;
@@ -141,6 +143,7 @@ public class MaterialTextFieldSkin extends TextFieldSkin {
         if (trailing != null) {
             getChildren().remove(trailing);
             trailing.getStyleClass().remove("md-field-trailing");
+            trailing.removeEventHandler(javafx.event.ActionEvent.ACTION, stopAction);
         }
         boolean filled = field.getVariant() == MaterialTextField.Variant.FILLED;
         // Background parts go behind the text area, which TextFieldSkin added first.
@@ -162,6 +165,8 @@ public class MaterialTextFieldSkin extends TextFieldSkin {
             if (!trailing.getStyleClass().contains("md-field-trailing")) {
                 trailing.getStyleClass().add("md-field-trailing");
             }
+            // A trailing button's action would bubble to the text field and fire its onAction.
+            trailing.addEventHandler(javafx.event.ActionEvent.ACTION, stopAction);
             getChildren().add(trailing);
         }
         field.pseudoClassStateChanged(LEADING, field.getLeadingIcon() != null);
@@ -198,6 +203,8 @@ public class MaterialTextFieldSkin extends TextFieldSkin {
     private void updateFloat(boolean animate) {
         boolean floating = shouldFloat();
         field().pseudoClassStateChanged(FLOATING, floating);
+        // Without a label the prompt text is the only hint: always show it.
+        field().pseudoClassStateChanged(NO_LABEL, !hasLabel());
         prefix.setVisible(floating);
         suffix.setVisible(floating);
         double target = floating ? 1 : 0;
@@ -381,6 +388,7 @@ public class MaterialTextFieldSkin extends TextFieldSkin {
                 prefix, suffix, leadingIcon, visibilityToggle);
         if (trailing != null) {
             getChildren().remove(trailing);
+            trailing.removeEventHandler(javafx.event.ActionEvent.ACTION, stopAction);
         }
         floatingLabel.textProperty().unbind();
         prefix.textProperty().unbind();

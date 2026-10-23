@@ -52,6 +52,10 @@ import java.util.WeakHashMap;
  * ({@code -md-sys-color-primary}, {@code -md-sys-color-on-surface-variant}...), plus translucent
  * variants for state layers and disabled states ({@code -md-sys-color-on-surface-a12} is
  * on-surface at 12% opacity). Available alpha suffixes: a08, a10, a12, a16, a32, a38.
+ * <p>
+ * Besides Material's roles, the theme always generates semantic status roles, harmonized with the
+ * seed: {@code -md-sys-color-success}, {@code -md-sys-color-warning}, their {@code on-},
+ * {@code -container} and {@code on-...-container} variants (error is Material's own).
  */
 public final class MaterialTheme {
 
@@ -59,6 +63,10 @@ public final class MaterialTheme {
     public static final Color BASELINE = Color.web("#6750A4");
 
     private static final int[] ALPHAS = {8, 10, 12, 16, 32, 38};
+    /** Seeds of the semantic status roles, harmonized with the theme. */
+    private static final Map<String, Color> STATUS_COLORS = Map.of(
+            "success", Color.web("#2E7D32"),
+            "warning", Color.web("#B26A00"));
     private static final String THEME_KEY = MaterialTheme.class.getName();
     private static final String STYLESHEET = Objects.requireNonNull(
             MaterialTheme.class.getResource("m3fx.css"), "m3fx.css missing").toExternalForm();
@@ -264,6 +272,14 @@ public final class MaterialTheme {
         css.append(".root, .tooltip, .context-menu {\n");
         for (ColorRole role : ColorRole.values()) {
             appendColor(css, role.cssName(), s.getArgb(role));
+        }
+        // Semantic status roles (an m3fx extension: Material only defines error), always available.
+        for (Map.Entry<String, Color> status : STATUS_COLORS.entrySet()) {
+            ColorScheme.CustomColor c = s.customColor(status.getKey(), status.getValue(), true);
+            appendColor(css, "-md-sys-color-" + status.getKey(), ColorUtils.fromFx(c.color()));
+            appendColor(css, "-md-sys-color-on-" + status.getKey(), ColorUtils.fromFx(c.onColor()));
+            appendColor(css, "-md-sys-color-" + status.getKey() + "-container", ColorUtils.fromFx(c.container()));
+            appendColor(css, "-md-sys-color-on-" + status.getKey() + "-container", ColorUtils.fromFx(c.onContainer()));
         }
         for (Map.Entry<String, Color> custom : customColors.entrySet()) {
             String name = custom.getKey().toLowerCase(Locale.ROOT).replaceAll("[^a-z0-9]+", "-");

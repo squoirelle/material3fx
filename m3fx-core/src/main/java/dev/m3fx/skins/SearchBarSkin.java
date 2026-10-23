@@ -37,6 +37,7 @@ public class SearchBarSkin extends TextFieldSkin {
     private final ListChangeListener<Node> trailingListener = c -> trailingBox.getChildren().setAll(((SearchBar) getSkinnable()).getTrailing());
     private final EventHandler<KeyEvent> keyHandler = this::onKeyPressed;
     private Node leading;
+    private final EventHandler<ActionEvent> stopAction = javafx.event.Event::consume;
     private double textX;
 
     public SearchBarSkin(SearchBar bar) {
@@ -46,6 +47,8 @@ public class SearchBarSkin extends TextFieldSkin {
         trailingBox.getStyleClass().add("search-bar-trailing");
         trailingBox.setAlignment(Pos.CENTER_RIGHT);
         trailingBox.setManaged(false);
+        // Actions of trailing / leading buttons would bubble to the search bar and fire its onAction.
+        trailingBox.addEventHandler(ActionEvent.ACTION, javafx.event.Event::consume);
         suggestions.getStyleClass().add("search-suggestions");
         stateLayer = new StateLayer(bar);
         stateLayer.setRippleEnabled(false);
@@ -70,8 +73,12 @@ public class SearchBarSkin extends TextFieldSkin {
         }
         getChildren().remove(stateLayer);
         getChildren().remove(trailingBox);
+        if (leading != null) {
+            leading.removeEventHandler(ActionEvent.ACTION, stopAction);
+        }
         leading = bar.getLeading() != null ? bar.getLeading() : searchIcon;
         leading.setManaged(false);
+        leading.addEventHandler(ActionEvent.ACTION, stopAction);
         getChildren().addFirst(stateLayer);
         getChildren().addAll(leading, trailingBox);
         bar.requestLayout();

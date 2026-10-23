@@ -143,7 +143,13 @@ class CarouselTest {
             field.setSupportingText("Help");
             controls.addAll(List.of(new Chip("Chip", "event", Chip.Variant.ASSIST), new Switch("Switch"), field, search, bar,
                     drawer, new TimePicker(), new Card(Card.Variant.ELEVATED, new javafx.scene.control.Label("Card")),
-                    new ListItem("Item", "Supporting"), new SegmentedButton("A", "B"), new Avatar("A B"), new Snackbar("Hi")));
+                    new ListItem("Item", "Supporting"), new SegmentedButton("A", "B"), new Avatar("A B"), new Snackbar("Hi"),
+                    new RangeSlider(), new NumberField("N"), new DateRangePicker("Period"), new DateRangeCalendar(),
+                    new Banner("Message", "info"), new StatusLight(StatusLight.Status.SUCCESS, "OK"),
+                    new SplitButton("Export", null), new ValidationSummary()));
+            StatusLight pulsing = new StatusLight(StatusLight.Status.ERROR, "Alert");
+            pulsing.setPulsing(true);
+            controls.add(pulsing);
             javafx.scene.layout.FlowPane row = new javafx.scene.layout.FlowPane(16, 16);
             row.getChildren().addAll(controls);
             javafx.scene.control.ScrollPane scroll = new javafx.scene.control.ScrollPane(new VBox(12, row));
@@ -166,8 +172,13 @@ class CarouselTest {
         assertEquals(first, second, "a component kept changing size or position without input");
     }
 
+    /**
+     * Layout geometry (position and layout size), which a layout loop would change. Not visual
+     * bounds: those legitimately change while something animates (e.g. a pulsing status light).
+     */
     private static List<String> bounds(List<javafx.scene.control.Control> controls) {
-        return controls.stream().map(c -> c.getClass().getSimpleName() + " " + c.getBoundsInParent()).toList();
+        return controls.stream().map(c -> String.format("%s x=%.1f y=%.1f w=%.1f h=%.1f", c.getClass().getSimpleName(),
+                c.getLayoutX(), c.getLayoutY(), c.getWidth(), c.getHeight())).toList();
     }
 
     private static List<Double> positions(Carousel carousel) {

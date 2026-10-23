@@ -77,7 +77,7 @@ public class Screenshots extends Application {
         DemoApp app = new DemoApp();
         app.start(stage);
         Scene scene = stage.getScene();
-        Scaffold scaffold = app.scaffold();
+        dev.m3fx.controls.AdaptiveScaffold scaffold = app.scaffold();
         MaterialTheme theme = app.theme();
 
         shoot(scene, dir, "app-light");
@@ -127,12 +127,52 @@ public class Screenshots extends Application {
         shoot(scene, dir, "app-dense-data");
         theme.setDensity(Density.DEFAULT);
 
+        theme.setMode(ThemeMode.LIGHT);
+        app.selectPage("feedback");
+        scene.getRoot().applyCss();
+        scene.getRoot().layout();
+        javafx.scene.control.MenuButton menu = (javafx.scene.control.MenuButton) scene.getRoot().lookup(".menu-button");
+        menu.show();
+        shootPopup(dir, "popup-menu-sections");
+        menu.hide();
+        javafx.scene.control.ColorPicker picker = (javafx.scene.control.ColorPicker) scene.getRoot().lookup(".color-picker");
+        picker.show();
+        shootPopup(dir, "popup-color-picker");
+        picker.hide();
+        app.selectPage("data-entry");
+        scene.getRoot().applyCss();
+        scene.getRoot().layout();
+        dev.m3fx.controls.SplitButton split = (dev.m3fx.controls.SplitButton) scene.getRoot().lookup(".split-button");
+        split.show();
+        shootPopup(dir, "popup-split-button");
+        split.hide();
+
         stage.setWidth(800);
         stage.setHeight(700);
         scene.getRoot().applyCss();
         scene.getRoot().layout();
         app.openDrawer();
         shoot(scene, dir, "app-narrow-modal-drawer");
+    }
+
+    /** Snapshot of the most recently opened popup window (menus, color palette). */
+    private static void shootPopup(File dir, String name) throws IOException {
+        javafx.stage.Window popup = null;
+        for (javafx.stage.Window w : javafx.stage.Window.getWindows()) {
+            if (w instanceof javafx.stage.PopupWindow && w.isShowing()) {
+                popup = w;
+            }
+        }
+        if (popup == null) {
+            System.out.println("no popup for " + name);
+            return;
+        }
+        popup.getScene().getRoot().applyCss();
+        popup.getScene().getRoot().layout();
+        WritableImage image = popup.getScene().snapshot(null);
+        File file = new File(dir, name + ".png");
+        ImageIO.write(SwingFXUtils.fromFXImage(image, null), "png", file);
+        System.out.println("wrote " + file);
     }
 
     private static void closeOverlays(Scaffold scaffold) {
