@@ -3,6 +3,13 @@ val minimumJava = 21
 // -Pjdk=21 builds and tests with another JDK (default: 25); see also -Pjavafx in the modules.
 val buildJdk = providers.gradleProperty("jdk").map { it.toInt() }.getOrElse(25)
 
+// Tests open real windows. Gradle runs the projects' test tasks in parallel (the configuration
+// cache allows it): their windows would take the keyboard focus from each other. One at a time.
+abstract class GuiTestLock : BuildService<BuildServiceParameters.None>
+val guiTestLock = gradle.sharedServices.registerIfAbsent("guiTestLock", GuiTestLock::class) {
+    maxParallelUsages = 1
+}
+
 subprojects {
     apply(plugin = "java-library")
 
@@ -27,5 +34,6 @@ subprojects {
 
     tasks.named<Test>("test") {
         useJUnitPlatform()
+        usesService(guiTestLock)
     }
 }

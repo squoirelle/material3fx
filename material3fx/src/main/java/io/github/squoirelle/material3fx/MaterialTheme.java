@@ -22,12 +22,15 @@ import javafx.beans.value.ChangeListener;
 import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableMap;
+import javafx.geometry.Point2D;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
+import javafx.stage.PopupWindow;
 import javafx.stage.Window;
+import javafx.stage.WindowEvent;
 
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
@@ -197,7 +200,8 @@ public final class MaterialTheme {
 
     /**
      * Applies the theme to every current and future window: stages, dialogs, alerts, menus,
-     * tooltips and other popups.
+     * tooltips and other popups. Open popups also stay attached: they move with the control that
+     * opened them when the layout moves it, and close when their window moves.
      * <p>
      * A scene is themed when it is set on a window. When you replace the scene of a window that
      * is <em>already showing</em>, JavaFX styles the new scene during {@code setScene}, before the
@@ -223,10 +227,78 @@ public final class MaterialTheme {
         if (window.getScene() != null) {
             apply(window.getScene());
         }
+        if (window instanceof PopupWindow popup) {
+            followOwner(popup);
+        }
         window.sceneProperty().addListener((obs, old, scene) -> {
             if (scene != null && windowListener != null) {
                 apply(scene);
             }
+        });
+    }
+
+    /**
+     * Keeps open popups (menus, dropdowns, pickers, suggestions...) attached to what they belong to.
+     * <ul>
+     * <li>When their window moves (dragged, or resized from the left edge), they close, as native
+     * dropdowns do: JavaFX leaves them in place, and following the window is not reliable on
+     * every desktop (some compositors report its position late during a drag).</li>
+     * <li>A popup shown on a node moves with it when the layout moves that node inside the window
+     * (e.g. a navigation drawer collapsing). Combo boxes and pickers have no owner node: JavaFX
+     * already keeps their popup under them in that case.</li>
+     * </ul>
+     */
+    private static void followOwner(PopupWindow popup) {
+        // Once per popup, even if several themes are applied globally: each would add the move.
+        if (popup.getProperties().putIfAbsent("material3fx.followsOwner", Boolean.TRUE) != null) {
+            return;
+        }
+        Window[] window = new Window[1];
+        Point2D[] windowPosition = new Point2D[1];
+        Node[] node = new Node[1];
+        Point2D[] nodePosition = new Point2D[1];
+        InvalidationListener windowMoved = o -> {
+            if (window[0] != null && !windowPosition[0].equals(new Point2D(window[0].getX(), window[0].getY()))) {
+                popup.hide();
+            }
+        };
+        InvalidationListener nodeMoved = o -> {
+            if (node[0] == null) {
+                return;
+            }
+            // Scene coordinates: only the node's move inside its window counts.
+            // Reading the transform property (not localToScene) re-arms this invalidation listener.
+            Point2D now = node[0].getLocalToSceneTransform().transform(0, 0);
+            Point2D delta = now.subtract(nodePosition[0]);
+            nodePosition[0] = now;
+            if (delta.getX() != 0 || delta.getY() != 0) {
+                popup.setAnchorX(popup.getAnchorX() + delta.getX());
+                popup.setAnchorY(popup.getAnchorY() + delta.getY());
+            }
+        };
+        popup.addEventHandler(WindowEvent.WINDOW_SHOWN, e -> {
+            window[0] = popup.getOwnerWindow();
+            if (window[0] != null) {
+                windowPosition[0] = new Point2D(window[0].getX(), window[0].getY());
+                window[0].xProperty().addListener(windowMoved);
+                window[0].yProperty().addListener(windowMoved);
+            }
+            node[0] = popup.getOwnerNode();
+            if (node[0] != null) {
+                node[0].localToSceneTransformProperty().addListener(nodeMoved);
+                nodePosition[0] = node[0].getLocalToSceneTransform().transform(0, 0);
+            }
+        });
+        popup.addEventHandler(WindowEvent.WINDOW_HIDDEN, e -> {
+            if (window[0] != null) {
+                window[0].xProperty().removeListener(windowMoved);
+                window[0].yProperty().removeListener(windowMoved);
+            }
+            if (node[0] != null) {
+                node[0].localToSceneTransformProperty().removeListener(nodeMoved);
+            }
+            window[0] = null;
+            node[0] = null;
         });
     }
 

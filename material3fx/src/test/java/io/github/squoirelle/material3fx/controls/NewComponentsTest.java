@@ -429,6 +429,44 @@ class NewComponentsTest {
         });
     }
 
+    @Test
+    void searchSuggestionsAreAsWideAsTheBarAndFollowItsWidth() throws Exception {
+        SearchBar[] bar = new SearchBar[1];
+        FxTestSupport.onFx(() -> {
+            bar[0] = new SearchBar("Search");
+            bar[0].setSuggestionProvider(text -> List.of("Cordless drill", "Cable"));
+            show(new VBox(bar[0]), 800, 400);
+            return null;
+        });
+        // Suggestions only show for a focused bar.
+        assertTrue(FxTestSupport.focus(bar[0]), "the search bar gets the focus");
+        FxTestSupport.onFx(() -> {
+            bar[0].setText("c");
+            return null;
+        });
+        Thread.sleep(400);
+        FxTestSupport.onFx(() -> {
+            assertEquals(bar[0].getWidth(), suggestionMenu().getWidth(), 0.5, "as wide as the bar");
+            // The window resizes while the suggestions show.
+            bar[0].setMaxWidth(500);
+            bar[0].getParent().layout();
+            return null;
+        });
+        Thread.sleep(400);
+        FxTestSupport.onFx(() -> {
+            assertEquals(500, suggestionMenu().getWidth(), 0.5, "follows the bar's new width");
+            bar[0].getScene().getWindow().hide();
+            return null;
+        });
+    }
+
+    private static javafx.scene.layout.Region suggestionMenu() {
+        Window popup = Window.getWindows().stream()
+                .filter(w -> w.isShowing() && w.getScene().getRoot().lookup(".search-suggestions") != null)
+                .findFirst().orElseThrow();
+        return (javafx.scene.layout.Region) popup.getScene().getRoot().lookup(".search-suggestions");
+    }
+
     // ---------- Adaptive scaffold ----------
 
     @Test

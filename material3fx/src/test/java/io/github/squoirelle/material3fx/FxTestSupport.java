@@ -30,6 +30,26 @@ public final class FxTestSupport {
         started = true;
     }
 
+    /**
+     * Gives the keyboard focus to a node, its window first, and waits until it has it: window
+     * focus arrives asynchronously. Returns whether the node got the focus.
+     */
+    public static boolean focus(javafx.scene.Node node) throws Exception {
+        long deadline = System.currentTimeMillis() + 3000;
+        while (System.currentTimeMillis() < deadline) {
+            boolean focused = onFx(() -> {
+                node.getScene().getWindow().requestFocus();
+                node.requestFocus();
+                return node.isFocused();
+            });
+            if (focused) {
+                return true;
+            }
+            Thread.sleep(50);
+        }
+        return false;
+    }
+
     public static <T> T onFx(Supplier<T> action) throws Exception {
         start();
         CompletableFuture<T> future = new CompletableFuture<>();

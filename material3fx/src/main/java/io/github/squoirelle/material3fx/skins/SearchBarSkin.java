@@ -29,6 +29,7 @@ public class SearchBarSkin extends TextFieldSkin {
 
     private static final double PADDING = 16;
     private static final double GAP = 16;
+    private static final double SUGGESTIONS_GAP = 4;
 
     private final Icon searchIcon = new Icon("search");
     private final HBox trailingBox = new HBox(4);
@@ -119,7 +120,9 @@ public class SearchBarSkin extends TextFieldSkin {
         for (String value : values.subList(0, Math.min(8, values.size()))) {
             ListItem item = new ListItem(value);
             item.setLeadingIcon("history");
-            item.setPrefWidth(bar.getWidth() - 16);
+            // The menu has no horizontal padding: items as wide as the bar make it exactly as wide,
+            // also when the bar resizes while the suggestions show.
+            item.prefWidthProperty().bind(bar.widthProperty());
             CustomMenuItem menuItem = new CustomMenuItem(item, true);
             menuItem.getStyleClass().add("search-suggestion");
             menuItem.setOnAction(e -> {
@@ -131,7 +134,7 @@ public class SearchBarSkin extends TextFieldSkin {
             suggestions.getItems().add(menuItem);
         }
         if (!suggestions.isShowing()) {
-            suggestions.show(bar, Side.BOTTOM, 0, 4);
+            suggestions.show(bar, Side.BOTTOM, 0, SUGGESTIONS_GAP);
         }
     }
 
