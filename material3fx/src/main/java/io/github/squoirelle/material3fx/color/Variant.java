@@ -4,6 +4,8 @@ package io.github.squoirelle.material3fx.color;
  * Scheme variants, matching the ones offered by Material Theme Builder. Each variant derives the
  * five key palettes (primary, secondary, tertiary, neutral, neutral variant) differently from
  * the seed color.
+ * <p>
+ * The hue and chroma rules follow Google's material-color-utilities (Apache 2.0).
  */
 public enum Variant {
     /** The default Material 3 look: calm, slightly tinted, seed hue kept for primary. */

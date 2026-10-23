@@ -7,6 +7,8 @@ import java.util.Locale;
  * <p>
  * Roles that are drawn <em>on top of</em> another role name it as their {@code against} role;
  * raising the scheme's contrast level pushes them further away from it.
+ * <p>
+ * The tones follow Google's material-color-utilities (Apache 2.0).
  */
 public enum ColorRole {
     PRIMARY(Palette.PRIMARY, 40, 80, "SURFACE"),
