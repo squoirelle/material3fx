@@ -13,6 +13,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class CarouselTest {
 
@@ -49,6 +50,81 @@ class CarouselTest {
         });
         assertEquals(first, second, "carousel items moved without any input");
         assertEquals(820.0, second.getLast(), "carousel must keep its preferred width");
+    }
+
+    /** Realistic input moves the carousel: one wheel notch, a short drag, arrow keys. */
+    @Test
+    void carouselRespondsToRealisticInput() throws Exception {
+        Carousel[] carousel = new Carousel[1];
+        Stage[] stage = new Stage[1];
+        FxTestSupport.onFx(() -> {
+            carousel[0] = new Carousel();
+            for (int i = 0; i < 6; i++) {
+                carousel[0].getItems().add(new StackPane());
+            }
+            carousel[0].setPrefSize(820, 200);
+            stage[0] = new Stage();
+            stage[0].setScene(new Scene(new VBox(carousel[0]), 1000, 400));
+            new MaterialTheme().apply(stage[0].getScene());
+            stage[0].show();
+            return null;
+        });
+        Thread.sleep(300);
+        double start = FxTestSupport.onFx(() -> firstItemX(carousel[0]));
+
+        // One mouse wheel notch (about 40 px) over an item.
+        FxTestSupport.onFx(() -> {
+            Node item = carousel[0].getChildrenUnmodifiable().get(1);
+            javafx.event.Event.fireEvent(item, new javafx.scene.input.ScrollEvent(javafx.scene.input.ScrollEvent.SCROLL,
+                    300, 100, 300, 100, false, false, false, false, false, false, 0, -40, 0, -40,
+                    javafx.scene.input.ScrollEvent.HorizontalTextScrollUnits.NONE, 0,
+                    javafx.scene.input.ScrollEvent.VerticalTextScrollUnits.NONE, 0, 0, null));
+            return null;
+        });
+        Thread.sleep(800);
+        double afterWheel = FxTestSupport.onFx(() -> firstItemX(carousel[0]));
+        assertTrue(afterWheel < start - 100, "one wheel notch must move to the next item (" + start + " -> " + afterWheel + ")");
+
+        // A short drag (60 px) back to the right.
+        FxTestSupport.onFx(() -> {
+            Node item = carousel[0].getChildrenUnmodifiable().get(2);
+            javafx.geometry.Point2D p = carousel[0].localToScene(400, 100);
+            javafx.event.Event.fireEvent(item, mouse(javafx.scene.input.MouseEvent.MOUSE_PRESSED, p.getX(), p.getY(), item));
+            javafx.event.Event.fireEvent(item, mouse(javafx.scene.input.MouseEvent.MOUSE_DRAGGED, p.getX() + 60, p.getY(), item));
+            javafx.event.Event.fireEvent(item, mouse(javafx.scene.input.MouseEvent.MOUSE_RELEASED, p.getX() + 60, p.getY(), item));
+            return null;
+        });
+        Thread.sleep(800);
+        double afterDrag = FxTestSupport.onFx(() -> firstItemX(carousel[0]));
+        assertEquals(start, afterDrag, 1, "a short drag must move back to the previous item");
+
+        // Arrow key.
+        FxTestSupport.onFx(() -> {
+            carousel[0].requestFocus();
+            javafx.event.Event.fireEvent(carousel[0], new javafx.scene.input.KeyEvent(javafx.scene.input.KeyEvent.KEY_PRESSED,
+                    "", "", javafx.scene.input.KeyCode.RIGHT, false, false, false, false));
+            return null;
+        });
+        Thread.sleep(800);
+        double afterKey = FxTestSupport.onFx(() -> firstItemX(carousel[0]));
+        FxTestSupport.onFx(() -> {
+            stage[0].close();
+            return null;
+        });
+        assertTrue(afterKey < start - 100, "Right must move to the next item");
+    }
+
+    /** Left edge of the third item: it stays clear of both edges in these tests, so it moves by whole items. */
+    private static double firstItemX(Carousel carousel) {
+        carousel.layout();
+        return carousel.getChildrenUnmodifiable().get(2).getLayoutX();
+    }
+
+    private static javafx.scene.input.MouseEvent mouse(javafx.event.EventType<javafx.scene.input.MouseEvent> type,
+                                                       double sx, double sy, Node target) {
+        return new javafx.scene.input.MouseEvent(type, sx, sy, sx, sy, javafx.scene.input.MouseButton.PRIMARY, 1,
+                false, false, false, false, true, false, false, false, false,
+                type != javafx.scene.input.MouseEvent.MOUSE_PRESSED, new javafx.scene.input.PickResult(target, sx, sy));
     }
 
     /** The same check for every component: nothing may keep re-laying itself out without input. */

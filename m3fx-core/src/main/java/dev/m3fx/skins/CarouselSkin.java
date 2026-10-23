@@ -37,10 +37,11 @@ public class CarouselSkin extends SkinBase<Carousel> {
     private final EventHandler<ScrollEvent> scrollHandler = this::onScroll;
     private final EventHandler<MouseEvent> pressHandler = this::onPressed;
     private final EventHandler<MouseEvent> dragHandler = this::onDragged;
-    private final EventHandler<MouseEvent> releaseHandler = e -> snapTo(Math.round(offset.get() / step()));
+    private final EventHandler<MouseEvent> releaseHandler = e -> snapInDirection(offset.get() - this.dragStartOffset);
     private final EventHandler<KeyEvent> keyHandler = this::onKeyPressed;
     private double dragStartX;
     private double dragStartOffset;
+    private double gestureStartOffset;
 
     public CarouselSkin(Carousel carousel) {
         super(carousel);
@@ -55,7 +56,7 @@ public class CarouselSkin extends SkinBase<Carousel> {
         registerChangeListener(carousel.itemWidthProperty(), o -> carousel.requestLayout());
         registerChangeListener(carousel.smallItemWidthProperty(), o -> carousel.requestLayout());
         registerChangeListener(carousel.spacingProperty(), o -> carousel.requestLayout());
-        snapDelay.setOnFinished(e -> snapTo(Math.round(offset.get() / step())));
+        snapDelay.setOnFinished(e -> snapInDirection(offset.get() - gestureStartOffset));
         rebuild();
     }
 
@@ -78,6 +79,14 @@ public class CarouselSkin extends SkinBase<Carousel> {
 
     private void onScroll(ScrollEvent e) {
         double delta = Math.abs(e.getDeltaX()) > Math.abs(e.getDeltaY()) ? e.getDeltaX() : e.getDeltaY();
+        if (delta == 0) {
+            return;
+        }
+        if (snapDelay.getStatus() != javafx.animation.Animation.Status.RUNNING) {
+            // First event of a wheel / trackpad gesture.
+            gestureStartOffset = offset.get();
+        }
+        snap.stop();
         setOffsetClamped(offset.get() - delta);
         snapDelay.playFromStart();
         e.consume();
@@ -135,6 +144,24 @@ public class CarouselSkin extends SkinBase<Carousel> {
 
     private void setOffsetClamped(double value) {
         offset.set(Math.clamp(value, 0, maxOffset()));
+    }
+
+    /**
+     * Snaps after a scroll or drag that moved the content by {@code moved} pixels: to the next or
+     * previous item in the direction of the movement, so even one mouse wheel notch or a short
+     * flick changes item. Only a few pixels of jitter round back to the nearest item.
+     */
+    private void snapInDirection(double moved) {
+        double position = offset.get() / step();
+        long index;
+        if (moved > 4) {
+            index = (long) Math.ceil(position);
+        } else if (moved < -4) {
+            index = (long) Math.floor(position);
+        } else {
+            index = Math.round(position);
+        }
+        snapTo(index);
     }
 
     private void snapTo(long index) {
