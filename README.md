@@ -29,8 +29,6 @@ To test a combination: `./gradlew :material3fx:test -Pjdk=21 -Pjavafx=22.0.2`.
 
 ## Installation
 
-Not released yet. Once on Maven Central:
-
 ```kotlin
 // build.gradle.kts
 dependencies {

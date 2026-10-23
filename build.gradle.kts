@@ -7,7 +7,7 @@ subprojects {
     apply(plugin = "java-library")
 
     group = "io.github.squoirelle"
-    version = "0.1.0-SNAPSHOT"
+    version = "0.1.0"
 
     repositories {
         mavenCentral()
