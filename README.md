@@ -12,8 +12,8 @@ theme.applyGlobally();                  // every window: stages, dialogs, menus,
 
 Requires **Java 21+ and JavaFX 21+** (both LTS). No dependencies; Roboto and the Material Icons
 fonts are bundled. Following the system dark mode (`ThemeMode.SYSTEM`) and accent color works on Linux through the
-XDG desktop portal (COSMIC, GNOME, KDE; it uses the standard `gdbus` tool and follows changes
-live), and elsewhere through `Platform.getPreferences()`, which needs JavaFX 22+. JavaFX's own
+XDG desktop portal (COSMIC, GNOME, KDE), read over the session bus by a small built-in D-Bus
+client (pure Java, no external process or native code) that also follows changes live, and elsewhere through `Platform.getPreferences()`, which needs JavaFX 22+. JavaFX's own
 detection is not used on Linux: it derives dark mode from the GTK theme, which is wrong on some
 desktops (COSMIC reports a light theme while the desktop is dark).
 

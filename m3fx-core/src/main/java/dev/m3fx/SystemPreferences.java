@@ -5,17 +5,11 @@ import javafx.beans.InvalidationListener;
 import javafx.beans.value.ObservableValue;
 import javafx.scene.paint.Color;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.lang.reflect.Method;
-import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Locale;
 import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.concurrent.TimeUnit;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 /**
  * The operating system's color scheme (light / dark) and accent color.
@@ -27,8 +21,9 @@ import java.util.regex.Pattern;
  * follow the desktop setting on several desktops (COSMIC, through XWayland, reports a light GTK
  * theme while the desktop is dark). On Linux the XDG desktop portal
  * ({@code org.freedesktop.appearance}), which COSMIC, GNOME and KDE implement, is therefore asked
- * first, with the {@code gdbus} tool; changes are followed with {@code gdbus monitor}. Without a
- * portal or {@code gdbus}, or when the portal has no preference, JavaFX's values are used.
+ * first, over the session bus with a small built-in D-Bus client ({@link DBusConnection}: no
+ * process, no native code), and its {@code SettingChanged} signals are followed. Without a session
+ * bus or portal, or when the portal has no preference, JavaFX's values are used.
  */
 final class SystemPreferences {
 
@@ -38,8 +33,9 @@ final class SystemPreferences {
     private static final String PORTAL_DEST = "org.freedesktop.portal.Desktop";
     private static final String PORTAL_PATH = "/org/freedesktop/portal/desktop";
 
-    private static final Pattern UINT32 = Pattern.compile("uint32 (\\d+)");
-    private static final Pattern RGB = Pattern.compile("\\(([-\\d.eE+]+), ([-\\d.eE+]+), ([-\\d.eE+]+)\\)");
+    private static final String SETTINGS = "org.freedesktop.portal.Settings";
+    private static final String APPEARANCE = "org.freedesktop.appearance";
+    private static final long READ_TIMEOUT_MILLIS = 2000;
 
     private static final List<InvalidationListener> SCHEME_LISTENERS = new CopyOnWriteArrayList<>();
     private static final List<InvalidationListener> ACCENT_LISTENERS = new CopyOnWriteArrayList<>();
@@ -112,68 +108,81 @@ final class SystemPreferences {
             return;
         }
         portalRead = true;
-        String scheme = readSetting("color-scheme");
-        portalScheme = scheme == null ? null : parseColorScheme(scheme);
-        String accent = readSetting("accent-color");
-        portalAccent = accent == null ? null : parseAccentColor(accent);
-    }
-
-    /** Output of the portal's ReadOne (or, on older portals, Read) for an appearance setting; null on failure. */
-    private static String readSetting(String key) {
-        String result = gdbusCall("org.freedesktop.portal.Settings.ReadOne", key);
-        return result != null ? result : gdbusCall("org.freedesktop.portal.Settings.Read", key);
-    }
-
-    private static String gdbusCall(String method, String key) {
-        try {
-            Process process = new ProcessBuilder("gdbus", "call", "--session", "--timeout", "2", "--dest", PORTAL_DEST,
-                    "--object-path", PORTAL_PATH, "--method", method, "org.freedesktop.appearance", key)
-                    .redirectErrorStream(true).start();
-            String output = new String(process.getInputStream().readAllBytes(), StandardCharsets.UTF_8);
-            if (!process.waitFor(3, TimeUnit.SECONDS)) {
-                process.destroyForcibly();
-                return null;
+        Object[] values = new Object[2];
+        // A daemon thread with a deadline: a stuck bus must not block the caller (often the FX thread).
+        DBusConnection[] connection = new DBusConnection[1];
+        Thread reader = new Thread(() -> {
+            try (DBusConnection bus = DBusConnection.openSessionBus()) {
+                connection[0] = bus;
+                values[0] = readSetting(bus, "color-scheme");
+                values[1] = readSetting(bus, "accent-color");
+            } catch (IOException | RuntimeException e) {
+                // No session bus or no portal: JavaFX's values are used.
             }
-            return process.exitValue() == 0 ? output.trim() : null;
-        } catch (IOException e) {
-            return null;   // no gdbus
+        }, "m3fx-portal-read");
+        reader.setDaemon(true);
+        reader.start();
+        try {
+            reader.join(READ_TIMEOUT_MILLIS);
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
-            return null;
         }
+        if (reader.isAlive()) {
+            closeQuietly(connection[0]);
+            return;
+        }
+        portalScheme = colorScheme(values[0]);
+        portalAccent = accentColor(values[1]);
+    }
+
+    /** The portal's ReadOne (or, on older portals, Read) value for an appearance setting; null if unset. */
+    private static Object readSetting(DBusConnection bus, String key) throws IOException {
+        DBusConnection.Message reply;
+        try {
+            reply = bus.call(PORTAL_DEST, PORTAL_PATH, SETTINGS, "ReadOne", APPEARANCE, key);
+        } catch (IOException e) {
+            try {
+                reply = bus.call(PORTAL_DEST, PORTAL_PATH, SETTINGS, "Read", APPEARANCE, key);
+            } catch (IOException notFound) {
+                return null;   // the portal does not know this key
+            }
+        }
+        return reply.body().isEmpty() ? null : reply.body().get(0);
     }
 
     private static void monitorPortal() {
-        try {
-            Process process = new ProcessBuilder("gdbus", "monitor", "--session", "--dest", PORTAL_DEST,
-                    "--object-path", PORTAL_PATH).redirectErrorStream(true).start();
-            Runtime.getRuntime().addShutdownHook(new Thread(process::destroy));
-            try (BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream(), StandardCharsets.UTF_8))) {
-                String line;
-                while ((line = reader.readLine()) != null) {
-                    onMonitorLine(line);
+        try (DBusConnection bus = DBusConnection.openSessionBus()) {
+            bus.call("org.freedesktop.DBus", "/org/freedesktop/DBus", "org.freedesktop.DBus", "AddMatch",
+                    "type='signal',interface='" + SETTINGS + "',member='SettingChanged',path='" + PORTAL_PATH
+                            + "',arg0='" + APPEARANCE + "'");
+            while (true) {
+                DBusConnection.Message message = bus.readMessage();
+                if (message.type() == DBusConnection.SIGNAL && "SettingChanged".equals(message.member())
+                        && message.body().size() == 3) {
+                    onSettingChanged(String.valueOf(message.body().get(0)), String.valueOf(message.body().get(1)),
+                            message.body().get(2));
                 }
             }
-        } catch (IOException e) {
-            // No monitor: values stay as read at startup.
+        } catch (IOException | RuntimeException e) {
+            // Bus gone: values stay as last read.
         }
     }
 
-    /** Handles one line of {@code gdbus monitor} output (package-private for tests). */
-    static void onMonitorLine(String line) {
-        if (!line.contains("SettingChanged") || !line.contains("'org.freedesktop.appearance'")) {
+    /** Handles a portal SettingChanged signal (package-private for tests). */
+    static void onSettingChanged(String namespace, String key, Object value) {
+        if (!APPEARANCE.equals(namespace)) {
             return;
         }
-        if (line.contains("'color-scheme'")) {
-            Integer scheme = parseColorScheme(line);
+        if ("color-scheme".equals(key)) {
+            Integer scheme = colorScheme(value);
             if (scheme != null) {
                 synchronized (SystemPreferences.class) {
                     portalScheme = scheme;
                 }
                 notifyLater(SCHEME_LISTENERS);
             }
-        } else if (line.contains("'accent-color'")) {
-            Color accent = parseAccentColor(line);
+        } else if ("accent-color".equals(key)) {
+            Color accent = accentColor(value);
             synchronized (SystemPreferences.class) {
                 portalAccent = accent;
             }
@@ -185,29 +194,34 @@ final class SystemPreferences {
         Platform.runLater(() -> listeners.forEach(l -> l.invalidated(null)));
     }
 
-    /** Parses a portal color-scheme value ("(<uint32 1>,)", "<<uint32 1>>", or a SettingChanged line). */
-    static Integer parseColorScheme(String text) {
-        Matcher m = UINT32.matcher(text);
-        return m.find() ? Integer.valueOf(m.group(1)) : null;
+    private static void closeQuietly(DBusConnection connection) {
+        if (connection != null) {
+            try {
+                connection.close();
+            } catch (IOException ignored) {
+                // closing anyway
+            }
+        }
     }
 
-    /** Parses a portal accent color "(r, g, b)" in [0, 1]; out-of-range components mean "unset" (null). */
-    static Color parseAccentColor(String text) {
-        Matcher m = RGB.matcher(text);
-        if (!m.find()) {
+    /** A decoded color-scheme value (uint32 0 / 1 / 2), or null when it is not one. */
+    static Integer colorScheme(Object value) {
+        return value instanceof Long l && l >= 0 && l <= 2 ? l.intValue() : null;
+    }
+
+    /** A decoded accent color (r, g, b) in [0, 1]; out-of-range components mean "unset" (null). */
+    static Color accentColor(Object value) {
+        if (!(value instanceof List<?> rgb) || rgb.size() != 3) {
             return null;
         }
-        try {
-            double r = Double.parseDouble(m.group(1));
-            double g = Double.parseDouble(m.group(2));
-            double b = Double.parseDouble(m.group(3));
-            if (r < 0 || r > 1 || g < 0 || g > 1 || b < 0 || b > 1) {
+        double[] c = new double[3];
+        for (int i = 0; i < 3; i++) {
+            if (!(rgb.get(i) instanceof Double d) || d < 0 || d > 1) {
                 return null;
             }
-            return Color.color(r, g, b);
-        } catch (NumberFormatException e) {
-            return null;
+            c[i] = d;
         }
+        return Color.color(c[0], c[1], c[2]);
     }
 
     // For tests.
