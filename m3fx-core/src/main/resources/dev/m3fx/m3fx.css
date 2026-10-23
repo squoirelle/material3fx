@@ -282,6 +282,57 @@
     -fx-background-color: -md-sys-color-on-surface-a12;
 }
 
+/* JavaFX's segmented-button convention (left-pill / center-pill / right-pill, used e.g. by the
+   color picker's custom color dialog): connected segments like a Material segmented button. */
+.toggle-button.left-pill,
+.toggle-button.center-pill,
+.toggle-button.right-pill,
+.button.left-pill,
+.button.center-pill,
+.button.right-pill {
+    -fx-background-color: transparent;
+    -fx-text-fill: -md-sys-color-on-surface;
+    -fx-border-color: -md-sys-color-outline;
+    -fx-border-width: 1 0 1 1;
+    -fx-padding: 0 16 0 16;
+    -fx-effect: null;
+}
+
+.toggle-button.left-pill,
+.button.left-pill {
+    -fx-background-radius: 100 0 0 100;
+    -fx-border-radius: 100 0 0 100;
+}
+
+.toggle-button.center-pill,
+.button.center-pill {
+    -fx-background-radius: 0;
+    -fx-border-radius: 0;
+}
+
+.toggle-button.right-pill,
+.button.right-pill {
+    -fx-background-radius: 0 100 100 0;
+    -fx-border-radius: 0 100 100 0;
+    -fx-border-width: 1;
+}
+
+.toggle-button.left-pill:selected,
+.toggle-button.center-pill:selected,
+.toggle-button.right-pill:selected {
+    -fx-background-color: -md-sys-color-secondary-container;
+    -fx-text-fill: -md-sys-color-on-secondary-container;
+}
+
+.custom-color-dialog .toggle-button.left-pill,
+.custom-color-dialog .toggle-button.center-pill,
+.custom-color-dialog .toggle-button.right-pill {
+    -fx-min-height: 32;
+    -fx-pref-height: 32;
+    -fx-padding: 0 14 0 14;
+    -fx-font-size: 13px;
+}
+
 .hyperlink {
     -fx-text-fill: -md-sys-color-primary;
     -fx-padding: 2 4 2 4;
@@ -1662,10 +1713,29 @@
     -fx-text-fill: -md-sys-color-on-surface-variant;
 }
 
+/* The mode buttons sit inside the settings card (Modena makes them straddle its top edge). */
 .custom-color-dialog .controls-pane .customcolor-controls-background {
     -fx-background-color: -md-sys-color-surface-container-low;
-    -fx-background-insets: 10 0 5 0;
+    -fx-background-insets: -6 -8 0 -8;
     -fx-background-radius: 12;
+}
+
+.custom-color-dialog .controls-pane #settings-pane {
+    -fx-vgap: 4;
+}
+
+/* Dialog actions: text buttons, the default one filled, as in Material dialogs. */
+.custom-color-dialog .controls-pane #buttons-hbox .button {
+    -fx-background-color: transparent;
+    -fx-text-fill: -md-sys-color-primary;
+    -fx-padding: 0 12 0 12;
+    -fx-effect: null;
+}
+
+.custom-color-dialog .controls-pane #buttons-hbox .button:default {
+    -fx-background-color: -md-sys-color-primary;
+    -fx-text-fill: -md-sys-color-on-primary;
+    -fx-padding: 0 20 0 20;
 }
 
 .custom-color-dialog .text-field,

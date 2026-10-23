@@ -138,6 +138,20 @@ public class Screenshots extends Application {
         javafx.scene.control.ColorPicker picker = (javafx.scene.control.ColorPicker) scene.getRoot().lookup(".color-picker");
         picker.show();
         shootPopup(dir, "popup-color-picker");
+        // The custom color dialog opens from the palette's link, in its own window.
+        javafx.stage.Window palette = javafx.stage.Window.getWindows().stream()
+                .filter(w -> w instanceof javafx.stage.PopupWindow && w.isShowing()).reduce((a, b) -> b).orElseThrow();
+        ((javafx.scene.control.Hyperlink) palette.getScene().getRoot().lookup(".hyperlink")).fire();
+        for (javafx.stage.Window w : java.util.List.copyOf(javafx.stage.Window.getWindows())) {
+            if (w.getScene() != null && w.getScene().getRoot().lookup(".custom-color-dialog") != null) {
+                w.getScene().getRoot().applyCss();
+                w.getScene().getRoot().layout();
+                WritableImage image = w.getScene().snapshot(null);
+                File file = new File(dir, "popup-custom-color-dialog.png");
+                ImageIO.write(SwingFXUtils.fromFXImage(image, null), "png", file);
+                ((javafx.stage.Stage) w).close();
+            }
+        }
         picker.hide();
         app.selectPage("data-entry");
         scene.getRoot().applyCss();
