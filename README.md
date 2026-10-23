@@ -1,4 +1,4 @@
-# m3fx
+# Material3FX
 
 Material Design 3 for JavaFX: dynamic color, a complete restyle of the standard controls, and the
 Material components JavaFX doesn't have.
@@ -24,19 +24,19 @@ The whole test suite passes on every combination the JavaFX releases themselves 
 | **JDK 21** | ✅ | ✅ | ✅ | needs JDK 22 | needs JDK 23 | needs JDK 24 | needs JDK 25 |
 | **JDK 25** | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
 
-To test a combination: `./gradlew :m3fx-core:test -Pjdk=21 -Pjavafx=22.0.2`.
+To test a combination: `./gradlew :material3fx:test -Pjdk=21 -Pjavafx=22.0.2`.
 
 ## Run the demo
 
 ```
-./gradlew :m3fx-demo:run           # the showcase app, with a live theme editor
-./gradlew :m3fx-demo:screenshots   # renders every page, light and dark, to m3fx-demo/build/screenshots
-./gradlew :m3fx-core:test
+./gradlew :material3fx-demo:run           # the showcase app, with a live theme editor
+./gradlew :material3fx-demo:screenshots   # renders every page, light and dark, to material3fx-demo/build/screenshots
+./gradlew :material3fx:test
 ```
 
 ## What's in it
 
-### 1. Dynamic color (`dev.m3fx.color`)
+### 1. Dynamic color (`io.github.squoirelle.material3fx.color`)
 A Java port of Material's color science: CAM16, HCT, tonal palettes.
 
 - `ColorScheme`: all 49 Material color roles from one seed color, light or dark.
@@ -46,7 +46,7 @@ A Java port of Material's color science: CAM16, HCT, tonal palettes.
 - Custom (extended) colors such as `success` or `warning`, harmonized towards the primary.
 - `SeedExtractor`: picks seed colors from an image.
 
-### 2. Theme (`dev.m3fx`)
+### 2. Theme (`io.github.squoirelle.material3fx`)
 `MaterialTheme` turns a scheme into CSS looked-up colors and applies them with the stylesheet.
 Every property can change at runtime: seed, mode (light / dark / system), variant, contrast,
 density, font family and custom colors.
@@ -102,10 +102,10 @@ Style classes add the Material variants: `.button.tonal`, `.elevated`, `.outline
 `.error-button`; `.text-field.filled`; `.table-view.striped` / `.grid`; `.tab-pane.secondary`;
 `.tooltip.rich`.
 
-### 4. Components (`dev.m3fx.controls`)
+### 4. Components (`io.github.squoirelle.material3fx.controls`)
 
 Every component follows the JavaFX control model: a `Control` (or the JavaFX control it
-specializes) with its look and behavior in a `Skin` (`dev.m3fx.skins`), created by
+specializes) with its look and behavior in a `Skin` (`io.github.squoirelle.material3fx.skins`), created by
 `createDefaultSkin()` and replaceable with `setSkin` or `-fx-skin` in CSS. Where JavaFX has an
 equivalent, the component *is* that control:
 
@@ -177,7 +177,7 @@ are buttons, password fields hide their text, icon buttons take their name from 
 
 **Black flickering during animations on Linux** (switches, progress indicators, ripples).
 Seen with NVIDIA drivers under XWayland (JavaFX has no native Wayland support), e.g. on COSMIC.
-It comes from vsynced buffer swaps, not from m3fx: the software renderer (`-Dprism.order=sw`)
+It comes from vsynced buffer swaps, not from Material3FX: the software renderer (`-Dprism.order=sw`)
 doesn't show it, and disabling dirty-region repaints (`-Dprism.dirtyopts=false`) doesn't help.
 Turning vsync off fixes it:
 
@@ -185,22 +185,22 @@ Turning vsync off fixes it:
 java -Dprism.vsync=false ...          # and/or the environment variable __GL_SYNC_TO_VBLANK=0
 ```
 
-The demo does this by default on Linux (`./gradlew :m3fx-demo:run -Pvsync=true` to compare).
+The demo does this by default on Linux (`./gradlew :material3fx-demo:run -Pvsync=true` to compare).
 Other diagnostics: `-Pprism=sw` (software renderer), `-Pdirtyopts=false`.
 
 **Clicks on a menu or dropdown go to the window behind it (Linux, Wayland).**
 On some Wayland compositors (seen on COSMIC, through XWayland), the parts of a JavaFX popup
 that extend outside its window do not receive clicks: the click reaches the window behind,
-which comes to the front. Plain JavaFX behaves the same. With `applyGlobally()`, m3fx keeps
+which comes to the front. Plain JavaFX behaves the same. With `applyGlobally()`, Material3FX keeps
 popups inside their window on Wayland sessions: a menu or dropdown that would extend below the
 window opens above its control, or is shifted to fit. `theme.setKeepPopupsInWindow(false)`
 turns it off; it is off by default outside Wayland.
 
 ## Project layout
 
-- `m3fx-core`: the library (JPMS module `dev.m3fx`)
-- `m3fx-demo`: the showcase app and the screenshot renderer
+- `material3fx`: the library (JPMS module `io.github.squoirelle.material3fx`)
+- `material3fx-demo`: the showcase app and the screenshot renderer
 
 ## Licenses
 
-m3fx bundles Roboto (Apache 2.0 / OFL) and the Material Icons fonts (Apache 2.0) from Google.
+Material3FX bundles Roboto (Apache 2.0 / OFL) and the Material Icons fonts (Apache 2.0) from Google.

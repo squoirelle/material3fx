@@ -6,7 +6,7 @@ val buildJdk = providers.gradleProperty("jdk").map { it.toInt() }.getOrElse(25)
 subprojects {
     apply(plugin = "java-library")
 
-    group = "dev.m3fx"
+    group = "io.github.squoirelle"
     version = "0.1.0-SNAPSHOT"
 
     repositories {

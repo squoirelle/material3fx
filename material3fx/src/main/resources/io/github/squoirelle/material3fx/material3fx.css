@@ -1,0 +1,4217 @@
+/*
+ * Material3FX - Material Design 3 for JavaFX.
+ *
+ * Applied as an author stylesheet on top of Modena. Colors come from the generated token
+ * stylesheet (-md-sys-color-*), installed by MaterialTheme alongside this file.
+ *
+ * Sections:
+ *   1. Root, Modena mapping, typography, elevation
+ *   2. Buttons and toggles
+ *   3. Selection controls (checkbox, radio, switch)
+ *   4. Text inputs and dropdowns
+ *   5. Menus, tooltips, popups
+ *   6. Lists, tables, trees
+ *   7. Containers (tabs, titled panes, split panes, scroll bars, toolbars, separators)
+ *   8. Sliders and progress indicators
+ *   9. Date picker, dialogs
+ *  10. Material3FX components
+ *  11. Density
+ */
+
+/* ===================================================================================== */
+/* 1. Root, Modena mapping, typography, elevation                                         */
+/* ===================================================================================== */
+
+.root {
+    -fx-font-size: 14px;
+    -fx-background-color: -md-sys-color-surface;
+
+    /* Map Modena's palette onto the Material roles, so any control not styled below still fits. */
+    -fx-base: -md-sys-color-surface-container-high;
+    -fx-background: -md-sys-color-surface;
+    -fx-control-inner-background: -md-sys-color-surface;
+    -fx-control-inner-background-alt: -md-sys-color-surface-container-low;
+    -fx-accent: -md-sys-color-primary;
+    -fx-default-button: -md-sys-color-primary;
+    -fx-focus-color: -md-sys-color-primary;
+    -fx-faint-focus-color: transparent;
+    -fx-dark-text-color: -md-sys-color-on-surface;
+    -fx-mid-text-color: -md-sys-color-on-surface-variant;
+    -fx-light-text-color: -md-sys-color-inverse-on-surface;
+    -fx-text-base-color: -md-sys-color-on-surface;
+    -fx-text-background-color: -md-sys-color-on-surface;
+    -fx-text-inner-color: -md-sys-color-on-surface;
+    -fx-prompt-text-fill: -md-sys-color-on-surface-variant;
+    -fx-selection-bar: -md-sys-color-secondary-container;
+    -fx-selection-bar-non-focused: -md-sys-color-secondary-container;
+    -fx-selection-bar-text: -md-sys-color-on-secondary-container;
+    -fx-highlight-fill: -md-sys-color-primary-a38;
+    -fx-highlight-text-fill: -md-sys-color-on-surface;
+    -fx-mark-color: -md-sys-color-on-surface-variant;
+    -fx-mark-highlight-color: transparent;
+    -fx-box-border: -md-sys-color-outline;
+    -fx-text-box-border: -md-sys-color-outline;
+    -fx-outer-border: -md-sys-color-outline-variant;
+    -fx-inner-border: transparent;
+    -fx-shadow-highlight-color: transparent;
+    -fx-table-cell-border-color: -md-sys-color-outline-variant;
+    -fx-table-header-border-color: -md-sys-color-outline-variant;
+}
+
+/* Popup windows (menus, tooltips, dropdowns) are transparent: their root must not paint a box. */
+.root.popup {
+    -fx-background-color: transparent;
+}
+
+.label {
+    -fx-text-fill: -md-sys-color-on-surface;
+}
+
+.text {
+    -fx-font-smoothing-type: gray;
+}
+
+.md-icon:standalone {
+    -fx-fill: -md-sys-color-on-surface-variant;
+}
+
+/* Type scale */
+.display-large   { -fx-font-size: 57px; -fx-font-weight: normal; }
+.display-medium  { -fx-font-size: 45px; -fx-font-weight: normal; }
+.display-small   { -fx-font-size: 36px; -fx-font-weight: normal; }
+.headline-large  { -fx-font-size: 32px; -fx-font-weight: normal; }
+.headline-medium { -fx-font-size: 28px; -fx-font-weight: normal; }
+.headline-small  { -fx-font-size: 24px; -fx-font-weight: normal; }
+.title-large     { -fx-font-size: 22px; -fx-font-weight: normal; }
+.title-medium    { -fx-font-size: 16px; -fx-font-weight: 500; }
+.title-small     { -fx-font-size: 14px; -fx-font-weight: 500; }
+.body-large      { -fx-font-size: 16px; -fx-font-weight: normal; }
+.body-medium     { -fx-font-size: 14px; -fx-font-weight: normal; }
+.body-small      { -fx-font-size: 12px; -fx-font-weight: normal; }
+.label-large     { -fx-font-size: 14px; -fx-font-weight: 500; }
+.label-medium    { -fx-font-size: 12px; -fx-font-weight: 500; }
+.label-small     { -fx-font-size: 11px; -fx-font-weight: 500; }
+
+/* Text color helpers */
+.on-surface-variant { -fx-text-fill: -md-sys-color-on-surface-variant; }
+.primary-text       { -fx-text-fill: -md-sys-color-primary; }
+.error-text         { -fx-text-fill: -md-sys-color-error; }
+
+/* Elevation */
+.md-elevation-0 { -fx-effect: null; }
+.md-elevation-1 { -fx-effect: dropshadow(gaussian, -md-sys-color-shadow-a32, 4, 0, 0, 1); }
+.md-elevation-2 { -fx-effect: dropshadow(gaussian, -md-sys-color-shadow-a32, 7, 0, 0, 2); }
+.md-elevation-3 { -fx-effect: dropshadow(gaussian, -md-sys-color-shadow-a32, 11, 0.04, 0, 4); }
+.md-elevation-4 { -fx-effect: dropshadow(gaussian, -md-sys-color-shadow-a32, 14, 0.05, 0, 6); }
+.md-elevation-5 { -fx-effect: dropshadow(gaussian, -md-sys-color-shadow-a32, 18, 0.06, 0, 8); }
+
+/* Surfaces */
+.surface                   { -fx-background-color: -md-sys-color-surface; }
+.surface-container-lowest  { -fx-background-color: -md-sys-color-surface-container-lowest; }
+.surface-container-low     { -fx-background-color: -md-sys-color-surface-container-low; }
+.surface-container         { -fx-background-color: -md-sys-color-surface-container; }
+.surface-container-high    { -fx-background-color: -md-sys-color-surface-container-high; }
+.surface-container-highest { -fx-background-color: -md-sys-color-surface-container-highest; }
+
+/* State layers: default color is the owner's text fill; components override -md-state-color. */
+.md-state-layer {
+    -fx-background-color: transparent;
+}
+
+/* ===================================================================================== */
+/* 2. Buttons and toggles                                                                 */
+/* ===================================================================================== */
+
+.button {
+    -fx-skin: "io.github.squoirelle.material3fx.skins.MaterialButtonSkin";
+}
+
+.toggle-button {
+    -fx-skin: "io.github.squoirelle.material3fx.skins.MaterialToggleButtonSkin";
+}
+
+/* Common button shape: filled by default, like Compose's Button. */
+.button,
+.toggle-button {
+    -fx-background-color: -md-sys-color-primary;
+    -fx-background-insets: 0;
+    -fx-background-radius: 100;
+    -fx-border-color: null;
+    -fx-border-width: 0;
+    -fx-text-fill: -md-sys-color-on-primary;
+    -fx-font-size: 14px;
+    -fx-font-weight: 500;
+    -fx-padding: 0 24 0 24;
+    -fx-min-height: 40;
+    -fx-pref-height: 40;
+    -fx-graphic-text-gap: 8;
+    -fx-alignment: center;
+    -fx-opacity: 1;
+}
+
+.button.icon-leading,
+.toggle-button.icon-leading {
+    -fx-padding: 0 24 0 16;
+}
+
+.button:disabled,
+.toggle-button:disabled {
+    -fx-background-color: -md-sys-color-on-surface-a12;
+    -fx-text-fill: -md-sys-color-on-surface-a38;
+    -fx-effect: null;
+}
+
+.button:hover {
+    -fx-effect: dropshadow(gaussian, -md-sys-color-shadow-a32, 4, 0, 0, 1);
+}
+
+.button:pressed,
+.button:armed {
+    -fx-effect: null;
+}
+
+/* Keyboard focus ring, drawn outside the button so it does not shift the layout. */
+.button:focus-visible,
+.toggle-button:focus-visible {
+    -fx-border-color: -md-sys-color-secondary;
+    -fx-border-width: 3;
+    -fx-border-insets: -5;
+    -fx-border-radius: 100;
+}
+
+.button.elevated {
+    -fx-background-color: -md-sys-color-surface-container-low;
+    -fx-text-fill: -md-sys-color-primary;
+    -fx-effect: dropshadow(gaussian, -md-sys-color-shadow-a32, 4, 0, 0, 1);
+}
+
+.button.elevated:hover {
+    -fx-effect: dropshadow(gaussian, -md-sys-color-shadow-a32, 7, 0, 0, 2);
+}
+
+.button.elevated:pressed {
+    -fx-effect: dropshadow(gaussian, -md-sys-color-shadow-a32, 4, 0, 0, 1);
+}
+
+.button.tonal {
+    -fx-background-color: -md-sys-color-secondary-container;
+    -fx-text-fill: -md-sys-color-on-secondary-container;
+}
+
+.button.outlined,
+.button.text,
+.button.flat {
+    -fx-background-color: transparent;
+    -fx-text-fill: -md-sys-color-primary;
+    -fx-effect: null;
+}
+
+.button.outlined {
+    -fx-border-color: -md-sys-color-outline;
+    -fx-border-width: 1;
+    -fx-border-radius: 100;
+    -fx-border-insets: 0;
+}
+
+.button.outlined:focus-visible {
+    -fx-border-color: -md-sys-color-outline, -md-sys-color-secondary;
+    -fx-border-width: 1, 3;
+    -fx-border-insets: 0, -5;
+    -fx-border-radius: 100, 100;
+}
+
+.button.text,
+.button.flat {
+    -fx-padding: 0 12 0 12;
+}
+
+.button.text.icon-leading {
+    -fx-padding: 0 16 0 12;
+}
+
+.button.outlined:hover,
+.button.text:hover,
+.button.flat:hover,
+.button.tonal:hover:pressed {
+    -fx-effect: null;
+}
+
+.button.outlined:disabled {
+    -fx-background-color: transparent;
+    -fx-border-color: -md-sys-color-on-surface-a12;
+}
+
+.button.text:disabled,
+.button.flat:disabled {
+    -fx-background-color: transparent;
+}
+
+/* Danger / error variant, usable with any of the above */
+.button.error-button {
+    -fx-background-color: -md-sys-color-error;
+    -fx-text-fill: -md-sys-color-on-error;
+}
+
+.button.text.error-button,
+.button.outlined.error-button {
+    -fx-background-color: transparent;
+    -fx-text-fill: -md-sys-color-error;
+}
+
+/* Generic toggle button: outlined when off, secondary container when on. */
+.toggle-button {
+    -fx-background-color: transparent;
+    -fx-text-fill: -md-sys-color-on-surface;
+    -fx-border-color: -md-sys-color-outline;
+    -fx-border-width: 1;
+    -fx-border-radius: 100;
+    -fx-border-insets: 0;
+}
+
+.toggle-button:selected {
+    -fx-background-color: -md-sys-color-secondary-container;
+    -fx-text-fill: -md-sys-color-on-secondary-container;
+}
+
+.toggle-button:disabled {
+    -fx-background-color: transparent;
+    -fx-border-color: -md-sys-color-on-surface-a12;
+}
+
+.toggle-button:selected:disabled {
+    -fx-background-color: -md-sys-color-on-surface-a12;
+}
+
+/* JavaFX's segmented-button convention (left-pill / center-pill / right-pill, used e.g. by the
+   color picker's custom color dialog): connected segments like a Material segmented button. */
+.toggle-button.left-pill,
+.toggle-button.center-pill,
+.toggle-button.right-pill,
+.button.left-pill,
+.button.center-pill,
+.button.right-pill {
+    -fx-background-color: transparent;
+    -fx-text-fill: -md-sys-color-on-surface;
+    -fx-border-color: -md-sys-color-outline;
+    -fx-border-width: 1 0 1 1;
+    -fx-padding: 0 16 0 16;
+    -fx-effect: null;
+}
+
+.toggle-button.left-pill,
+.button.left-pill {
+    -fx-background-radius: 100 0 0 100;
+    -fx-border-radius: 100 0 0 100;
+}
+
+.toggle-button.center-pill,
+.button.center-pill {
+    -fx-background-radius: 0;
+    -fx-border-radius: 0;
+}
+
+.toggle-button.right-pill,
+.button.right-pill {
+    -fx-background-radius: 0 100 100 0;
+    -fx-border-radius: 0 100 100 0;
+    -fx-border-width: 1;
+}
+
+.toggle-button.left-pill:selected,
+.toggle-button.center-pill:selected,
+.toggle-button.right-pill:selected {
+    -fx-background-color: -md-sys-color-secondary-container;
+    -fx-text-fill: -md-sys-color-on-secondary-container;
+}
+
+.custom-color-dialog .toggle-button.left-pill,
+.custom-color-dialog .toggle-button.center-pill,
+.custom-color-dialog .toggle-button.right-pill {
+    -fx-min-height: 32;
+    -fx-pref-height: 32;
+    -fx-padding: 0 14 0 14;
+    -fx-font-size: 13px;
+}
+
+.hyperlink {
+    -fx-text-fill: -md-sys-color-primary;
+    -fx-padding: 2 4 2 4;
+    -fx-border-color: transparent;
+    -fx-border-width: 0;
+    -fx-underline: false;
+    -fx-cursor: hand;
+}
+
+.hyperlink:hover {
+    -fx-underline: true;
+}
+
+.hyperlink:visited {
+    -fx-text-fill: -md-sys-color-tertiary;
+}
+
+.hyperlink:focus-visible {
+    -fx-border-color: -md-sys-color-secondary;
+    -fx-border-width: 2;
+    -fx-border-radius: 4;
+}
+
+/* MenuButton / SplitMenuButton look like tonal buttons with an arrow */
+.menu-button,
+.split-menu-button {
+    -fx-background-color: -md-sys-color-secondary-container;
+    -fx-background-insets: 0;
+    -fx-background-radius: 100;
+    -fx-padding: 0 8 0 16;
+    -fx-min-height: 40;
+    -fx-pref-height: 40;
+    -fx-text-fill: -md-sys-color-on-secondary-container;
+    -fx-font-weight: 500;
+}
+
+.menu-button > .label,
+.split-menu-button > .label {
+    -fx-text-fill: -md-sys-color-on-secondary-container;
+    -fx-padding: 0;
+}
+
+.menu-button:hover,
+.split-menu-button:hover {
+    -fx-background-color: -md-sys-color-secondary-container, -md-sys-color-on-secondary-container-a08;
+}
+
+.menu-button > .arrow-button,
+.split-menu-button > .arrow-button {
+    -fx-background-color: transparent;
+    -fx-padding: 0 4 0 8;
+}
+
+.split-menu-button > .label {
+    -fx-background-color: transparent;
+    -fx-padding: 0 12 0 0;
+}
+
+.split-menu-button > .arrow-button {
+    -fx-border-color: transparent transparent transparent -md-sys-color-on-secondary-container-a38;
+    -fx-border-width: 0 0 0 1;
+    -fx-padding: 0 4 0 12;
+}
+
+.menu-button > .arrow-button > .arrow,
+.split-menu-button > .arrow-button > .arrow {
+    -fx-background-color: -md-sys-color-on-secondary-container;
+    -fx-background-insets: 0;
+    -fx-shape: "M7 10l5 5 5-5z";
+    -fx-padding: 3 5 3 5;
+}
+
+/* ===================================================================================== */
+/* 3. Selection controls                                                                  */
+/* ===================================================================================== */
+
+.check-box {
+    -fx-skin: "io.github.squoirelle.material3fx.skins.MaterialCheckBoxSkin";
+    -fx-text-fill: -md-sys-color-on-surface;
+    -fx-label-padding: 0 0 0 16;
+    -fx-padding: 11 0 11 11;
+    -fx-opacity: 1;
+}
+
+.check-box > .box {
+    -fx-background-color: transparent;
+    -fx-background-insets: 0;
+    -fx-background-radius: 2;
+    -fx-border-color: -md-sys-color-on-surface-variant;
+    -fx-border-width: 2;
+    -fx-border-radius: 2;
+    -fx-padding: 0;
+    -fx-min-width: 18;
+    -fx-min-height: 18;
+    -fx-pref-width: 18;
+    -fx-pref-height: 18;
+    -fx-max-width: 18;
+    -fx-max-height: 18;
+}
+
+.check-box > .box > .mark {
+    -fx-background-color: transparent;
+    -fx-background-insets: 0;
+    -fx-padding: 0;
+    -fx-shape: null;
+}
+
+.check-box:selected > .box,
+.check-box:indeterminate > .box {
+    -fx-background-color: -md-sys-color-primary;
+    -fx-border-color: -md-sys-color-primary;
+}
+
+.check-box:selected > .box > .mark {
+    -fx-background-color: -md-sys-color-on-primary;
+    -fx-shape: "M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z";
+    -fx-scale-shape: true;
+    -fx-padding: 5 6 5 6;
+    -fx-max-width: 12;
+    -fx-max-height: 9;
+}
+
+.check-box:indeterminate > .box > .mark {
+    -fx-background-color: -md-sys-color-on-primary;
+    -fx-shape: "M0 0h10v2H0z";
+    -fx-scale-shape: true;
+    -fx-padding: 1 5 1 5;
+    -fx-max-width: 10;
+    -fx-max-height: 2;
+}
+
+.check-box:selected .md-state-layer,
+.check-box:indeterminate .md-state-layer {
+    -md-state-color: -md-sys-color-primary;
+}
+
+.check-box:focus-visible > .box {
+    -fx-border-color: -md-sys-color-on-surface-variant, -md-sys-color-secondary;
+    -fx-border-width: 2, 3;
+    -fx-border-insets: 0, -8;
+    -fx-border-radius: 2, 100;
+}
+
+.check-box:selected:focus-visible > .box,
+.check-box:indeterminate:focus-visible > .box {
+    -fx-border-color: -md-sys-color-primary, -md-sys-color-secondary;
+}
+
+.check-box.error > .box {
+    -fx-border-color: -md-sys-color-error;
+}
+
+.check-box.error:selected > .box,
+.check-box.error:indeterminate > .box {
+    -fx-background-color: -md-sys-color-error;
+}
+
+.check-box.error:selected > .box > .mark {
+    -fx-background-color: -md-sys-color-on-error;
+}
+
+.check-box:disabled {
+    -fx-text-fill: -md-sys-color-on-surface-a38;
+}
+
+.check-box:disabled > .box {
+    -fx-border-color: -md-sys-color-on-surface-a38;
+}
+
+.check-box:selected:disabled > .box,
+.check-box:indeterminate:disabled > .box {
+    -fx-background-color: -md-sys-color-on-surface-a38;
+    -fx-border-color: transparent;
+}
+
+.check-box:selected:disabled > .box > .mark,
+.check-box:indeterminate:disabled > .box > .mark {
+    -fx-background-color: -md-sys-color-surface;
+}
+
+.radio-button {
+    -fx-skin: "io.github.squoirelle.material3fx.skins.MaterialRadioButtonSkin";
+    -fx-text-fill: -md-sys-color-on-surface;
+    -fx-label-padding: 0 0 0 16;
+    -fx-padding: 10 0 10 10;
+    -fx-opacity: 1;
+}
+
+.radio-button > .radio {
+    -fx-background-color: transparent;
+    -fx-background-insets: 0;
+    -fx-background-radius: 100;
+    -fx-border-color: -md-sys-color-on-surface-variant;
+    -fx-border-width: 2;
+    -fx-border-radius: 100;
+    -fx-padding: 4;
+}
+
+.radio-button > .radio > .dot {
+    -fx-background-color: transparent;
+    -fx-background-insets: 0;
+    -fx-background-radius: 100;
+    -fx-padding: 4;
+}
+
+.radio-button:selected > .radio {
+    -fx-border-color: -md-sys-color-primary;
+}
+
+.radio-button:selected > .radio > .dot {
+    -fx-background-color: -md-sys-color-primary;
+}
+
+.radio-button:selected .md-state-layer {
+    -md-state-color: -md-sys-color-primary;
+}
+
+.radio-button:focus-visible > .radio {
+    -fx-border-color: -md-sys-color-on-surface-variant, -md-sys-color-secondary;
+    -fx-border-width: 2, 3;
+    -fx-border-insets: 0, -8;
+    -fx-border-radius: 100, 100;
+}
+
+.radio-button:selected:focus-visible > .radio {
+    -fx-border-color: -md-sys-color-primary, -md-sys-color-secondary;
+}
+
+.radio-button:disabled {
+    -fx-text-fill: -md-sys-color-on-surface-a38;
+}
+
+.radio-button:disabled > .radio {
+    -fx-border-color: -md-sys-color-on-surface-a38;
+}
+
+.radio-button:selected:disabled > .radio > .dot {
+    -fx-background-color: -md-sys-color-on-surface-a38;
+}
+
+/* ===================================================================================== */
+/* 4. Text inputs and dropdowns (outlined style)                                          */
+/* ===================================================================================== */
+
+/*
+ * Borders are two 1px strokes: the outline, and an inner stroke that is transparent until the
+ * control is focused. The border always takes the same space, so focusing a field (2px
+ * outline) never shifts its content.
+ */
+.text-field,
+.password-field,
+.text-area,
+.combo-box-base,
+.choice-box,
+.spinner {
+    -fx-background-color: transparent;
+    -fx-background-insets: 0;
+    -fx-background-radius: 4;
+    -fx-border-color: -md-sys-color-outline, transparent;
+    -fx-border-width: 1, 1;
+    -fx-border-radius: 4, 3;
+    -fx-border-insets: 0, 1;
+    -fx-text-fill: -md-sys-color-on-surface;
+    -fx-prompt-text-fill: -md-sys-color-on-surface-variant;
+    -fx-highlight-fill: -md-sys-color-primary-a38;
+    -fx-highlight-text-fill: -md-sys-color-on-surface;
+    -fx-font-size: 16px;
+    -fx-opacity: 1;
+}
+
+.text-field,
+.password-field {
+    -fx-padding: 0 14 0 14;
+    -fx-min-height: 56;
+    -fx-pref-height: 56;
+}
+
+.text-area {
+    -fx-padding: 7 3 7 3;
+}
+
+.text-area > .scroll-pane,
+.text-area > .scroll-pane > .viewport,
+.text-area .content {
+    -fx-background-color: transparent;
+    -fx-background-insets: 0;
+    -fx-padding: 0;
+}
+
+.text-area .content {
+    -fx-padding: 8 12 8 12;
+}
+
+.text-field:hover,
+.password-field:hover,
+.text-area:hover,
+.combo-box-base:hover,
+.choice-box:hover,
+.spinner:hover {
+    -fx-border-color: -md-sys-color-on-surface, transparent;
+}
+
+.text-field:focused,
+.password-field:focused,
+.text-area:focused,
+.combo-box-base:focused,
+.combo-box-base:showing,
+.choice-box:focused,
+.choice-box:showing,
+.spinner:focused {
+    -fx-border-color: -md-sys-color-primary, -md-sys-color-primary;
+}
+
+.text-field.error,
+.password-field.error,
+.text-area.error,
+.combo-box-base.error {
+    -fx-border-color: -md-sys-color-error, transparent;
+}
+
+.text-field.error:focused,
+.password-field.error:focused,
+.text-area.error:focused,
+.combo-box-base.error:focused {
+    -fx-border-color: -md-sys-color-error, -md-sys-color-error;
+}
+
+.text-field:disabled,
+.password-field:disabled,
+.text-area:disabled,
+.combo-box-base:disabled,
+.choice-box:disabled,
+.spinner:disabled {
+    -fx-border-color: -md-sys-color-on-surface-a12, transparent;
+    -fx-text-fill: -md-sys-color-on-surface-a38;
+}
+
+/* Filled variant for plain text fields: same two-stroke trick on the bottom edge. */
+.text-field.filled,
+.password-field.filled,
+.text-area.filled {
+    -fx-background-color: -md-sys-color-surface-container-highest;
+    -fx-background-radius: 4 4 0 0;
+    -fx-border-color: transparent transparent -md-sys-color-on-surface-variant transparent, transparent;
+    -fx-border-width: 0 0 1 0, 0 0 1 0;
+    -fx-border-radius: 0, 0;
+    -fx-border-insets: 0, 0 0 1 0;
+}
+
+.text-field.filled,
+.password-field.filled {
+    -fx-padding: 0 16 0 16;
+}
+
+.text-field.filled:hover,
+.password-field.filled:hover {
+    -fx-background-color: -md-sys-color-surface-container-highest, -md-sys-color-on-surface-a08;
+    -fx-border-color: transparent transparent -md-sys-color-on-surface transparent, transparent;
+}
+
+.text-field.filled:focused,
+.password-field.filled:focused,
+.text-area.filled:focused {
+    -fx-border-color: transparent transparent -md-sys-color-primary transparent,
+                      transparent transparent -md-sys-color-primary transparent;
+}
+
+/* Combo box, choice box, date picker, color picker */
+.combo-box-base,
+.choice-box {
+    -fx-padding: 0 0 0 4;
+    -fx-min-height: 56;
+    -fx-pref-height: 56;
+}
+
+.combo-box > .list-cell {
+    -fx-background-color: transparent;
+    -fx-text-fill: -md-sys-color-on-surface;
+    -fx-padding: 0 0 0 12;
+    -fx-font-size: 16px;
+}
+
+.combo-box-base > .arrow-button,
+.choice-box > .open-button {
+    -fx-background-color: transparent;
+    -fx-background-insets: 0;
+    -fx-padding: 0 14 0 12;
+}
+
+.combo-box-base > .arrow-button > .arrow,
+.choice-box > .open-button > .arrow {
+    -fx-background-color: -md-sys-color-on-surface-variant;
+    -fx-background-insets: 0;
+    -fx-shape: "M7 10l5 5 5-5z";
+    -fx-padding: 3 6 3 6;
+}
+
+.combo-box-base:showing > .arrow-button > .arrow,
+.choice-box:showing > .open-button > .arrow {
+    -fx-shape: "M7 14l5-5 5 5z";
+}
+
+.choice-box > .label {
+    -fx-text-fill: -md-sys-color-on-surface;
+    -fx-padding: 0 0 0 12;
+}
+
+.combo-box-base:editable > .text-field,
+.date-picker > .text-field {
+    -fx-background-color: transparent;
+    -fx-border-color: null;
+    -fx-border-width: 0;
+    -fx-padding: 0 0 0 12;
+    -fx-min-height: 0;
+    -fx-pref-height: -1;
+}
+
+.date-picker > .arrow-button > .arrow {
+    -fx-shape: "M19 4h-1V2h-2v2H8V2H6v2H5c-1.11 0-1.99.9-1.99 2L3 20a2 2 0 0 0 2 2h14c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 16H5V9h14v11zM7 11h5v5H7z";
+    -fx-padding: 9;
+}
+
+.date-picker:showing > .arrow-button > .arrow {
+    -fx-shape: "M19 4h-1V2h-2v2H8V2H6v2H5c-1.11 0-1.99.9-1.99 2L3 20a2 2 0 0 0 2 2h14c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 16H5V9h14v11zM7 11h5v5H7z";
+}
+
+.color-picker > .color-picker-label {
+    -fx-text-fill: -md-sys-color-on-surface;
+    -fx-padding: 0 0 0 12;
+}
+
+.spinner {
+    -fx-padding: 0;
+    -fx-min-height: 56;
+    -fx-pref-height: 56;
+}
+
+.spinner > .text-field {
+    -fx-background-color: transparent;
+    -fx-border-color: null;
+    -fx-border-width: 0;
+    -fx-min-height: 0;
+    -fx-pref-height: -1;
+}
+
+.spinner > .increment-arrow-button,
+.spinner > .decrement-arrow-button {
+    -fx-background-color: transparent;
+    -fx-background-insets: 0;
+    -fx-padding: 4 12 4 12;
+}
+
+.spinner > .increment-arrow-button:hover,
+.spinner > .decrement-arrow-button:hover {
+    -fx-background-color: -md-sys-color-on-surface-a08;
+}
+
+.spinner > .increment-arrow-button > .increment-arrow,
+.spinner > .decrement-arrow-button > .decrement-arrow {
+    -fx-background-color: -md-sys-color-on-surface-variant;
+    -fx-background-insets: 0;
+}
+
+/* Dropdown popups */
+.combo-box-popup > .list-view,
+.choice-box > .context-menu {
+    -fx-background-color: -md-sys-color-surface-container;
+    -fx-background-insets: 0;
+    -fx-background-radius: 4;
+    -fx-border-width: 0;
+    -fx-padding: 8 0 8 0;
+    -fx-effect: dropshadow(gaussian, -md-sys-color-shadow-a32, 7, 0, 0, 2);
+}
+
+.combo-box-popup > .list-view > .virtual-flow > .clipped-container > .sheet > .list-cell {
+    -fx-background-color: transparent;
+    -fx-text-fill: -md-sys-color-on-surface;
+    -fx-padding: 0 12 0 12;
+    -fx-min-height: 48;
+    -fx-pref-height: 48;
+    -fx-font-size: 14px;
+}
+
+.combo-box-popup > .list-view > .virtual-flow > .clipped-container > .sheet > .list-cell:filled:hover {
+    -fx-background-color: -md-sys-color-on-surface-a08;
+}
+
+.combo-box-popup > .list-view > .virtual-flow > .clipped-container > .sheet > .list-cell:filled:selected {
+    -fx-background-color: -md-sys-color-on-surface-a12;
+    -fx-text-fill: -md-sys-color-on-surface;
+}
+
+/* ===================================================================================== */
+/* 5. Menus, tooltips, popups                                                             */
+/* ===================================================================================== */
+
+.context-menu {
+    -fx-background-color: -md-sys-color-surface-container;
+    -fx-background-insets: 0;
+    -fx-background-radius: 4;
+    -fx-border-width: 0;
+    -fx-padding: 8 0 8 0;
+    -fx-effect: dropshadow(gaussian, -md-sys-color-shadow-a32, 7, 0, 0, 2);
+}
+
+.context-menu > .scroll-arrow {
+    -fx-background-color: transparent;
+}
+
+/* Menus size items to their preferred height, so set it (a min height alone has no effect). */
+.menu-item {
+    -fx-background-color: transparent;
+    -fx-padding: 0 12 0 12;
+    -fx-min-height: 48;
+    -fx-pref-height: 48;
+    -fx-alignment: center-left;
+}
+
+.menu-item > .label {
+    -fx-text-fill: -md-sys-color-on-surface;
+    -fx-font-size: 14px;
+    -fx-padding: 0 12 0 0;
+}
+
+.menu-item:focused {
+    -fx-background-color: -md-sys-color-on-surface-a08;
+}
+
+.menu-item:focused > .label {
+    -fx-text-fill: -md-sys-color-on-surface;
+}
+
+.menu-item:disabled > .label {
+    -fx-text-fill: -md-sys-color-on-surface-a38;
+}
+
+.menu-item > .left-container {
+    -fx-padding: 0 12 0 0;
+}
+
+.menu-item > .right-container > .arrow {
+    -fx-background-color: -md-sys-color-on-surface-variant;
+    -fx-shape: "M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z";
+    -fx-padding: 5 3 5 3;
+}
+
+.menu-item:focused > .right-container > .arrow {
+    -fx-background-color: -md-sys-color-on-surface-variant;
+}
+
+.menu-item > .accelerator-text,
+.menu-item:focused > .accelerator-text {
+    -fx-text-fill: -md-sys-color-on-surface-variant;
+}
+
+.check-menu-item:checked > .left-container > .check,
+.radio-menu-item:checked > .left-container > .radio {
+    -fx-background-color: -md-sys-color-on-surface-variant;
+}
+
+.check-menu-item:checked:focused > .left-container > .check,
+.radio-menu-item:checked:focused > .left-container > .radio {
+    -fx-background-color: -md-sys-color-on-surface;
+}
+
+.separator-menu-item {
+    -fx-padding: 8 0 8 0;
+}
+
+.separator-menu-item > .line {
+    -fx-border-color: -md-sys-color-outline-variant transparent transparent transparent;
+    -fx-border-insets: 0;
+    -fx-border-width: 1 0 0 0;
+    -fx-padding: 0;
+}
+
+/* Section headers (MenuHeader): small, colored, not selectable */
+.menu-item.menu-header,
+.menu-item.menu-header:focused,
+.menu-item.menu-header:disabled {
+    -fx-background-color: transparent;
+    -fx-min-height: 32;
+    -fx-pref-height: 32;
+    -fx-padding: 8 12 4 12;
+    -fx-opacity: 1;
+}
+
+.menu-header .menu-header-label,
+.menu-header:disabled .menu-header-label {
+    -fx-text-fill: -md-sys-color-primary;
+    -fx-font-size: 12px;
+    -fx-font-weight: bold;
+    -fx-opacity: 1;
+}
+
+.context-menu {
+    -fx-min-width: 112;
+}
+
+.menu-bar {
+    -fx-background-color: -md-sys-color-surface-container;
+    -fx-background-insets: 0;
+    -fx-padding: 0 4 0 4;
+    -fx-border-width: 0;
+}
+
+.menu-bar > .container > .menu-button {
+    -fx-background-color: transparent;
+    -fx-background-radius: 4;
+    -fx-padding: 6 12 6 12;
+    -fx-min-height: 0;
+    -fx-pref-height: -1;
+}
+
+.menu-bar > .container > .menu-button:hover,
+.menu-bar > .container > .menu-button:focused,
+.menu-bar > .container > .menu-button:showing {
+    -fx-background-color: -md-sys-color-on-surface-a08;
+}
+
+.menu-bar > .container > .menu-button > .label,
+.menu-bar > .container > .menu-button:hover > .label,
+.menu-bar > .container > .menu-button:showing > .label {
+    -fx-text-fill: -md-sys-color-on-surface;
+    -fx-font-weight: normal;
+}
+
+.tooltip {
+    -fx-background-color: -md-sys-color-inverse-surface;
+    -fx-background-insets: 0;
+    -fx-background-radius: 4;
+    -fx-text-fill: -md-sys-color-inverse-on-surface;
+    -fx-font-size: 12px;
+    -fx-padding: 4 8 4 8;
+    -fx-effect: null;
+}
+
+/* Rich tooltip: add the "rich" style class */
+.tooltip.rich {
+    -fx-background-color: -md-sys-color-surface-container;
+    -fx-text-fill: -md-sys-color-on-surface-variant;
+    -fx-background-radius: 12;
+    -fx-font-size: 14px;
+    -fx-padding: 12 16 12 16;
+    -fx-effect: dropshadow(gaussian, -md-sys-color-shadow-a32, 7, 0, 0, 2);
+}
+
+/* ===================================================================================== */
+/* 6. Lists, tables, trees                                                                */
+/* ===================================================================================== */
+
+.list-view,
+.tree-view,
+.table-view,
+.tree-table-view {
+    -fx-background-color: -md-sys-color-surface;
+    -fx-background-insets: 0;
+    -fx-padding: 0;
+    -fx-border-color: null;
+    -fx-border-width: 0;
+}
+
+.list-view.outlined,
+.tree-view.outlined,
+.table-view,
+.tree-table-view {
+    -fx-border-color: -md-sys-color-outline-variant;
+    -fx-border-width: 1;
+    -fx-border-radius: 4;
+    -fx-background-radius: 4;
+}
+
+.list-view > .placeholder > .label,
+.table-view > .placeholder > .label,
+.tree-table-view > .placeholder > .label {
+    -fx-text-fill: -md-sys-color-on-surface-variant;
+}
+
+.list-cell,
+.tree-cell {
+    -fx-background-color: transparent;
+    -fx-background-insets: 0;
+    -fx-text-fill: -md-sys-color-on-surface;
+    -fx-padding: 8 16 8 16;
+    -fx-min-height: 48;
+    -fx-font-size: 14px;
+    -fx-border-width: 0;
+}
+
+.list-cell:filled:hover,
+.tree-cell:filled:hover {
+    -fx-background-color: -md-sys-color-on-surface-a08;
+}
+
+.list-cell:filled:selected,
+.tree-cell:filled:selected,
+.list-view:focused > .virtual-flow > .clipped-container > .sheet > .list-cell:filled:selected,
+.tree-view:focused > .virtual-flow > .clipped-container > .sheet > .tree-cell:filled:selected {
+    -fx-background-color: -md-sys-color-secondary-container;
+    -fx-text-fill: -md-sys-color-on-secondary-container;
+}
+
+.list-cell:filled:selected:hover,
+.tree-cell:filled:selected:hover {
+    -fx-background-color: -md-sys-color-secondary-container, -md-sys-color-on-secondary-container-a08;
+}
+
+.list-view:focused > .virtual-flow > .clipped-container > .sheet > .list-cell:focused,
+.tree-view:focused > .virtual-flow > .clipped-container > .sheet > .tree-cell:focused {
+    -fx-border-color: -md-sys-color-secondary;
+    -fx-border-width: 0;
+}
+
+.list-view:focus-visible > .virtual-flow > .clipped-container > .sheet > .list-cell:focused,
+.tree-view:focus-visible > .virtual-flow > .clipped-container > .sheet > .tree-cell:focused {
+    -fx-border-width: 2;
+}
+
+.tree-cell > .tree-disclosure-node,
+.tree-table-row-cell > .tree-disclosure-node {
+    -fx-padding: 4 8 4 0;
+}
+
+.tree-cell > .tree-disclosure-node > .arrow,
+.tree-table-row-cell > .tree-disclosure-node > .arrow {
+    -fx-background-color: -md-sys-color-on-surface-variant;
+    -fx-shape: "M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z";
+    -fx-padding: 5 3 5 3;
+}
+
+.tree-cell:selected > .tree-disclosure-node > .arrow,
+.tree-table-row-cell:selected > .tree-disclosure-node > .arrow {
+    -fx-background-color: -md-sys-color-on-secondary-container;
+}
+
+/* Tables */
+.table-view > .column-header-background,
+.tree-table-view > .column-header-background {
+    -fx-background-color: -md-sys-color-surface-container;
+    -fx-background-radius: 4 4 0 0;
+    -fx-border-color: transparent transparent -md-sys-color-outline-variant transparent;
+    -fx-border-width: 0 0 1 0;
+}
+
+.table-view .column-header,
+.tree-table-view .column-header {
+    -fx-background-color: transparent;
+    -fx-border-color: transparent;
+    -fx-border-width: 0;
+    -fx-size: 56;
+    -fx-padding: 0;
+}
+
+.table-view .column-header .label,
+.tree-table-view .column-header .label {
+    -fx-text-fill: -md-sys-color-on-surface-variant;
+    -fx-font-weight: 500;
+    -fx-font-size: 14px;
+    -fx-padding: 0 16 0 16;
+    -fx-alignment: center-left;
+}
+
+.table-view .column-header:hover,
+.tree-table-view .column-header:hover {
+    -fx-background-color: -md-sys-color-on-surface-a08;
+}
+
+.table-view .column-header .arrow,
+.tree-table-view .column-header .arrow {
+    -fx-background-color: -md-sys-color-on-surface-variant;
+    -fx-padding: 3 4 3 4;
+}
+
+.table-view .filler,
+.tree-table-view .filler,
+.table-view > .column-header-background > .show-hide-columns-button,
+.tree-table-view > .column-header-background > .show-hide-columns-button {
+    -fx-background-color: transparent;
+    -fx-border-width: 0;
+}
+
+.table-view .column-resize-line,
+.tree-table-view .column-resize-line {
+    -fx-background-color: -md-sys-color-primary;
+}
+
+.table-view .column-overlay,
+.tree-table-view .column-overlay {
+    -fx-background-color: -md-sys-color-primary-a12;
+}
+
+.table-view .column-drag-header,
+.tree-table-view .column-drag-header {
+    -fx-background-color: -md-sys-color-surface-container-highest;
+}
+
+.table-row-cell,
+.tree-table-row-cell {
+    -fx-background-color: -md-sys-color-surface;
+    -fx-background-insets: 0;
+    -fx-border-color: transparent transparent -md-sys-color-outline-variant transparent;
+    -fx-border-width: 0 0 1 0;
+    -fx-cell-size: 52;
+    -fx-text-fill: -md-sys-color-on-surface;
+    -fx-padding: 0;
+}
+
+.table-row-cell:empty,
+.tree-table-row-cell:empty {
+    -fx-background-color: transparent;
+    -fx-border-width: 0;
+}
+
+.table-row-cell:filled:hover,
+.tree-table-row-cell:filled:hover {
+    -fx-background-color: -md-sys-color-surface, -md-sys-color-on-surface-a08;
+}
+
+.table-row-cell:filled:selected,
+.tree-table-row-cell:filled:selected,
+.table-view:focused > .virtual-flow > .clipped-container > .sheet > .table-row-cell:filled:selected,
+.tree-table-view:focused > .virtual-flow > .clipped-container > .sheet > .tree-table-row-cell:filled:selected {
+    -fx-background-color: -md-sys-color-secondary-container;
+}
+
+.table-row-cell:filled:selected:hover,
+.tree-table-row-cell:filled:selected:hover {
+    -fx-background-color: -md-sys-color-secondary-container, -md-sys-color-on-secondary-container-a08;
+}
+
+.table-view.striped .table-row-cell:odd,
+.tree-table-view.striped .tree-table-row-cell:odd {
+    -fx-background-color: -md-sys-color-surface-container-low;
+}
+
+.table-cell,
+.tree-table-cell {
+    -fx-padding: 0 16 0 16;
+    -fx-text-fill: -md-sys-color-on-surface;
+    -fx-border-color: transparent;
+    -fx-border-width: 0;
+    -fx-alignment: center-left;
+    -fx-background-color: transparent;
+}
+
+.table-row-cell:selected > .table-cell,
+.tree-table-row-cell:selected > .tree-table-cell {
+    -fx-text-fill: -md-sys-color-on-secondary-container;
+}
+
+.table-view:focused > .virtual-flow > .clipped-container > .sheet > .table-row-cell:focused,
+.tree-table-view:focused > .virtual-flow > .clipped-container > .sheet > .tree-table-row-cell:focused {
+    -fx-background-insets: 0;
+}
+
+.table-view:focus-visible > .virtual-flow > .clipped-container > .sheet > .table-row-cell:focused,
+.tree-table-view:focus-visible > .virtual-flow > .clipped-container > .sheet > .tree-table-row-cell:focused {
+    -fx-border-color: -md-sys-color-secondary;
+    -fx-border-width: 2;
+}
+
+.table-view.grid .table-cell,
+.tree-table-view.grid .tree-table-cell {
+    -fx-border-color: transparent -md-sys-color-outline-variant transparent transparent;
+    -fx-border-width: 0 1 0 0;
+}
+
+/* ===================================================================================== */
+/* 7. Containers                                                                          */
+/* ===================================================================================== */
+
+/* Tabs: Material primary tabs */
+.tab-pane {
+    -fx-background-color: transparent;
+    -fx-padding: 0;
+}
+
+.tab-pane > .tab-header-area {
+    -fx-padding: 0;
+}
+
+.tab-pane > .tab-header-area > .tab-header-background {
+    -fx-background-color: -md-sys-color-surface;
+    -fx-background-insets: 0;
+    -fx-border-color: transparent transparent -md-sys-color-surface-variant transparent;
+    -fx-border-width: 0 0 1 0;
+    -fx-effect: null;
+}
+
+.tab-pane > .tab-header-area > .headers-region > .tab {
+    -fx-background-color: transparent;
+    -fx-background-insets: 0;
+    -fx-background-radius: 0;
+    -fx-border-color: transparent;
+    -fx-border-width: 0 0 3 0;
+    -fx-border-insets: 0 12 0 12;
+    -fx-padding: 0 16 0 16;
+    -fx-min-height: 48;
+    -fx-pref-height: 48;
+    -fx-cursor: hand;
+}
+
+.tab-pane > .tab-header-area > .headers-region > .tab:hover {
+    -fx-background-color: -md-sys-color-on-surface-a08;
+}
+
+.tab-pane > .tab-header-area > .headers-region > .tab:selected {
+    -fx-border-color: transparent transparent -md-sys-color-primary transparent;
+}
+
+.tab-pane > .tab-header-area > .headers-region > .tab:selected:hover {
+    -fx-background-color: -md-sys-color-primary-a08;
+}
+
+.tab-pane > .tab-header-area > .headers-region > .tab > .tab-container > .tab-label {
+    -fx-text-fill: -md-sys-color-on-surface-variant;
+    -fx-font-size: 14px;
+    -fx-font-weight: 500;
+    -fx-alignment: center;
+}
+
+.tab-pane > .tab-header-area > .headers-region > .tab:selected > .tab-container > .tab-label {
+    -fx-text-fill: -md-sys-color-primary;
+}
+
+.tab-pane > .tab-header-area > .headers-region > .tab:disabled > .tab-container > .tab-label {
+    -fx-text-fill: -md-sys-color-on-surface-a38;
+}
+
+.tab-pane > .tab-header-area > .headers-region > .tab > .tab-container > .focus-indicator {
+    -fx-border-color: transparent;
+    -fx-border-width: 0;
+}
+
+.tab-pane:focus-visible > .tab-header-area > .headers-region > .tab:selected > .tab-container > .focus-indicator {
+    -fx-border-color: -md-sys-color-secondary;
+    -fx-border-width: 2;
+    -fx-border-radius: 4;
+}
+
+.tab-pane > .tab-header-area > .headers-region > .tab > .tab-container > .tab-close-button {
+    -fx-background-color: -md-sys-color-on-surface-variant;
+    -fx-shape: "M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z";
+    -fx-padding: 5;
+}
+
+.tab-pane > .tab-header-area > .control-buttons-tab > .container > .tab-down-button {
+    -fx-background-color: transparent;
+    -fx-padding: 8;
+}
+
+.tab-pane > .tab-header-area > .control-buttons-tab > .container > .tab-down-button > .arrow {
+    -fx-background-color: -md-sys-color-on-surface-variant;
+}
+
+.tab-pane > .tab-content-area {
+    -fx-background-color: transparent;
+    -fx-padding: 0;
+}
+
+/* Secondary tabs: add "secondary" to the TabPane */
+.tab-pane.secondary > .tab-header-area > .headers-region > .tab:selected {
+    -fx-border-color: transparent transparent -md-sys-color-primary transparent;
+    -fx-border-width: 0 0 2 0;
+    -fx-border-insets: 0;
+}
+
+.tab-pane.secondary > .tab-header-area > .headers-region > .tab:selected > .tab-container > .tab-label {
+    -fx-text-fill: -md-sys-color-on-surface;
+}
+
+/* Titled pane / accordion: rendered as cards */
+.titled-pane {
+    -fx-text-fill: -md-sys-color-on-surface;
+}
+
+.titled-pane > .title {
+    -fx-font-size: 16px;
+    -fx-background-color: -md-sys-color-surface-container-low;
+    -fx-background-insets: 0;
+    -fx-background-radius: 12 12 0 0;
+    -fx-border-width: 0;
+    -fx-padding: 14 16 14 16;
+}
+
+.titled-pane:collapsed > .title {
+    -fx-background-radius: 12;
+}
+
+.titled-pane > .title:hover {
+    -fx-background-color: -md-sys-color-surface-container-low, -md-sys-color-on-surface-a08;
+}
+
+.titled-pane > .title > .arrow-button {
+    -fx-background-color: transparent;
+    -fx-padding: 0 12 0 0;
+}
+
+.titled-pane > .title > .arrow-button > .arrow {
+    -fx-background-color: -md-sys-color-on-surface-variant;
+    -fx-background-insets: 0;
+    -fx-shape: "M7.41 8.59L12 13.17l4.59-4.58L18 10l-6 6-6-6z";
+    -fx-padding: 3 5 3 5;
+}
+
+.titled-pane > .content {
+    -fx-background-color: -md-sys-color-surface-container-low;
+    -fx-background-insets: 0;
+    -fx-background-radius: 0 0 12 12;
+    -fx-border-width: 0;
+    -fx-padding: 8 16 16 16;
+}
+
+.titled-pane:focus-visible > .title {
+    -fx-border-color: -md-sys-color-secondary;
+    -fx-border-width: 2;
+    -fx-border-radius: 12 12 0 0;
+}
+
+.accordion > .titled-pane > .title,
+.accordion > .titled-pane:collapsed > .title {
+    -fx-background-radius: 0;
+    -fx-border-color: transparent transparent -md-sys-color-outline-variant transparent;
+    -fx-border-width: 0 0 1 0;
+}
+
+.accordion > .titled-pane > .content {
+    -fx-background-radius: 0;
+}
+
+.accordion > .first-titled-pane > .title {
+    -fx-background-radius: 12 12 0 0;
+}
+
+/* Split pane */
+.split-pane {
+    -fx-background-color: transparent;
+    -fx-background-insets: 0;
+    -fx-padding: 0;
+}
+
+.split-pane > .split-pane-divider {
+    -fx-background-color: -md-sys-color-outline-variant;
+    -fx-background-insets: 0;
+    -fx-padding: 0 0.5 0 0.5;
+}
+
+.split-pane:horizontal > .split-pane-divider {
+    -fx-padding: 0 0.5 0 0.5;
+}
+
+.split-pane:vertical > .split-pane-divider {
+    -fx-padding: 0.5 0 0.5 0;
+}
+
+.split-pane > .split-pane-divider:hover {
+    -fx-background-color: -md-sys-color-primary;
+}
+
+/* Scroll bars: slim, rounded, no arrows */
+.scroll-pane {
+    -fx-background-color: transparent;
+    -fx-background-insets: 0;
+    -fx-padding: 0;
+}
+
+.scroll-pane > .viewport {
+    -fx-background-color: transparent;
+}
+
+.scroll-pane > .corner,
+.list-view > .corner,
+.table-view > .corner,
+.tree-view > .corner,
+.tree-table-view > .corner,
+.virtual-flow > .corner {
+    -fx-background-color: transparent;
+}
+
+.scroll-bar {
+    -fx-background-color: transparent;
+    -fx-background-insets: 0;
+    -fx-padding: 2;
+}
+
+.scroll-bar > .track,
+.scroll-bar > .track-background {
+    -fx-background-color: transparent;
+    -fx-background-insets: 0;
+    -fx-border-width: 0;
+}
+
+.scroll-bar > .thumb {
+    -fx-background-color: -md-sys-color-on-surface-a32;
+    -fx-background-insets: 0;
+    -fx-background-radius: 100;
+}
+
+.scroll-bar > .thumb:hover {
+    -fx-background-color: -md-sys-color-on-surface-variant;
+}
+
+.scroll-bar > .thumb:pressed {
+    -fx-background-color: -md-sys-color-on-surface;
+}
+
+.scroll-bar:vertical > .increment-button,
+.scroll-bar:vertical > .decrement-button {
+    -fx-background-color: transparent;
+    -fx-padding: 0 3 0 3;
+}
+
+.scroll-bar:horizontal > .increment-button,
+.scroll-bar:horizontal > .decrement-button {
+    -fx-background-color: transparent;
+    -fx-padding: 3 0 3 0;
+}
+
+.scroll-bar > .increment-button > .increment-arrow,
+.scroll-bar > .decrement-button > .decrement-arrow {
+    -fx-shape: null;
+    -fx-padding: 0;
+    -fx-background-color: transparent;
+}
+
+/* Tool bar */
+.tool-bar {
+    -fx-background-color: -md-sys-color-surface-container;
+    -fx-background-insets: 0;
+    -fx-border-width: 0;
+    -fx-padding: 8 12 8 12;
+    -fx-spacing: 8;
+}
+
+.tool-bar:vertical {
+    -fx-padding: 12 8 12 8;
+}
+
+.tool-bar .separator .line {
+    -fx-border-color: -md-sys-color-outline-variant;
+}
+
+/* Separator (divider) */
+.separator:horizontal .line {
+    -fx-border-color: -md-sys-color-outline-variant transparent transparent transparent;
+    -fx-border-width: 1 0 0 0;
+    -fx-border-insets: 0;
+}
+
+.separator:vertical .line {
+    -fx-border-color: transparent transparent transparent -md-sys-color-outline-variant;
+    -fx-border-width: 0 0 0 1;
+    -fx-border-insets: 0;
+}
+
+.separator {
+    -fx-padding: 0;
+}
+
+/* Pagination */
+.pagination > .pagination-control > .control-box > .number-button,
+.pagination > .pagination-control > .control-box > .left-arrow-button,
+.pagination > .pagination-control > .control-box > .right-arrow-button {
+    -fx-skin: "io.github.squoirelle.material3fx.skins.MaterialToggleButtonSkin";
+    -fx-background-color: transparent;
+    -fx-background-radius: 100;
+    -fx-border-width: 0;
+    -fx-text-fill: -md-sys-color-on-surface-variant;
+    -fx-padding: 0;
+    -fx-min-width: 40;
+    -fx-min-height: 40;
+}
+
+.pagination > .pagination-control > .control-box > .left-arrow-button,
+.pagination > .pagination-control > .control-box > .right-arrow-button {
+    -fx-skin: "io.github.squoirelle.material3fx.skins.MaterialButtonSkin";
+}
+
+.pagination > .pagination-control > .control-box > .number-button:selected {
+    -fx-background-color: -md-sys-color-secondary-container;
+    -fx-text-fill: -md-sys-color-on-secondary-container;
+}
+
+.pagination > .pagination-control > .control-box > .left-arrow-button > .left-arrow,
+.pagination > .pagination-control > .control-box > .right-arrow-button > .right-arrow {
+    -fx-background-color: -md-sys-color-on-surface-variant;
+}
+
+.pagination > .pagination-control > .page-information {
+    -fx-text-fill: -md-sys-color-on-surface-variant;
+}
+
+.pagination > .pagination-control {
+    -fx-background-color: transparent;
+}
+
+/* ===================================================================================== */
+/* 8. Sliders and progress indicators                                                     */
+/* ===================================================================================== */
+
+.slider {
+    -fx-skin: "io.github.squoirelle.material3fx.skins.MaterialSliderSkin";
+    -fx-padding: 12 10 12 10;
+}
+
+.slider > .track {
+    -fx-background-color: -md-sys-color-secondary-container;
+    -fx-background-insets: 0;
+    /* SliderSkin extends the track by this radius on both ends: keep it at half the track height. */
+    -fx-background-radius: 2;
+    -fx-padding: 2;
+}
+
+.slider > .md-active-track {
+    -fx-background-color: -md-sys-color-primary;
+    -fx-background-radius: 2;
+}
+
+.slider > .thumb {
+    -fx-background-color: -md-sys-color-primary;
+    -fx-background-insets: 0;
+    -fx-background-radius: 100;
+    -fx-padding: 10;
+    -fx-effect: dropshadow(gaussian, -md-sys-color-shadow-a32, 3, 0, 0, 1);
+}
+
+.slider > .md-thumb-state-layer {
+    -md-state-color: -md-sys-color-primary;
+}
+
+.slider:focus-visible > .thumb {
+    -fx-border-color: -md-sys-color-secondary;
+    -fx-border-width: 3;
+    -fx-border-insets: -6;
+    -fx-border-radius: 100;
+}
+
+.slider > .md-value-label {
+    -fx-background-color: -md-sys-color-inverse-surface;
+    -fx-background-radius: 100;
+    -fx-text-fill: -md-sys-color-inverse-on-surface;
+    -fx-font-size: 12px;
+    -fx-font-weight: 500;
+    -fx-padding: 4 8 4 8;
+    -fx-alignment: center;
+}
+
+.slider > .axis {
+    -fx-tick-label-fill: -md-sys-color-on-surface-variant;
+    -fx-tick-length: 4;
+    -fx-minor-tick-length: 2;
+}
+
+.slider > .axis > .axis-tick-mark,
+.slider > .axis > .axis-minor-tick-mark {
+    -fx-stroke: -md-sys-color-outline;
+}
+
+.slider:disabled > .track {
+    -fx-background-color: -md-sys-color-on-surface-a12;
+}
+
+.slider:disabled > .md-active-track,
+.slider:disabled > .thumb {
+    -fx-background-color: -md-sys-color-on-surface-a38;
+    -fx-effect: null;
+}
+
+.progress-indicator {
+    -fx-skin: "io.github.squoirelle.material3fx.skins.CircularProgressSkin";
+    -fx-padding: 0;
+}
+
+.progress-indicator > .md-progress-indicator {
+    -fx-stroke: -md-sys-color-primary;
+    -fx-stroke-width: 4;
+}
+
+.progress-indicator > .md-progress-track {
+    -fx-stroke: -md-sys-color-secondary-container;
+    -fx-stroke-width: 4;
+}
+
+.progress-indicator.small {
+    -fx-pref-width: 24;
+    -fx-pref-height: 24;
+}
+
+.progress-indicator.small > .md-progress-indicator,
+.progress-indicator.small > .md-progress-track {
+    -fx-stroke-width: 3;
+}
+
+.progress-bar {
+    -fx-skin: "io.github.squoirelle.material3fx.skins.LinearProgressSkin";
+    -fx-background-color: transparent;
+    -fx-padding: 0;
+    -fx-indeterminate-bar-length: 60;
+}
+
+.progress-bar > .md-progress-bar {
+    -fx-background-color: -md-sys-color-primary;
+    -fx-background-radius: 100;
+}
+
+.progress-bar > .md-progress-track {
+    -fx-background-color: -md-sys-color-secondary-container;
+    -fx-background-radius: 100;
+}
+
+.progress-bar > .md-progress-stop {
+    -fx-background-color: -md-sys-color-primary;
+    -fx-background-radius: 100;
+}
+
+/* Color picker popup and custom color dialog */
+.color-palette {
+    -fx-background-color: -md-sys-color-surface-container;
+    -fx-background-insets: 0;
+    -fx-background-radius: 12;
+    -fx-padding: 12;
+    -fx-spacing: 8;
+    -fx-effect: dropshadow(gaussian, -md-sys-color-shadow-a32, 7, 0, 0, 2);
+}
+
+.color-palette > .color-picker-grid {
+    -fx-padding: 0;
+    -fx-hgap: 2;
+    -fx-vgap: 2;
+}
+
+.color-palette > .color-picker-grid > .color-square {
+    -fx-background-color: transparent;
+    -fx-padding: 1;
+}
+
+.color-palette .color-square > .color-rect {
+    -fx-arc-width: 6;
+    -fx-arc-height: 6;
+    -fx-stroke: -md-sys-color-outline-variant;
+    -fx-stroke-width: 0.5;
+}
+
+.color-palette-region > .color-square.hover-square {
+    -fx-background-color: -md-sys-color-surface-container-highest;
+    -fx-background-insets: -3;
+    -fx-background-radius: 6;
+    -fx-border-color: -md-sys-color-primary;
+    -fx-border-width: 2;
+    -fx-border-insets: -3;
+    -fx-border-radius: 6;
+    -fx-scale-x: 1.4;
+    -fx-scale-y: 1.4;
+}
+
+.color-palette > .separator .line {
+    -fx-border-color: -md-sys-color-outline-variant transparent transparent transparent;
+}
+
+.color-palette > .hyperlink {
+    -fx-text-fill: -md-sys-color-primary;
+    -fx-font-weight: 500;
+}
+
+.color-picker > .color-picker-label > .picker-color > .picker-color-rect {
+    -fx-stroke: -md-sys-color-outline-variant;
+    -fx-arc-width: 4;
+    -fx-arc-height: 4;
+}
+
+.custom-color-dialog {
+    -fx-background-color: -md-sys-color-surface-container-high;
+    -fx-padding: 24;
+    -fx-spacing: 24;
+}
+
+.custom-color-dialog .label {
+    -fx-text-fill: -md-sys-color-on-surface-variant;
+}
+
+/* The mode buttons sit inside the settings card (Modena makes them straddle its top edge). */
+.custom-color-dialog .controls-pane .customcolor-controls-background {
+    -fx-background-color: -md-sys-color-surface-container-low;
+    -fx-background-insets: -6 -8 0 -8;
+    -fx-background-radius: 12;
+}
+
+.custom-color-dialog .controls-pane #settings-pane {
+    -fx-vgap: 4;
+}
+
+/* Dialog actions: text buttons, the default one filled, as in Material dialogs. */
+.custom-color-dialog .controls-pane #buttons-hbox .button {
+    -fx-background-color: transparent;
+    -fx-text-fill: -md-sys-color-primary;
+    -fx-padding: 0 12 0 12;
+    -fx-effect: null;
+}
+
+.custom-color-dialog .controls-pane #buttons-hbox .button:default {
+    -fx-background-color: -md-sys-color-primary;
+    -fx-text-fill: -md-sys-color-on-primary;
+    -fx-padding: 0 20 0 20;
+}
+
+.custom-color-dialog .text-field,
+.custom-color-dialog .text-field:focused {
+    -fx-min-height: 32;
+    -fx-pref-height: 32;
+    -fx-padding: 0 8 0 8;
+    -fx-font-size: 14px;
+}
+
+.custom-color-dialog .color-rect-pane .color-rect-border,
+.custom-color-dialog .controls-pane .current-new-color-grid #current-new-color-border {
+    -fx-border-color: -md-sys-color-outline-variant;
+}
+
+.custom-color-dialog > .color-rect-pane #color-rect-indicator,
+.custom-color-dialog > .color-rect-pane > .color-bar > #color-bar-indicator {
+    -fx-border-color: white, -md-sys-color-shadow-a38;
+}
+
+.custom-color-dialog .controls-pane #buttons-hbox {
+    -fx-spacing: 8;
+}
+
+/* ===================================================================================== */
+/* 9. Date picker, dialogs                                                                */
+/* ===================================================================================== */
+
+.date-picker-popup {
+    -fx-background-color: -md-sys-color-surface-container-high;
+    -fx-background-insets: 0;
+    -fx-background-radius: 16;
+    -fx-border-width: 0;
+    -fx-padding: 12;
+    -fx-effect: dropshadow(gaussian, -md-sys-color-shadow-a32, 11, 0.04, 0, 4);
+    -fx-spacing: 4;
+}
+
+.date-picker-popup > .month-year-pane {
+    -fx-background-color: transparent;
+    -fx-background-insets: 0;
+    -fx-padding: 4 4 12 4;
+}
+
+.date-picker-popup > * > .spinner {
+    -fx-background-color: transparent;
+    -fx-border-width: 0;
+    -fx-min-height: 0;
+    -fx-pref-height: -1;
+    -fx-spacing: 4;
+}
+
+.date-picker-popup > * > .spinner > .button {
+    -fx-background-color: transparent;
+    -fx-background-radius: 100;
+    -fx-padding: 8;
+    -fx-min-height: 0;
+    -fx-pref-height: -1;
+    -fx-text-fill: -md-sys-color-on-surface-variant;
+    -fx-effect: null;
+}
+
+.date-picker-popup > * > .spinner > .button > .left-arrow,
+.date-picker-popup > * > .spinner > .button > .right-arrow {
+    -fx-background-color: -md-sys-color-on-surface-variant;
+}
+
+.date-picker-popup > * > .spinner > .spinner-label {
+    -fx-text-fill: -md-sys-color-on-surface-variant;
+    -fx-font-size: 14px;
+    -fx-font-weight: 500;
+    -fx-alignment: center;
+}
+
+.date-picker-popup > .calendar-grid {
+    -fx-background-color: transparent;
+    -fx-padding: 0;
+}
+
+.date-picker-popup > * > .day-name-cell,
+.date-picker-popup > * > .week-number-cell {
+    -fx-text-fill: -md-sys-color-on-surface;
+    -fx-font-size: 13px;
+    -fx-background-color: transparent;
+}
+
+.date-picker-popup > * > .date-cell {
+    -fx-background-color: transparent;
+    -fx-background-insets: 2;
+    -fx-background-radius: 100;
+    -fx-border-width: 0;
+    -fx-padding: 0;
+    -fx-min-width: 40;
+    -fx-min-height: 40;
+    -fx-pref-width: 40;
+    -fx-pref-height: 40;
+    -fx-alignment: center;
+    -fx-font-size: 14px;
+    -fx-text-fill: -md-sys-color-on-surface;
+}
+
+.date-picker-popup > * > .day-cell:hover {
+    -fx-background-color: -md-sys-color-on-surface-a08;
+}
+
+.date-picker-popup > * > .today {
+    -fx-border-color: -md-sys-color-primary;
+    -fx-border-width: 1;
+    -fx-border-insets: 2;
+    -fx-border-radius: 100;
+    -fx-text-fill: -md-sys-color-primary;
+}
+
+.date-picker-popup > * > .selected,
+.date-picker-popup > * > .selected:hover,
+.date-picker-popup > * > .selected:focused {
+    -fx-background-color: -md-sys-color-primary;
+    -fx-text-fill: -md-sys-color-on-primary;
+}
+
+.date-picker-popup > * > .previous-month,
+.date-picker-popup > * > .next-month {
+    -fx-background-color: transparent;
+    -fx-text-fill: -md-sys-color-on-surface-a38;
+}
+
+.date-picker-popup > * > .day-cell:disabled {
+    -fx-opacity: 1;
+    -fx-text-fill: -md-sys-color-on-surface-a38;
+}
+
+/* JavaFX Dialog / Alert */
+.dialog-pane {
+    -fx-background-color: -md-sys-color-surface-container-high;
+    -fx-padding: 24;
+}
+
+.dialog-pane > .header-panel {
+    -fx-background-color: transparent;
+    -fx-padding: 0 0 16 0;
+}
+
+.dialog-pane > .header-panel > .label {
+    -fx-font-size: 24px;
+    -fx-text-fill: -md-sys-color-on-surface;
+}
+
+.dialog-pane > .content.label,
+.dialog-pane > .content .label {
+    -fx-text-fill: -md-sys-color-on-surface-variant;
+    -fx-font-size: 14px;
+    -fx-padding: 0;
+}
+
+.dialog-pane > .button-bar > .container {
+    -fx-padding: 24 0 0 0;
+}
+
+.dialog-pane > .button-bar > .container > .button {
+    -fx-background-color: transparent;
+    -fx-text-fill: -md-sys-color-primary;
+    -fx-padding: 0 12 0 12;
+    -fx-effect: null;
+}
+
+.dialog-pane > .button-bar > .container > .button:default {
+    -fx-background-color: -md-sys-color-primary;
+    -fx-text-fill: -md-sys-color-on-primary;
+    -fx-padding: 0 24 0 24;
+}
+
+.dialog-pane:header .header-panel .graphic-container,
+.dialog-pane > .graphic-container {
+    -fx-padding: 0 16 0 0;
+}
+
+.alert.information.dialog-pane,
+.alert.warning.dialog-pane,
+.alert.error.dialog-pane,
+.alert.confirmation.dialog-pane,
+.text-input-dialog.dialog-pane,
+.choice-dialog.dialog-pane {
+    -fx-graphic: null;
+}
+
+/* ===================================================================================== */
+/* 10. Material3FX components                                                                    */
+/* ===================================================================================== */
+
+/* COMPONENTS-START */
+/* ---------- Icons ---------- */
+
+.md-icon {
+    -fx-font-smoothing-type: gray;
+}
+
+/* ---------- Icon buttons ---------- */
+
+.icon-button,
+.icon-button.filled,
+.icon-button.tonal,
+.icon-button.outlined {
+    -fx-background-color: transparent;
+    -fx-background-radius: 100;
+    -fx-border-color: null;
+    -fx-border-width: 0;
+    -fx-text-fill: -md-sys-color-on-surface-variant;
+    -fx-padding: 0;
+    -fx-min-width: 40;
+    -fx-min-height: 40;
+    -fx-pref-width: 40;
+    -fx-pref-height: 40;
+    -fx-max-width: 40;
+    -fx-max-height: 40;
+    -fx-effect: null;
+}
+
+.icon-button:hover {
+    -fx-effect: null;
+}
+
+.icon-button:toggle:selected {
+    -fx-text-fill: -md-sys-color-primary;
+}
+
+.icon-button.filled {
+    -fx-background-color: -md-sys-color-primary;
+    -fx-text-fill: -md-sys-color-on-primary;
+}
+
+.icon-button.filled:toggle {
+    -fx-background-color: -md-sys-color-surface-container-highest;
+    -fx-text-fill: -md-sys-color-primary;
+}
+
+.icon-button.filled:toggle:selected {
+    -fx-background-color: -md-sys-color-primary;
+    -fx-text-fill: -md-sys-color-on-primary;
+}
+
+.icon-button.tonal {
+    -fx-background-color: -md-sys-color-secondary-container;
+    -fx-text-fill: -md-sys-color-on-secondary-container;
+}
+
+.icon-button.tonal:toggle {
+    -fx-background-color: -md-sys-color-surface-container-highest;
+    -fx-text-fill: -md-sys-color-on-surface-variant;
+}
+
+.icon-button.tonal:toggle:selected {
+    -fx-background-color: -md-sys-color-secondary-container;
+    -fx-text-fill: -md-sys-color-on-secondary-container;
+}
+
+.icon-button.outlined {
+    -fx-border-color: -md-sys-color-outline;
+    -fx-border-width: 1;
+    -fx-border-radius: 100;
+}
+
+.icon-button.outlined:toggle:selected {
+    -fx-background-color: -md-sys-color-inverse-surface;
+    -fx-text-fill: -md-sys-color-inverse-on-surface;
+    -fx-border-color: transparent;
+}
+
+.icon-button:disabled,
+.icon-button.outlined:disabled {
+    -fx-background-color: transparent;
+    -fx-text-fill: -md-sys-color-on-surface-a38;
+}
+
+.icon-button.filled:disabled,
+.icon-button.tonal:disabled {
+    -fx-background-color: -md-sys-color-on-surface-a12;
+}
+
+.icon-button.outlined:disabled {
+    -fx-border-color: -md-sys-color-on-surface-a12;
+}
+
+.icon-button:focus-visible {
+    -fx-border-color: -md-sys-color-secondary;
+    -fx-border-width: 3;
+    -fx-border-insets: -5;
+    -fx-border-radius: 100;
+}
+
+/* ---------- FAB ---------- */
+
+.fab {
+    -fx-background-color: -md-sys-color-primary-container;
+    -fx-text-fill: -md-sys-color-on-primary-container;
+    -fx-background-radius: 16;
+    -fx-padding: 0;
+    -fx-min-width: 56;
+    -fx-min-height: 56;
+    -fx-pref-width: 56;
+    -fx-pref-height: 56;
+    -fx-max-width: 56;
+    -fx-max-height: 56;
+    -fx-effect: dropshadow(gaussian, -md-sys-color-shadow-a32, 11, 0.04, 0, 4);
+}
+
+.fab:hover {
+    -fx-effect: dropshadow(gaussian, -md-sys-color-shadow-a32, 14, 0.05, 0, 6);
+}
+
+.fab:pressed,
+.fab:armed {
+    -fx-effect: dropshadow(gaussian, -md-sys-color-shadow-a32, 11, 0.04, 0, 4);
+}
+
+.fab.lowered {
+    -fx-effect: dropshadow(gaussian, -md-sys-color-shadow-a32, 4, 0, 0, 1);
+}
+
+.fab:focus-visible {
+    -fx-border-color: -md-sys-color-secondary;
+    -fx-border-width: 3;
+    -fx-border-insets: -5;
+    -fx-border-radius: 21;
+}
+
+.fab.fab-small {
+    -fx-background-radius: 12;
+    -fx-min-width: 40;
+    -fx-min-height: 40;
+    -fx-pref-width: 40;
+    -fx-pref-height: 40;
+    -fx-max-width: 40;
+    -fx-max-height: 40;
+}
+
+.fab.fab-large {
+    -fx-background-radius: 28;
+    -fx-min-width: 96;
+    -fx-min-height: 96;
+    -fx-pref-width: 96;
+    -fx-pref-height: 96;
+    -fx-max-width: 96;
+    -fx-max-height: 96;
+}
+
+.fab.fab-extended {
+    -fx-padding: 0 20 0 16;
+    -fx-graphic-text-gap: 12;
+    -fx-min-width: 80;
+    -fx-pref-width: -1;
+    -fx-max-width: -1;
+    -fx-font-size: 14px;
+    -fx-font-weight: 500;
+}
+
+.fab.fab-secondary {
+    -fx-background-color: -md-sys-color-secondary-container;
+    -fx-text-fill: -md-sys-color-on-secondary-container;
+}
+
+.fab.fab-tertiary {
+    -fx-background-color: -md-sys-color-tertiary-container;
+    -fx-text-fill: -md-sys-color-on-tertiary-container;
+}
+
+.fab.fab-surface {
+    -fx-background-color: -md-sys-color-surface-container-high;
+    -fx-text-fill: -md-sys-color-primary;
+}
+
+.fab:disabled {
+    -fx-background-color: -md-sys-color-on-surface-a12;
+    -fx-text-fill: -md-sys-color-on-surface-a38;
+    -fx-effect: null;
+}
+
+/* ---------- Segmented button ---------- */
+
+.segmented-button {
+    -fx-spacing: 0;
+}
+
+.segmented-button .segment {
+    -fx-background-color: transparent;
+    -fx-background-radius: 0;
+    -fx-border-color: -md-sys-color-outline;
+    -fx-border-width: 1 0 1 1;
+    -fx-border-radius: 0;
+    -fx-padding: 0 12 0 12;
+    -fx-min-width: 48;
+    -fx-text-fill: -md-sys-color-on-surface;
+    -fx-graphic-text-gap: 8;
+}
+
+.segmented-button .segment.first {
+    -fx-background-radius: 100 0 0 100;
+    -fx-border-radius: 100 0 0 100;
+}
+
+.segmented-button .segment.last {
+    -fx-background-radius: 0 100 100 0;
+    -fx-border-radius: 0 100 100 0;
+    -fx-border-width: 1;
+}
+
+.segmented-button .segment.only {
+    -fx-background-radius: 100;
+    -fx-border-radius: 100;
+    -fx-border-width: 1;
+}
+
+.segmented-button .segment:selected {
+    -fx-background-color: -md-sys-color-secondary-container;
+    -fx-text-fill: -md-sys-color-on-secondary-container;
+}
+
+.segmented-button .segment:disabled {
+    -fx-background-color: transparent;
+    -fx-text-fill: -md-sys-color-on-surface-a38;
+    -fx-border-color: -md-sys-color-on-surface-a12;
+}
+
+.segmented-button .segment:focus-visible {
+    -fx-border-color: -md-sys-color-outline, -md-sys-color-secondary;
+    -fx-border-width: 1, 2;
+    -fx-border-insets: 0, 1;
+}
+
+/* ---------- Chips ---------- */
+
+.chip {
+    -fx-background-color: transparent;
+    -fx-background-insets: 0;
+    -fx-background-radius: 8;
+    -fx-border-color: -md-sys-color-outline;
+    -fx-border-width: 1;
+    -fx-border-radius: 8;
+    -fx-padding: 0 16 0 16;
+    -fx-min-height: 32;
+    -fx-pref-height: 32;
+    -fx-max-height: 32;
+    -fx-graphic-text-gap: 8;
+    -fx-text-fill: -md-sys-color-on-surface-variant;
+    -fx-font-size: 14px;
+    -fx-font-weight: 500;
+    -fx-cursor: hand;
+}
+
+.chip:leading {
+    -fx-padding: 0 16 0 8;
+}
+
+.chip:trailing {
+    -fx-padding: 0 8 0 12;
+}
+
+.chip:leading:trailing {
+    -fx-padding: 0 8 0 8;
+}
+
+.chip:avatar {
+    -fx-padding: 0 8 0 4;
+    -fx-background-radius: 100;
+    -fx-border-radius: 100;
+}
+
+.chip.assist {
+    -fx-text-fill: -md-sys-color-on-surface;
+}
+
+.chip > .chip-icon {
+    -fx-fill: -md-sys-color-primary;
+}
+
+.chip.filter > .chip-icon,
+.chip.input > .chip-icon {
+    -fx-fill: -md-sys-color-on-surface-variant;
+}
+
+.chip > .chip-close > .chip-close-icon {
+    -fx-fill: -md-sys-color-on-surface-variant;
+}
+
+.chip > .md-state-layer {
+    -md-state-color: -md-sys-color-on-surface-variant;
+}
+
+.chip:selected {
+    -fx-background-color: -md-sys-color-secondary-container;
+    -fx-border-color: transparent;
+}
+
+.chip:selected {
+    -fx-text-fill: -md-sys-color-on-secondary-container;
+}
+
+.chip:selected > .chip-check,
+.chip:selected > .chip-icon,
+.chip:selected > .chip-close > .chip-close-icon {
+    -fx-fill: -md-sys-color-on-secondary-container;
+}
+
+.chip:selected > .md-state-layer {
+    -md-state-color: -md-sys-color-on-secondary-container;
+}
+
+.chip:elevated {
+    -fx-background-color: -md-sys-color-surface-container-low;
+    -fx-border-color: transparent;
+    -fx-effect: dropshadow(gaussian, -md-sys-color-shadow-a32, 4, 0, 0, 1);
+}
+
+.chip:elevated:selected {
+    -fx-background-color: -md-sys-color-secondary-container;
+}
+
+.chip:focus-visible {
+    -fx-border-color: -md-sys-color-outline, -md-sys-color-secondary;
+    -fx-border-width: 1, 3;
+    -fx-border-insets: 0, -5;
+    -fx-border-radius: 8, 13;
+}
+
+.chip:disabled {
+    -fx-border-color: -md-sys-color-on-surface-a12;
+    -fx-cursor: default;
+}
+
+.chip:disabled {
+    -fx-text-fill: -md-sys-color-on-surface-a38;
+    -fx-opacity: 1;
+}
+
+.chip:disabled > .chip-icon {
+    -fx-fill: -md-sys-color-on-surface-a38;
+}
+
+/* ---------- Cards ---------- */
+
+.card {
+    -fx-background-radius: 12;
+    -fx-padding: 16;
+}
+
+.card .card-content {
+    -fx-spacing: 8;
+}
+
+.card.flush {
+    -fx-padding: 0;
+}
+
+.card.flush .card-content {
+    -fx-spacing: 0;
+}
+
+.card.elevated {
+    -fx-background-color: -md-sys-color-surface-container-low;
+    -fx-effect: dropshadow(gaussian, -md-sys-color-shadow-a32, 4, 0, 0, 1);
+}
+
+.card.elevated:clickable:hover {
+    -fx-effect: dropshadow(gaussian, -md-sys-color-shadow-a32, 7, 0, 0, 2);
+}
+
+.card.filled {
+    -fx-background-color: -md-sys-color-surface-container-highest;
+}
+
+.card.outlined {
+    -fx-background-color: -md-sys-color-surface;
+    -fx-border-color: -md-sys-color-outline-variant;
+    -fx-border-width: 1;
+    -fx-border-radius: 12;
+}
+
+.card > .card-state-layer {
+    -md-state-color: -md-sys-color-on-surface;
+}
+
+.card:clickable {
+    -fx-cursor: hand;
+}
+
+.card:focus-visible {
+    -fx-border-color: -md-sys-color-secondary;
+    -fx-border-width: 3;
+    -fx-border-radius: 12;
+}
+
+.card:disabled {
+    -fx-opacity: 0.38;
+}
+
+.card .card-title {
+    -fx-font-size: 16px;
+    -fx-font-weight: 500;
+    -fx-text-fill: -md-sys-color-on-surface;
+}
+
+.card .card-subtitle {
+    -fx-font-size: 14px;
+    -fx-text-fill: -md-sys-color-on-surface-variant;
+}
+
+/* ---------- Switch ---------- */
+
+.switch {
+    -fx-background-color: transparent;
+    -fx-padding: 4 0 4 0;
+    -fx-text-fill: -md-sys-color-on-surface;
+    -fx-font-size: 14px;
+    -fx-alignment: center-left;
+    -fx-cursor: hand;
+}
+
+.switch .switch-track {
+    -fx-background-color: -md-sys-color-surface-container-highest;
+    -fx-background-radius: 100;
+    -fx-border-color: -md-sys-color-outline;
+    -fx-border-width: 2;
+    -fx-border-radius: 100;
+}
+
+.switch .switch-thumb {
+    -fx-background-color: -md-sys-color-outline;
+    -fx-background-radius: 100;
+}
+
+.switch:hover .switch-thumb {
+    -fx-background-color: -md-sys-color-on-surface-variant;
+}
+
+.switch:selected .switch-track {
+    -fx-background-color: -md-sys-color-primary;
+    -fx-border-color: -md-sys-color-primary;
+}
+
+.switch:selected .switch-thumb {
+    -fx-background-color: -md-sys-color-on-primary;
+}
+
+.switch:selected:hover .switch-thumb {
+    -fx-background-color: -md-sys-color-primary-container;
+}
+
+.switch .switch-icon {
+    -fx-fill: -md-sys-color-surface-container-highest;
+}
+
+.switch:selected .switch-icon {
+    -fx-fill: -md-sys-color-on-primary-container;
+}
+
+.switch .switch-state-layer {
+    -md-state-color: -md-sys-color-on-surface;
+}
+
+.switch:selected .switch-state-layer {
+    -md-state-color: -md-sys-color-primary;
+}
+
+.switch:focus-visible .switch-track {
+    -fx-border-color: -md-sys-color-outline, -md-sys-color-secondary;
+    -fx-border-width: 2, 3;
+    -fx-border-insets: 0, -5;
+    -fx-border-radius: 100, 100;
+}
+
+.switch:selected:focus-visible .switch-track {
+    -fx-border-color: -md-sys-color-primary, -md-sys-color-secondary;
+}
+
+.switch:disabled {
+    -fx-opacity: 0.38;
+}
+
+/* ---------- Badge ---------- */
+
+.badge {
+    -fx-background-color: -md-sys-color-error;
+    -fx-background-radius: 100;
+    -fx-text-fill: -md-sys-color-on-error;
+    -fx-font-size: 11px;
+    -fx-font-weight: 500;
+    -fx-padding: 0 4 0 4;
+    -fx-min-width: 16;
+    -fx-pref-height: 16;
+    -fx-min-height: 16;
+}
+
+.badge:small {
+    -fx-padding: 0;
+    -fx-min-width: 6;
+    -fx-min-height: 6;
+    -fx-pref-width: 6;
+    -fx-pref-height: 6;
+}
+
+/* ---------- Avatar ---------- */
+
+.avatar {
+    -fx-background-color: -md-sys-color-primary-container;
+}
+
+.avatar > .avatar-initials {
+    -fx-text-fill: -md-sys-color-on-primary-container;
+    -fx-font-weight: 500;
+}
+
+/* ---------- Divider ---------- */
+
+.divider.inset-start .line {
+    -fx-border-insets: 0 0 0 16;
+}
+
+.divider.inset-end .line {
+    -fx-border-insets: 0 16 0 0;
+}
+
+.divider.inset .line {
+    -fx-border-insets: 0 16 0 16;
+}
+
+/* ---------- Navigation bar ---------- */
+
+.navigation-bar {
+    -fx-background-color: -md-sys-color-surface-container;
+    -fx-min-height: 80;
+    -fx-pref-height: 80;
+    -fx-padding: 12 8 16 8;
+}
+
+.navigation-item {
+    -fx-cursor: hand;
+}
+
+.navigation-item .navigation-indicator {
+    -fx-background-radius: 100;
+    -fx-min-width: 64;
+    -fx-pref-width: 64;
+    -fx-max-width: 64;
+    -fx-min-height: 32;
+    -fx-pref-height: 32;
+    -fx-max-height: 32;
+}
+
+.navigation-item .md-icon {
+    -fx-fill: -md-sys-color-on-surface-variant;
+}
+
+.navigation-item:selected .md-icon {
+    -fx-fill: -md-sys-color-on-secondary-container;
+}
+
+.navigation-item:selected .navigation-indicator {
+    -fx-background-color: -md-sys-color-secondary-container;
+}
+
+.navigation-item .navigation-label {
+    -fx-text-fill: -md-sys-color-on-surface-variant;
+    -fx-font-size: 12px;
+    -fx-font-weight: 500;
+}
+
+.navigation-item:selected .navigation-label {
+    -fx-text-fill: -md-sys-color-on-surface;
+    -fx-font-weight: bold;
+}
+
+.navigation-item .md-state-layer {
+    -md-state-color: -md-sys-color-on-surface-variant;
+}
+
+.navigation-item:selected .md-state-layer {
+    -md-state-color: -md-sys-color-on-secondary-container;
+}
+
+.navigation-item:focus-visible .navigation-indicator {
+    -fx-border-color: -md-sys-color-secondary;
+    -fx-border-width: 2;
+    -fx-border-radius: 100;
+}
+
+.navigation-item:disabled {
+    -fx-opacity: 0.38;
+}
+
+/* ---------- Navigation rail ---------- */
+
+.navigation-rail {
+    -fx-background-color: -md-sys-color-surface;
+    -fx-min-width: 80;
+    -fx-pref-width: 80;
+    -fx-padding: 12 0 12 0;
+}
+
+.navigation-rail-header {
+    -fx-spacing: 8;
+    -fx-padding: 0 0 40 0;
+}
+
+.navigation-rail-items {
+    -fx-spacing: 12;
+}
+
+.navigation-rail .navigation-indicator {
+    -fx-min-width: 56;
+    -fx-pref-width: 56;
+    -fx-max-width: 56;
+}
+
+.navigation-rail .navigation-item {
+    -fx-min-width: 80;
+    -fx-pref-width: 80;
+}
+
+/* ---------- Navigation drawer ---------- */
+
+.navigation-drawer {
+    -fx-background-color: -md-sys-color-surface-container-low;
+    -fx-padding: 0;
+}
+
+.navigation-drawer.modal {
+    -fx-background-radius: 0 16 16 0;
+    -fx-pref-width: 360;
+    -fx-effect: dropshadow(gaussian, -md-sys-color-shadow-a32, 7, 0, 0, 2);
+}
+
+.navigation-drawer-scroll,
+.navigation-drawer-scroll > .viewport {
+    -fx-background-color: transparent;
+}
+
+.navigation-drawer-content {
+    -fx-padding: 12;
+}
+
+/* Title and section headlines are smaller and colored, so they never read as destinations. */
+.navigation-drawer-title {
+    -fx-text-fill: -md-sys-color-on-surface;
+    -fx-font-size: 22px;
+    -fx-padding: 12 16 16 16;
+}
+
+.navigation-drawer-headline {
+    -fx-text-fill: -md-sys-color-primary;
+    -fx-font-size: 12px;
+    -fx-font-weight: bold;
+    -fx-padding: 16 16 8 16;
+}
+
+.navigation-drawer-divider .line {
+    -fx-border-insets: 0 16 0 16;
+}
+
+
+
+.navigation-item.drawer-item {
+    -fx-min-height: 56;
+    -fx-pref-height: 56;
+    -fx-max-height: 56;
+}
+
+.navigation-item.drawer-item .navigation-indicator {
+    -fx-min-width: 0;
+    -fx-pref-width: -1;
+    -fx-max-width: 100000;
+    -fx-min-height: 56;
+    -fx-pref-height: 56;
+    -fx-max-height: 56;
+}
+
+.navigation-drawer-item-content {
+    -fx-padding: 0 24 0 16;
+}
+
+.navigation-item.drawer-item .navigation-label {
+    -fx-font-size: 14px;
+    -fx-font-weight: 500;
+    -fx-text-fill: -md-sys-color-on-surface-variant;
+}
+
+.navigation-item.drawer-item:selected .navigation-label,
+.navigation-item.drawer-item:selected .navigation-drawer-badge {
+    -fx-text-fill: -md-sys-color-on-secondary-container;
+    -fx-font-weight: 500;
+}
+
+.navigation-drawer-badge {
+    -fx-text-fill: -md-sys-color-on-surface-variant;
+    -fx-font-size: 14px;
+    -fx-font-weight: 500;
+}
+
+/* ---------- Overlays ---------- */
+
+.md-overlay {
+    /* No fill: even a transparent background is pickable and would block clicks. */
+    -fx-background-color: null;
+}
+
+.md-scrim {
+    -fx-background-color: -md-sys-color-scrim-a32;
+}
+
+/* ---------- Dialog ---------- */
+
+.material-dialog .dialog-container {
+    -fx-spacing: 16;
+}
+
+.material-dialog:full-screen .dialog-container {
+    -fx-spacing: 0;
+}
+
+.material-dialog {
+    -fx-background-color: -md-sys-color-surface-container-high;
+    -fx-background-radius: 28;
+    -fx-padding: 24;
+    -fx-min-width: 280;
+    -fx-max-width: 560;
+    -fx-pref-width: 400;
+    -fx-effect: dropshadow(gaussian, -md-sys-color-shadow-a32, 11, 0.04, 0, 4);
+}
+
+.material-dialog .dialog-icon {
+    -fx-fill: -md-sys-color-secondary;
+}
+
+.material-dialog .dialog-headline {
+    -fx-text-fill: -md-sys-color-on-surface;
+    -fx-font-size: 24px;
+}
+
+.material-dialog:with-icon .dialog-headline {
+    -fx-text-alignment: center;
+    -fx-alignment: center;
+}
+
+.material-dialog .dialog-body {
+    -fx-spacing: 16;
+}
+
+.material-dialog .dialog-text {
+    -fx-text-fill: -md-sys-color-on-surface-variant;
+    -fx-font-size: 14px;
+}
+
+.material-dialog .dialog-actions {
+    -fx-padding: 8 0 0 0;
+}
+
+.material-dialog:full-screen {
+    -fx-background-radius: 0;
+    -fx-max-width: 100000;
+    -fx-pref-width: -1;
+    -fx-padding: 0;
+    -fx-effect: null;
+    -fx-background-color: -md-sys-color-surface;
+}
+
+.material-dialog:full-screen .dialog-top-bar {
+    -fx-padding: 8 16 8 8;
+    -fx-min-height: 56;
+}
+
+.material-dialog:full-screen .dialog-headline {
+    -fx-font-size: 22px;
+}
+
+.material-dialog:full-screen .dialog-body {
+    -fx-padding: 16 24 24 24;
+}
+
+/* ---------- Snackbar ---------- */
+
+.snackbar .snackbar-content {
+    -fx-spacing: 8;
+}
+
+.snackbar {
+    -fx-background-color: -md-sys-color-inverse-surface;
+    -fx-background-radius: 4;
+    -fx-padding: 0 8 0 16;
+    -fx-min-height: 48;
+    -fx-min-width: 280;
+    -fx-max-width: 560;
+    -fx-effect: dropshadow(gaussian, -md-sys-color-shadow-a32, 11, 0.04, 0, 4);
+}
+
+.snackbar .snackbar-text {
+    -fx-text-fill: -md-sys-color-inverse-on-surface;
+    -fx-font-size: 14px;
+    -fx-padding: 14 0 14 0;
+}
+
+.snackbar .snackbar-action {
+    -fx-text-fill: -md-sys-color-inverse-primary;
+}
+
+.snackbar .snackbar-close {
+    -fx-text-fill: -md-sys-color-inverse-on-surface;
+}
+
+/* ---------- Bottom sheet ---------- */
+
+.bottom-sheet {
+    -fx-background-color: -md-sys-color-surface-container-low;
+    -fx-background-radius: 28 28 0 0;
+    -fx-padding: 0 0 24 0;
+    -fx-min-width: 320;
+    -fx-max-width: 640;
+    -fx-pref-width: 640;
+    -fx-effect: dropshadow(gaussian, -md-sys-color-shadow-a32, 7, 0, 0, -1);
+}
+
+.bottom-sheet-handle-area {
+    -fx-padding: 22 0 22 0;
+}
+
+.bottom-sheet-handle {
+    -fx-background-color: -md-sys-color-on-surface-variant;
+    -fx-opacity: 0.4;
+    -fx-background-radius: 100;
+    -fx-min-width: 32;
+    -fx-pref-width: 32;
+    -fx-max-width: 32;
+    -fx-min-height: 4;
+    -fx-pref-height: 4;
+    -fx-max-height: 4;
+}
+
+/* ---------- Side sheet ---------- */
+
+.side-sheet {
+    -fx-background-color: -md-sys-color-surface-container-low;
+    -fx-background-radius: 16 0 0 16;
+    -fx-min-width: 256;
+    -fx-pref-width: 400;
+    -fx-padding: 0 0 24 0;
+    -fx-effect: dropshadow(gaussian, -md-sys-color-shadow-a32, 7, 0, 0, 2);
+}
+
+.side-sheet-header {
+    -fx-padding: 12 12 16 24;
+    -fx-min-height: 72;
+}
+
+.side-sheet-headline {
+    -fx-text-fill: -md-sys-color-on-surface-variant;
+    -fx-font-size: 22px;
+}
+
+.side-sheet-actions {
+    -fx-padding: 16 24 0 24;
+    -fx-border-color: -md-sys-color-outline-variant transparent transparent transparent;
+    -fx-border-width: 1 0 0 0;
+}
+
+/* ---------- Top app bar ---------- */
+
+.top-app-bar {
+    -fx-background-color: -md-sys-color-surface;
+    -fx-padding: 0 4 0 4;
+}
+
+.top-app-bar:scrolled {
+    -fx-background-color: -md-sys-color-surface-container;
+}
+
+.top-app-bar .top-app-bar-row {
+    -fx-min-height: 64;
+    -fx-pref-height: 64;
+    -fx-spacing: 0;
+}
+
+.top-app-bar .top-app-bar-title {
+    -fx-text-fill: -md-sys-color-on-surface;
+    -fx-font-size: 22px;
+    -fx-padding: 0 12 0 12;
+}
+
+.top-app-bar .top-app-bar-actions {
+    -fx-spacing: 0;
+}
+
+.top-app-bar .icon-button {
+    -fx-text-fill: -md-sys-color-on-surface-variant;
+}
+
+.top-app-bar .top-app-bar-row > .stack-pane:first-child .icon-button,
+.top-app-bar .top-app-bar-row > .stack-pane .icon-button {
+    -fx-text-fill: -md-sys-color-on-surface;
+}
+
+.top-app-bar.medium .top-app-bar-row,
+.top-app-bar.large .top-app-bar-row {
+    -fx-min-height: 64;
+    -fx-pref-height: 64;
+}
+
+.top-app-bar.medium .top-app-bar-title {
+    -fx-font-size: 24px;
+    -fx-padding: 0 12 24 12;
+}
+
+.top-app-bar.large .top-app-bar-title {
+    -fx-font-size: 28px;
+    -fx-padding: 24 12 28 12;
+}
+
+/* ---------- Bottom app bar ---------- */
+
+.bottom-app-bar {
+    -fx-background-color: -md-sys-color-surface-container;
+    -fx-min-height: 80;
+    -fx-pref-height: 80;
+    -fx-padding: 12 16 12 4;
+}
+
+.bottom-app-bar .bottom-app-bar-actions {
+    -fx-spacing: 4;
+}
+
+.bottom-app-bar .fab {
+    -fx-effect: null;
+}
+
+/* ---------- Lists ---------- */
+
+.md-list {
+    -fx-padding: 8 0 8 0;
+    -fx-background-color: -md-sys-color-surface;
+}
+
+.list-item {
+    -fx-padding: 8 24 8 16;
+    -fx-min-height: 56;
+    -fx-background-color: transparent;
+}
+
+.list-item .list-item-row {
+    -fx-spacing: 16;
+}
+
+.list-item.two-line {
+    -fx-min-height: 72;
+}
+
+.list-item.three-line {
+    -fx-min-height: 88;
+    -fx-padding: 12 24 12 16;
+}
+
+.list-item.three-line .list-item-row {
+    -fx-alignment: top-left;
+}
+
+.list-item:clickable {
+    -fx-cursor: hand;
+}
+
+.list-item:selected {
+    -fx-background-color: -md-sys-color-secondary-container;
+}
+
+.list-item > .md-state-layer {
+    -md-state-color: -md-sys-color-on-surface;
+}
+
+.list-item:focus-visible {
+    -fx-border-color: -md-sys-color-secondary;
+    -fx-border-width: 2;
+}
+
+.list-item .list-item-headline {
+    -fx-text-fill: -md-sys-color-on-surface;
+    -fx-font-size: 16px;
+}
+
+.list-item .list-item-supporting {
+    -fx-text-fill: -md-sys-color-on-surface-variant;
+    -fx-font-size: 14px;
+}
+
+.list-item .list-item-overline,
+.list-item .list-item-trailing-text {
+    -fx-text-fill: -md-sys-color-on-surface-variant;
+    -fx-font-size: 12px;
+    -fx-font-weight: 500;
+}
+
+.list-item:selected .list-item-headline,
+.list-item:selected .list-item-supporting {
+    -fx-text-fill: -md-sys-color-on-secondary-container;
+}
+
+.list-item .list-item-row > .md-icon {
+    -fx-fill: -md-sys-color-on-surface-variant;
+}
+
+.list-item-cell,
+.list-item-cell:filled:selected,
+.list-view:focused > .virtual-flow > .clipped-container > .sheet > .list-item-cell:filled:selected,
+.list-item-cell:filled:hover {
+    -fx-padding: 0;
+    -fx-background-color: transparent;
+}
+
+/* ---------- Material text field ---------- */
+
+.material-text-field,
+.material-text-field:focused,
+.material-text-field:hover {
+    -fx-background-color: transparent;
+    -fx-background-insets: 0;
+    -fx-border-color: null;
+    -fx-border-width: 0;
+    -fx-padding: 0;
+    -fx-font-size: 16px;
+    -fx-text-fill: -md-sys-color-on-surface;
+    -fx-highlight-fill: -md-sys-color-primary-a38;
+    -fx-highlight-text-fill: -md-sys-color-on-surface;
+    -fx-prompt-text-fill: transparent;
+}
+
+.material-text-field:focused,
+.material-text-field:no-label {
+    -fx-prompt-text-fill: -md-sys-color-on-surface-variant;
+}
+
+.material-text-field .md-field-container {
+    -fx-min-height: 56;
+    -fx-background-color: -md-sys-color-surface-container-highest;
+    -fx-background-radius: 4 4 0 0;
+}
+
+.material-text-field > .md-state-layer {
+    -md-state-color: -md-sys-color-on-surface;
+}
+
+.material-text-field .md-field-indicator {
+    -fx-background-color: -md-sys-color-on-surface-variant;
+    -fx-pref-height: 1;
+}
+
+.material-text-field:hover .md-field-indicator {
+    -fx-background-color: -md-sys-color-on-surface;
+}
+
+.material-text-field:focused .md-field-indicator {
+    -fx-background-color: -md-sys-color-primary;
+    -fx-pref-height: 2;
+}
+
+.material-text-field .md-field-outline {
+    -fx-stroke: -md-sys-color-outline;
+    -fx-stroke-width: 1;
+    -fx-fill: transparent;
+    -fx-stroke-type: inside;
+}
+
+.material-text-field:hover .md-field-outline {
+    -fx-stroke: -md-sys-color-on-surface;
+}
+
+.material-text-field:focused .md-field-outline {
+    -fx-stroke: -md-sys-color-primary;
+    -fx-stroke-width: 2;
+}
+
+.material-text-field .md-field-label {
+    -fx-text-fill: -md-sys-color-on-surface-variant;
+    -fx-font-size: 16px;
+}
+
+.material-text-field:focused .md-field-label {
+    -fx-text-fill: -md-sys-color-primary;
+}
+
+.material-text-field .md-field-supporting,
+.material-text-field .md-field-counter {
+    -fx-text-fill: -md-sys-color-on-surface-variant;
+    -fx-font-size: 12px;
+}
+
+.material-text-field .md-field-prefix,
+.material-text-field .md-field-suffix {
+    -fx-text-fill: -md-sys-color-on-surface-variant;
+    -fx-font-size: 16px;
+}
+
+.material-text-field .md-field-leading-icon {
+    -fx-fill: -md-sys-color-on-surface-variant;
+}
+
+.material-text-field .md-field-trailing.md-icon {
+    -fx-fill: -md-sys-color-on-surface-variant;
+}
+
+.material-text-field:error .md-field-label,
+.material-text-field:error .md-field-supporting,
+.material-text-field:error .md-field-trailing.md-icon {
+    -fx-text-fill: -md-sys-color-error;
+    -fx-fill: -md-sys-color-error;
+}
+
+.material-text-field:error .md-field-outline {
+    -fx-stroke: -md-sys-color-error;
+}
+
+.material-text-field:error .md-field-indicator {
+    -fx-background-color: -md-sys-color-error;
+}
+
+.material-text-field:error:hover .md-field-outline {
+    -fx-stroke: -md-sys-color-on-error-container;
+}
+
+.material-text-field:disabled {
+    -fx-opacity: 0.38;
+}
+
+/* ---------- Search bar ---------- */
+
+.search-bar,
+.search-bar:focused,
+.search-bar:hover {
+    -fx-background-color: -md-sys-color-surface-container-high;
+    -fx-background-insets: 0;
+    -fx-background-radius: 100;
+    -fx-border-color: null;
+    -fx-border-width: 0;
+    -fx-padding: 0;
+    -fx-min-height: 56;
+    -fx-pref-height: 56;
+    -fx-max-height: 56;
+    -fx-min-width: 360;
+    -fx-font-size: 16px;
+    -fx-text-fill: -md-sys-color-on-surface;
+    -fx-prompt-text-fill: -md-sys-color-on-surface-variant;
+    -fx-highlight-fill: -md-sys-color-primary-a38;
+    -fx-highlight-text-fill: -md-sys-color-on-surface;
+}
+
+.search-bar > .md-state-layer {
+    -md-state-color: -md-sys-color-on-surface;
+}
+
+.search-bar:focused {
+    -fx-effect: dropshadow(gaussian, -md-sys-color-shadow-a32, 4, 0, 0, 1);
+}
+
+.search-bar > .search-bar-icon {
+    -fx-fill: -md-sys-color-on-surface;
+}
+
+.search-bar .search-bar-trailing .icon-button {
+    -fx-text-fill: -md-sys-color-on-surface-variant;
+}
+
+.search-suggestions {
+    -fx-background-color: -md-sys-color-surface-container-high;
+    -fx-background-radius: 16;
+    -fx-padding: 8 0 8 0;
+}
+
+.search-suggestions .search-suggestion {
+    -fx-padding: 0;
+}
+
+.search-suggestions .search-suggestion .list-item {
+    -fx-min-height: 48;
+    -fx-padding: 0 16 0 16;
+}
+
+/* ---------- Time picker ---------- */
+
+.time-picker {
+    -fx-padding: 4 0 0 0;
+}
+
+.time-picker .time-picker-content {
+    -fx-spacing: 24;
+}
+
+.time-picker-dial:focus-visible {
+    -fx-border-color: -md-sys-color-secondary;
+    -fx-border-width: 2;
+    -fx-border-radius: 128;
+}
+
+.time-picker-header {
+    -fx-spacing: 0;
+}
+
+.time-picker-field,
+.time-picker-field:focused,
+.time-picker-field:hover {
+    -fx-background-color: -md-sys-color-surface-container-highest;
+    -fx-background-radius: 8;
+    -fx-border-color: null;
+    -fx-border-width: 0;
+    -fx-text-fill: -md-sys-color-on-surface;
+    -fx-font-size: 52px;
+    -fx-padding: 0;
+    -fx-min-width: 96;
+    -fx-pref-width: 96;
+    -fx-max-width: 96;
+    -fx-min-height: 80;
+    -fx-pref-height: 80;
+    -fx-max-height: 80;
+}
+
+.time-picker-field:selected {
+    -fx-background-color: -md-sys-color-primary-container;
+    -fx-text-fill: -md-sys-color-on-primary-container;
+}
+
+.time-picker-field:focused {
+    -fx-border-color: -md-sys-color-primary;
+    -fx-border-width: 2;
+    -fx-border-radius: 8;
+}
+
+.time-picker-separator {
+    -fx-font-size: 52px;
+    -fx-text-fill: -md-sys-color-on-surface;
+    -fx-padding: 0 4 0 4;
+}
+
+.time-picker-am-pm {
+    -fx-padding: 0 0 0 12;
+    -fx-max-height: 80;
+}
+
+.time-picker-period,
+.time-picker-period:selected {
+    -fx-background-radius: 0;
+    -fx-border-color: -md-sys-color-outline;
+    -fx-border-radius: 0;
+    -fx-min-height: 40;
+    -fx-pref-height: 40;
+    -fx-min-width: 52;
+    -fx-padding: 0 8 0 8;
+}
+
+.time-picker-period.am,
+.time-picker-period.am:selected {
+    -fx-background-radius: 8 8 0 0;
+    -fx-border-radius: 8 8 0 0;
+    -fx-border-width: 1 1 0 1;
+}
+
+.time-picker-period.pm,
+.time-picker-period.pm:selected {
+    -fx-background-radius: 0 0 8 8;
+    -fx-border-radius: 0 0 8 8;
+    -fx-border-width: 1;
+}
+
+.time-picker-period:selected {
+    -fx-background-color: -md-sys-color-tertiary-container;
+    -fx-text-fill: -md-sys-color-on-tertiary-container;
+}
+
+.time-picker-face {
+    -fx-fill: -md-sys-color-surface-container-highest;
+}
+
+.time-picker-hand {
+    -fx-stroke: -md-sys-color-primary;
+    -fx-stroke-width: 2;
+}
+
+.time-picker-selector,
+.time-picker-center {
+    -fx-fill: -md-sys-color-primary;
+}
+
+.time-picker-selector-dot {
+    -fx-fill: -md-sys-color-on-primary;
+}
+
+.time-picker-number {
+    -fx-text-fill: -md-sys-color-on-surface;
+    -fx-font-size: 16px;
+}
+
+.time-picker-number.inner {
+    -fx-font-size: 14px;
+    -fx-text-fill: -md-sys-color-on-surface-variant;
+}
+
+.time-picker-number:selected,
+.time-picker-number.inner:selected {
+    -fx-text-fill: -md-sys-color-on-primary;
+}
+
+.material-dialog.time-picker-dialog {
+    -fx-pref-width: 328;
+}
+
+/* ---------- Date picker dialog ---------- */
+
+.material-dialog.date-picker-dialog {
+    -fx-padding: 0 12 12 12;
+    -fx-pref-width: 360;
+}
+
+.date-picker-dialog-header {
+    -fx-padding: 16 12 12 12;
+}
+
+.date-picker-dialog-title {
+    -fx-text-fill: -md-sys-color-on-surface-variant;
+    -fx-font-size: 14px;
+    -fx-font-weight: 500;
+}
+
+.date-picker-dialog-headline {
+    -fx-text-fill: -md-sys-color-on-surface;
+    -fx-font-size: 32px;
+}
+
+.date-picker-dialog-content > .date-picker-popup,
+.date-picker-dialog-calendar {
+    -fx-background-color: transparent;
+    -fx-effect: null;
+    -fx-padding: 8 0 0 0;
+}
+
+/* ---------- Carousel ---------- */
+
+.carousel {
+    -fx-padding: 0;
+}
+
+.carousel-item {
+    -fx-background-color: -md-sys-color-surface-container-highest;
+}
+
+.carousel:focus-visible {
+    -fx-border-color: -md-sys-color-secondary;
+    -fx-border-width: 2;
+    -fx-border-radius: 28;
+}
+
+/* ---------- Rich tooltip ---------- */
+
+.tooltip.rich .rich-tooltip-title {
+    -fx-text-fill: -md-sys-color-on-surface-variant;
+    -fx-font-size: 14px;
+    -fx-font-weight: 500;
+}
+
+.tooltip.rich .rich-tooltip-text {
+    -fx-text-fill: -md-sys-color-on-surface-variant;
+    -fx-font-size: 14px;
+}
+
+/* ---------- Status light ---------- */
+
+.status-light {
+    -fx-padding: 0;
+}
+
+.status-light .status-light-dot,
+.status-light .status-light-ring {
+    -fx-background-radius: 100;
+    -fx-background-color: -md-sys-color-outline;
+}
+
+.status-light.info .status-light-dot,
+.status-light.info .status-light-ring {
+    -fx-background-color: -md-sys-color-primary;
+}
+
+.status-light.success .status-light-dot,
+.status-light.success .status-light-ring {
+    -fx-background-color: -md-sys-color-success;
+}
+
+.status-light.warning .status-light-dot,
+.status-light.warning .status-light-ring {
+    -fx-background-color: -md-sys-color-warning;
+}
+
+.status-light.error .status-light-dot,
+.status-light.error .status-light-ring {
+    -fx-background-color: -md-sys-color-error;
+}
+
+.status-light .status-light-label {
+    -fx-text-fill: -md-sys-color-on-surface;
+    -fx-font-size: 14px;
+}
+
+/* ---------- Banner ---------- */
+
+.banner {
+    -fx-background-color: -md-sys-color-surface-container-low;
+    -fx-border-color: transparent transparent -md-sys-color-outline-variant transparent;
+    -fx-border-width: 0 0 1 0;
+    -fx-padding: 12 8 8 16;
+}
+
+.banner .banner-content {
+    -fx-spacing: 16;
+}
+
+.banner .banner-icon-container {
+    -fx-background-color: -md-sys-color-primary;
+    -fx-background-radius: 100;
+    -fx-min-width: 40;
+    -fx-min-height: 40;
+    -fx-max-width: 40;
+    -fx-max-height: 40;
+}
+
+.banner .banner-icon {
+    -fx-fill: -md-sys-color-on-primary;
+}
+
+.banner .banner-text {
+    -fx-text-fill: -md-sys-color-on-surface;
+    -fx-font-size: 14px;
+}
+
+.banner .banner-actions .button {
+    -fx-text-fill: -md-sys-color-primary;
+}
+
+.banner.success {
+    -fx-background-color: -md-sys-color-success-container;
+}
+
+.banner.success .banner-text,
+.banner.success .banner-actions .button {
+    -fx-text-fill: -md-sys-color-on-success-container;
+}
+
+.banner.success .banner-icon-container {
+    -fx-background-color: -md-sys-color-success;
+}
+
+.banner.success .banner-icon {
+    -fx-fill: -md-sys-color-on-success;
+}
+
+.banner.warning {
+    -fx-background-color: -md-sys-color-warning-container;
+}
+
+.banner.warning .banner-text,
+.banner.warning .banner-actions .button {
+    -fx-text-fill: -md-sys-color-on-warning-container;
+}
+
+.banner.warning .banner-icon-container {
+    -fx-background-color: -md-sys-color-warning;
+}
+
+.banner.warning .banner-icon {
+    -fx-fill: -md-sys-color-on-warning;
+}
+
+.banner.error {
+    -fx-background-color: -md-sys-color-error-container;
+}
+
+.banner.error .banner-text,
+.banner.error .banner-actions .button {
+    -fx-text-fill: -md-sys-color-on-error-container;
+}
+
+.banner.error .banner-icon-container {
+    -fx-background-color: -md-sys-color-error;
+}
+
+.banner.error .banner-icon {
+    -fx-fill: -md-sys-color-on-error;
+}
+
+/* ---------- Range slider ---------- */
+
+.range-slider {
+    -fx-padding: 0 10 0 10;
+}
+
+.range-slider .range-slider-track {
+    -fx-background-color: -md-sys-color-secondary-container;
+    -fx-background-radius: 2;
+}
+
+.range-slider .range-slider-active-track {
+    -fx-background-color: -md-sys-color-primary;
+}
+
+.range-slider .range-slider-tick {
+    -fx-background-color: -md-sys-color-on-secondary-container;
+    -fx-background-radius: 100;
+    -fx-opacity: 0.6;
+}
+
+.range-slider .range-slider-thumb {
+    -fx-background-color: -md-sys-color-primary;
+    -fx-background-radius: 100;
+    -fx-effect: dropshadow(gaussian, -md-sys-color-shadow-a32, 3, 0, 0, 1);
+}
+
+.range-slider .range-slider-thumb:focus-visible {
+    -fx-border-color: -md-sys-color-secondary;
+    -fx-border-width: 3;
+    -fx-border-insets: -6;
+    -fx-border-radius: 100;
+}
+
+.range-slider .range-slider-state-layer {
+    -md-state-color: -md-sys-color-primary;
+}
+
+.range-slider .md-value-label {
+    -fx-background-color: -md-sys-color-inverse-surface;
+    -fx-background-radius: 100;
+    -fx-text-fill: -md-sys-color-inverse-on-surface;
+    -fx-font-size: 12px;
+    -fx-font-weight: 500;
+    -fx-padding: 4 8 4 8;
+    -fx-alignment: center;
+}
+
+.range-slider:disabled .range-slider-active-track,
+.range-slider:disabled .range-slider-thumb {
+    -fx-background-color: -md-sys-color-on-surface-a38;
+    -fx-effect: null;
+}
+
+.range-slider:disabled .range-slider-track {
+    -fx-background-color: -md-sys-color-on-surface-a12;
+}
+
+/* ---------- Date range calendar ---------- */
+
+.date-range-calendar {
+    -fx-padding: 0;
+}
+
+.date-range-calendar .date-range-calendar-header {
+    -fx-padding: 4 0 8 8;
+}
+
+.date-range-calendar .date-range-calendar-month {
+    -fx-text-fill: -md-sys-color-on-surface-variant;
+    -fx-font-size: 14px;
+    -fx-font-weight: 500;
+}
+
+.date-range-calendar .date-range-calendar-weekday {
+    -fx-text-fill: -md-sys-color-on-surface;
+    -fx-font-size: 13px;
+    -fx-min-height: 32;
+}
+
+.date-range-calendar .date-range-day {
+    -fx-min-width: 44;
+    -fx-pref-width: 44;
+    -fx-max-width: 44;
+    -fx-min-height: 44;
+    -fx-pref-height: 44;
+    -fx-max-height: 44;
+    -fx-cursor: hand;
+}
+
+.date-range-calendar .date-range-circle {
+    -fx-background-radius: 100;
+    -fx-min-width: 40;
+    -fx-min-height: 40;
+}
+
+.date-range-calendar .date-range-day-label {
+    -fx-text-fill: -md-sys-color-on-surface;
+    -fx-font-size: 14px;
+}
+
+.date-range-calendar .date-range-day:hover .date-range-circle {
+    -fx-background-color: -md-sys-color-on-surface-a08;
+}
+
+.date-range-calendar .date-range-day:other-month .date-range-day-label {
+    -fx-text-fill: -md-sys-color-on-surface-a38;
+}
+
+.date-range-calendar .date-range-day:today .date-range-circle {
+    -fx-border-color: -md-sys-color-primary;
+    -fx-border-width: 1;
+    -fx-border-radius: 100;
+}
+
+.date-range-calendar .date-range-day:today .date-range-day-label {
+    -fx-text-fill: -md-sys-color-primary;
+}
+
+/* The band behind days of the range; half bands on the endpoints. */
+.date-range-calendar .date-range-day:in-range .date-range-band {
+    -fx-background-color: -md-sys-color-secondary-container;
+    -fx-background-insets: 2 0 2 0;
+}
+
+.date-range-calendar .date-range-day:in-range:range-start .date-range-band {
+    -fx-background-insets: 2 0 2 22;
+}
+
+.date-range-calendar .date-range-day:in-range:range-end .date-range-band {
+    -fx-background-insets: 2 22 2 0;
+}
+
+.date-range-calendar .date-range-day:in-range .date-range-day-label {
+    -fx-text-fill: -md-sys-color-on-secondary-container;
+}
+
+.date-range-calendar .date-range-day:range-start .date-range-circle,
+.date-range-calendar .date-range-day:range-end .date-range-circle {
+    -fx-background-color: -md-sys-color-primary;
+}
+
+.date-range-calendar .date-range-day:range-start .date-range-day-label,
+.date-range-calendar .date-range-day:range-end .date-range-day-label {
+    -fx-text-fill: -md-sys-color-on-primary;
+}
+
+.date-range-calendar .date-range-day:focused-day .date-range-circle {
+    -fx-border-color: -md-sys-color-secondary;
+    -fx-border-width: 2;
+    -fx-border-radius: 100;
+}
+
+.material-dialog.date-range-picker-dialog {
+    -fx-pref-width: 360;
+}
+
+/* ---------- Form ---------- */
+
+.form-pane {
+    -fx-padding: 0;
+}
+
+.form-pane .form-section-title {
+    -fx-text-fill: -md-sys-color-primary;
+    -fx-font-size: 14px;
+    -fx-font-weight: bold;
+    -fx-padding: 0 0 4 0;
+}
+
+.form-row .form-row-label {
+    -fx-text-fill: -md-sys-color-on-surface-variant;
+    -fx-font-size: 14px;
+}
+
+.form-row .form-row-label {
+    -fx-graphic-text-gap: 2;
+}
+
+.form-row .form-row-required {
+    -fx-text-fill: -md-sys-color-error;
+    -fx-font-size: 14px;
+}
+
+.validation-summary {
+    -fx-background-color: -md-sys-color-error-container;
+    -fx-background-radius: 12;
+    -fx-padding: 16;
+}
+
+.validation-summary .validation-summary-content {
+    -fx-spacing: 8;
+}
+
+.validation-summary .validation-summary-icon {
+    -fx-fill: -md-sys-color-error;
+}
+
+.validation-summary .validation-summary-title {
+    -fx-text-fill: -md-sys-color-on-error-container;
+    -fx-font-size: 16px;
+    -fx-font-weight: 500;
+}
+
+.validation-summary .validation-summary-links {
+    -fx-padding: 0 0 0 32;
+}
+
+.validation-summary .validation-summary-link {
+    -fx-text-fill: -md-sys-color-on-error-container;
+    -fx-underline: true;
+    -fx-padding: 2 0 2 0;
+}
+
+/* ---------- Split button ---------- */
+
+.split-button {
+    -fx-padding: 0;
+}
+
+.split-button .split-button-leading,
+.split-button .split-button-trailing {
+    -fx-background-color: -md-sys-color-primary;
+    -fx-text-fill: -md-sys-color-on-primary;
+    -fx-effect: null;
+}
+
+.split-button .split-button-leading {
+    -fx-background-radius: 100 4 4 100;
+    -fx-padding: 0 16 0 16;
+}
+
+.split-button .split-button-trailing {
+    -fx-background-radius: 4 100 100 4;
+    -fx-padding: 0 12 0 8;
+    -fx-min-width: 44;
+}
+
+.split-button .split-button-trailing:showing {
+    -fx-background-radius: 100;
+}
+
+.split-button.tonal .split-button-leading,
+.split-button.tonal .split-button-trailing {
+    -fx-background-color: -md-sys-color-secondary-container;
+    -fx-text-fill: -md-sys-color-on-secondary-container;
+}
+
+.split-button.elevated .split-button-leading,
+.split-button.elevated .split-button-trailing {
+    -fx-background-color: -md-sys-color-surface-container-low;
+    -fx-text-fill: -md-sys-color-primary;
+    -fx-effect: dropshadow(gaussian, -md-sys-color-shadow-a32, 4, 0, 0, 1);
+}
+
+.split-button.outlined .split-button-leading,
+.split-button.outlined .split-button-trailing {
+    -fx-background-color: transparent;
+    -fx-text-fill: -md-sys-color-on-surface-variant;
+    -fx-border-color: -md-sys-color-outline-variant;
+    -fx-border-width: 1;
+}
+
+.split-button.outlined .split-button-leading {
+    -fx-border-radius: 100 4 4 100;
+}
+
+.split-button.outlined .split-button-trailing {
+    -fx-border-radius: 4 100 100 4;
+}
+
+.split-button .split-button-leading:focus-visible {
+    -fx-border-color: -md-sys-color-secondary;
+    -fx-border-width: 3;
+    -fx-border-insets: -5;
+    -fx-border-radius: 100 9 9 100;
+}
+
+.split-button .split-button-trailing:focus-visible {
+    -fx-border-color: -md-sys-color-secondary;
+    -fx-border-width: 3;
+    -fx-border-insets: -5;
+    -fx-border-radius: 9 100 100 9;
+}
+
+/* ---------- Adaptive scaffold ---------- */
+
+.adaptive-scaffold .adaptive-panes {
+    -fx-spacing: 0;
+}
+
+.adaptive-scaffold:two-pane .adaptive-list-pane {
+    -fx-border-color: transparent -md-sys-color-outline-variant transparent transparent;
+    -fx-border-width: 0 1 0 0;
+}
+
+/* COMPONENTS-END */
+
+/* ===================================================================================== */
+/* 11. Density                                                                            */
+/* ===================================================================================== */
+
+/* DENSITY-START */
+/* Density -1: 4px less */
+.md-density-1 .button,
+.md-density-1 .toggle-button,
+.md-density-1 .menu-button,
+.md-density-1 .split-menu-button {
+    -fx-min-height: 36;
+    -fx-pref-height: 36;
+}
+
+.md-density-1 .icon-button,
+.md-density-1 .icon-button.filled,
+.md-density-1 .icon-button.tonal,
+.md-density-1 .icon-button.outlined {
+    -fx-min-height: 36;
+    -fx-pref-height: 36;
+    -fx-max-height: 36;
+    -fx-min-width: 36;
+    -fx-pref-width: 36;
+    -fx-max-width: 36;
+}
+
+.md-density-1 .text-field,
+.md-density-1 .password-field,
+.md-density-1 .combo-box-base,
+.md-density-1 .choice-box,
+.md-density-1 .spinner {
+    -fx-min-height: 52;
+    -fx-pref-height: 52;
+}
+
+.md-density-1 .material-text-field .md-field-container {
+    -fx-min-height: 52;
+}
+
+.md-density-1 .search-bar {
+    -fx-min-height: 52;
+    -fx-pref-height: 52;
+    -fx-max-height: 52;
+}
+
+.md-density-1 .list-cell,
+.md-density-1 .tree-cell,
+.md-density-1 .list-item {
+    -fx-min-height: 52;
+}
+
+.md-density-1 .list-item.two-line {
+    -fx-min-height: 68;
+}
+
+.md-density-1 .list-item.three-line {
+    -fx-min-height: 84;
+}
+
+.md-density-1 .table-row-cell,
+.md-density-1 .tree-table-row-cell {
+    -fx-cell-size: 48;
+}
+
+.md-density-1 .table-view .column-header,
+.md-density-1 .tree-table-view .column-header {
+    -fx-size: 52;
+}
+
+.md-density-1 .menu-item,
+.md-density-1 .combo-box-popup > .list-view > .virtual-flow > .clipped-container > .sheet > .list-cell {
+    -fx-min-height: 44;
+}
+
+.md-density-1 .menu-item {
+    -fx-pref-height: 44;
+}
+
+.md-density-1 .menu-item.menu-header {
+    -fx-min-height: 30;
+    -fx-pref-height: 30;
+}
+
+.md-density-1 .tab-pane > .tab-header-area > .headers-region > .tab {
+    -fx-min-height: 44;
+    -fx-pref-height: 44;
+}
+
+.md-density-1 .chip {
+    -fx-min-height: 28;
+    -fx-pref-height: 28;
+    -fx-max-height: 28;
+}
+
+.md-density-1 .navigation-item.drawer-item,
+.md-density-1 .navigation-item.drawer-item .navigation-indicator {
+    -fx-min-height: 52;
+    -fx-pref-height: 52;
+    -fx-max-height: 52;
+}
+
+.md-density-1 .top-app-bar .top-app-bar-row {
+    -fx-min-height: 60;
+    -fx-pref-height: 60;
+}
+
+.md-density-1 .navigation-bar {
+    -fx-min-height: 76;
+    -fx-pref-height: 76;
+}
+
+.md-density-1 .bottom-app-bar {
+    -fx-min-height: 76;
+    -fx-pref-height: 76;
+}
+
+.md-density-1 .check-box {
+    -fx-padding: 9 0 9 9;
+}
+
+.md-density-1 .radio-button {
+    -fx-padding: 8 0 8 8;
+}
+
+.md-density-1 .navigation-rail-items {
+    -fx-spacing: 8;
+}
+
+/* Density -2: 8px less */
+.md-density-2 .button,
+.md-density-2 .toggle-button,
+.md-density-2 .menu-button,
+.md-density-2 .split-menu-button {
+    -fx-min-height: 32;
+    -fx-pref-height: 32;
+}
+
+.md-density-2 .icon-button,
+.md-density-2 .icon-button.filled,
+.md-density-2 .icon-button.tonal,
+.md-density-2 .icon-button.outlined {
+    -fx-min-height: 32;
+    -fx-pref-height: 32;
+    -fx-max-height: 32;
+    -fx-min-width: 32;
+    -fx-pref-width: 32;
+    -fx-max-width: 32;
+}
+
+.md-density-2 .text-field,
+.md-density-2 .password-field,
+.md-density-2 .combo-box-base,
+.md-density-2 .choice-box,
+.md-density-2 .spinner {
+    -fx-min-height: 48;
+    -fx-pref-height: 48;
+}
+
+.md-density-2 .material-text-field .md-field-container {
+    -fx-min-height: 48;
+}
+
+.md-density-2 .search-bar {
+    -fx-min-height: 48;
+    -fx-pref-height: 48;
+    -fx-max-height: 48;
+}
+
+.md-density-2 .list-cell,
+.md-density-2 .tree-cell,
+.md-density-2 .list-item {
+    -fx-min-height: 48;
+}
+
+.md-density-2 .list-item.two-line {
+    -fx-min-height: 64;
+}
+
+.md-density-2 .list-item.three-line {
+    -fx-min-height: 80;
+}
+
+.md-density-2 .table-row-cell,
+.md-density-2 .tree-table-row-cell {
+    -fx-cell-size: 44;
+}
+
+.md-density-2 .table-view .column-header,
+.md-density-2 .tree-table-view .column-header {
+    -fx-size: 48;
+}
+
+.md-density-2 .menu-item,
+.md-density-2 .combo-box-popup > .list-view > .virtual-flow > .clipped-container > .sheet > .list-cell {
+    -fx-min-height: 40;
+}
+
+.md-density-2 .menu-item {
+    -fx-pref-height: 40;
+}
+
+.md-density-2 .menu-item.menu-header {
+    -fx-min-height: 28;
+    -fx-pref-height: 28;
+}
+
+.md-density-2 .tab-pane > .tab-header-area > .headers-region > .tab {
+    -fx-min-height: 40;
+    -fx-pref-height: 40;
+}
+
+.md-density-2 .chip {
+    -fx-min-height: 24;
+    -fx-pref-height: 24;
+    -fx-max-height: 24;
+}
+
+.md-density-2 .navigation-item.drawer-item,
+.md-density-2 .navigation-item.drawer-item .navigation-indicator {
+    -fx-min-height: 48;
+    -fx-pref-height: 48;
+    -fx-max-height: 48;
+}
+
+.md-density-2 .top-app-bar .top-app-bar-row {
+    -fx-min-height: 56;
+    -fx-pref-height: 56;
+}
+
+.md-density-2 .navigation-bar {
+    -fx-min-height: 72;
+    -fx-pref-height: 72;
+}
+
+.md-density-2 .bottom-app-bar {
+    -fx-min-height: 72;
+    -fx-pref-height: 72;
+}
+
+.md-density-2 .check-box {
+    -fx-padding: 7 0 7 7;
+}
+
+.md-density-2 .radio-button {
+    -fx-padding: 6 0 6 6;
+}
+
+.md-density-2 .navigation-rail-items {
+    -fx-spacing: 4;
+}
+
+/* Density -3: 12px less */
+.md-density-3 .button,
+.md-density-3 .toggle-button,
+.md-density-3 .menu-button,
+.md-density-3 .split-menu-button {
+    -fx-min-height: 28;
+    -fx-pref-height: 28;
+}
+
+.md-density-3 .icon-button,
+.md-density-3 .icon-button.filled,
+.md-density-3 .icon-button.tonal,
+.md-density-3 .icon-button.outlined {
+    -fx-min-height: 28;
+    -fx-pref-height: 28;
+    -fx-max-height: 28;
+    -fx-min-width: 28;
+    -fx-pref-width: 28;
+    -fx-max-width: 28;
+}
+
+.md-density-3 .text-field,
+.md-density-3 .password-field,
+.md-density-3 .combo-box-base,
+.md-density-3 .choice-box,
+.md-density-3 .spinner {
+    -fx-min-height: 44;
+    -fx-pref-height: 44;
+}
+
+.md-density-3 .material-text-field .md-field-container {
+    -fx-min-height: 44;
+}
+
+.md-density-3 .search-bar {
+    -fx-min-height: 44;
+    -fx-pref-height: 44;
+    -fx-max-height: 44;
+}
+
+.md-density-3 .list-cell,
+.md-density-3 .tree-cell,
+.md-density-3 .list-item {
+    -fx-min-height: 44;
+}
+
+.md-density-3 .list-item.two-line {
+    -fx-min-height: 60;
+}
+
+.md-density-3 .list-item.three-line {
+    -fx-min-height: 76;
+}
+
+.md-density-3 .table-row-cell,
+.md-density-3 .tree-table-row-cell {
+    -fx-cell-size: 40;
+}
+
+.md-density-3 .table-view .column-header,
+.md-density-3 .tree-table-view .column-header {
+    -fx-size: 44;
+}
+
+.md-density-3 .menu-item,
+.md-density-3 .combo-box-popup > .list-view > .virtual-flow > .clipped-container > .sheet > .list-cell {
+    -fx-min-height: 36;
+}
+
+.md-density-3 .menu-item {
+    -fx-pref-height: 36;
+}
+
+.md-density-3 .menu-item.menu-header {
+    -fx-min-height: 26;
+    -fx-pref-height: 26;
+}
+
+.md-density-3 .tab-pane > .tab-header-area > .headers-region > .tab {
+    -fx-min-height: 36;
+    -fx-pref-height: 36;
+}
+
+.md-density-3 .chip {
+    -fx-min-height: 20;
+    -fx-pref-height: 20;
+    -fx-max-height: 20;
+}
+
+.md-density-3 .navigation-item.drawer-item,
+.md-density-3 .navigation-item.drawer-item .navigation-indicator {
+    -fx-min-height: 44;
+    -fx-pref-height: 44;
+    -fx-max-height: 44;
+}
+
+.md-density-3 .top-app-bar .top-app-bar-row {
+    -fx-min-height: 52;
+    -fx-pref-height: 52;
+}
+
+.md-density-3 .navigation-bar {
+    -fx-min-height: 68;
+    -fx-pref-height: 68;
+}
+
+.md-density-3 .bottom-app-bar {
+    -fx-min-height: 68;
+    -fx-pref-height: 68;
+}
+
+.md-density-3 .check-box {
+    -fx-padding: 5 0 5 5;
+}
+
+.md-density-3 .radio-button {
+    -fx-padding: 4 0 4 4;
+}
+
+.md-density-3 .navigation-rail-items {
+    -fx-spacing: 0;
+}
+
+/* Density -1: components that inherit .button / .text-field keep their own sizes */
+.md-density-1 .fab {
+    -fx-min-height: 56;
+    -fx-pref-height: 56;
+}
+
+.md-density-1 .fab.fab-small {
+    -fx-min-height: 40;
+    -fx-pref-height: 40;
+}
+
+.md-density-1 .fab.fab-large {
+    -fx-min-height: 96;
+    -fx-pref-height: 96;
+}
+
+.md-density-1 .spinner > .text-field,
+.md-density-1 .combo-box-base > .text-field,
+.md-density-1 .date-picker-popup > * > .spinner {
+    -fx-min-height: 0;
+    -fx-pref-height: -1;
+}
+
+.md-density-1 .time-picker-field {
+    -fx-min-height: 80;
+    -fx-pref-height: 80;
+}
+
+/* Density -2: components that inherit .button / .text-field keep their own sizes */
+.md-density-2 .fab {
+    -fx-min-height: 56;
+    -fx-pref-height: 56;
+}
+
+.md-density-2 .fab.fab-small {
+    -fx-min-height: 40;
+    -fx-pref-height: 40;
+}
+
+.md-density-2 .fab.fab-large {
+    -fx-min-height: 96;
+    -fx-pref-height: 96;
+}
+
+.md-density-2 .spinner > .text-field,
+.md-density-2 .combo-box-base > .text-field,
+.md-density-2 .date-picker-popup > * > .spinner {
+    -fx-min-height: 0;
+    -fx-pref-height: -1;
+}
+
+.md-density-2 .time-picker-field {
+    -fx-min-height: 80;
+    -fx-pref-height: 80;
+}
+
+/* Density -3: components that inherit .button / .text-field keep their own sizes */
+.md-density-3 .fab {
+    -fx-min-height: 56;
+    -fx-pref-height: 56;
+}
+
+.md-density-3 .fab.fab-small {
+    -fx-min-height: 40;
+    -fx-pref-height: 40;
+}
+
+.md-density-3 .fab.fab-large {
+    -fx-min-height: 96;
+    -fx-pref-height: 96;
+}
+
+.md-density-3 .spinner > .text-field,
+.md-density-3 .combo-box-base > .text-field,
+.md-density-3 .date-picker-popup > * > .spinner {
+    -fx-min-height: 0;
+    -fx-pref-height: -1;
+}
+
+.md-density-3 .time-picker-field {
+    -fx-min-height: 80;
+    -fx-pref-height: 80;
+}
+
+.md-density-1 .split-button .split-button-leading,
+.md-density-1 .split-button .split-button-trailing {
+    -fx-min-height: 36;
+    -fx-pref-height: 36;
+}
+
+.md-density-1 .date-range-calendar .date-range-day {
+    -fx-min-height: 42;
+    -fx-pref-height: 42;
+    -fx-max-height: 42;
+}
+
+.md-density-2 .split-button .split-button-leading,
+.md-density-2 .split-button .split-button-trailing {
+    -fx-min-height: 32;
+    -fx-pref-height: 32;
+}
+
+.md-density-2 .date-range-calendar .date-range-day {
+    -fx-min-height: 40;
+    -fx-pref-height: 40;
+    -fx-max-height: 40;
+}
+
+.md-density-3 .split-button .split-button-leading,
+.md-density-3 .split-button .split-button-trailing {
+    -fx-min-height: 28;
+    -fx-pref-height: 28;
+}
+
+.md-density-3 .date-range-calendar .date-range-day {
+    -fx-min-height: 38;
+    -fx-pref-height: 38;
+    -fx-max-height: 38;
+}
+
+/* DENSITY-END */
