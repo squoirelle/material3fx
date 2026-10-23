@@ -1,5 +1,6 @@
 package io.github.squoirelle.material3fx.controls;
 
+import javafx.beans.DefaultProperty;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.ReadOnlyObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
@@ -20,6 +21,7 @@ import javafx.scene.control.SingleSelectionModel;
  * Keyboard: arrow keys move focus between destinations, Home / End jump to the first / last one,
  * Enter or Space selects the focused one.
  */
+@DefaultProperty("items")
 public abstract class NavigationView extends Control {
 
     private final ObservableList<NavigationItem> items = FXCollections.observableArrayList();

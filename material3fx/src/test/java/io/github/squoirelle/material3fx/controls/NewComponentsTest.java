@@ -25,6 +25,7 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 import java.time.LocalDate;
+import java.util.List;
 import java.util.Locale;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -262,6 +263,42 @@ class NewComponentsTest {
             assertNotNull(row);
             return null;
         });
+    }
+
+    @Test
+    void formHeightMatchesItsLabelPlacementInsideACard() throws Exception {
+        FxTestSupport.onFx(() -> {
+            // A card does not pass its content's bias on: it asks for the height without a width, and
+            // the form must not answer for labels on top (its narrow pref width) once laid out wide.
+            FormPane form = new FormPane();
+            for (String label : List.of("Name", "SKU", "Location")) {
+                form.addRow(label, new MaterialTextField());
+            }
+            Scene scene = show(new VBox(new Card(Card.Variant.OUTLINED, new VBox(form))), 900, 600);
+            scene.getRoot().layout();
+            assertFalse(form.labelsOnTopProperty().get());
+            assertEquals(form.prefHeight(form.getWidth()), form.getHeight(), 1, "no empty space below the rows");
+            return null;
+        });
+    }
+
+    @Test
+    void fxmlFriendlyConstructorsWork() {
+        // FXML creates these with no-arg or @NamedArg constructors, then sets properties.
+        FormRow row = new FormRow();
+        assertFalse(row.hasLabel());
+        row.setLabel("Name");
+        assertTrue(row.hasLabel());
+        assertTrue(row.labelNode().isVisible(), "a label set after construction shows");
+        NavigationItem divider = new NavigationItem(NavigationItem.Kind.DIVIDER, null, null);
+        assertFalse(divider.isDestination());
+        assertEquals("Edit", setTitle(new MenuHeader(), "Edit").getTitle());
+        assertTrue(new SegmentedButton().getButtons().isEmpty());
+    }
+
+    private static MenuHeader setTitle(MenuHeader header, String title) {
+        header.setTitle(title);
+        return header;
     }
 
     // ---------- Banner, status light ----------

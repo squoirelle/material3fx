@@ -301,6 +301,10 @@ public class AdaptiveScaffold extends Scaffold {
         return navigationTitle;
     }
 
+    public final String getNavigationTitle() {
+        return navigationTitle.get();
+    }
+
     public final void setNavigationTitle(String value) {
         navigationTitle.set(value);
     }
@@ -308,6 +312,10 @@ public class AdaptiveScaffold extends Scaffold {
     /** Header of the rail, typically a {@link Fab}. */
     public final ObjectProperty<Node> railHeaderProperty() {
         return railHeader;
+    }
+
+    public final Node getRailHeader() {
+        return railHeader.get();
     }
 
     public final void setRailHeader(Node value) {

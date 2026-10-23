@@ -114,9 +114,19 @@ public class Chip extends ToggleButton {
         setGraphic(node);
     }
 
+    /** The name of the icon set with {@link #setIcon(String)}, or null. */
+    public final String getIcon() {
+        return getGraphic() instanceof Icon icon && icon.getStyleClass().contains("chip-icon") ? icon.getName() : null;
+    }
+
     /** Convenience: sets the graphic to an avatar (input chips). */
     public final void setAvatar(Node avatar) {
         setGraphic(avatar);
+    }
+
+    /** The graphic, when it is not an icon set with {@link #setIcon(String)}. */
+    public final Node getAvatar() {
+        return getIcon() == null ? getGraphic() : null;
     }
 
     public final ObjectProperty<Variant> variantProperty() {

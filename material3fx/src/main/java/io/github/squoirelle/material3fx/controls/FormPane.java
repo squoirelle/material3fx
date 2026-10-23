@@ -1,5 +1,6 @@
 package io.github.squoirelle.material3fx.controls;
 
+import javafx.beans.DefaultProperty;
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.ReadOnlyBooleanProperty;
@@ -8,6 +9,7 @@ import javafx.beans.property.SimpleDoubleProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.geometry.Orientation;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.control.Label;
@@ -36,6 +38,7 @@ import java.util.List;
  * if (form.validate()) save();
  * }</pre>
  */
+@DefaultProperty("children")
 public class FormPane extends Region {
 
     public enum LabelPosition { AUTO, LEFT, TOP }
@@ -173,6 +176,12 @@ public class FormPane extends Region {
             y += h;
             first = false;
         }
+    }
+
+    /** The height depends on the width: labels go above the fields below the breakpoint. */
+    @Override
+    public Orientation getContentBias() {
+        return Orientation.HORIZONTAL;
     }
 
     @Override

@@ -1,5 +1,6 @@
 package io.github.squoirelle.material3fx.controls;
 
+import javafx.beans.NamedArg;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.ObjectProperty;
@@ -27,11 +28,16 @@ public class NavigationItem {
     private final BooleanProperty disabled = new SimpleBooleanProperty(this, "disabled");
     private final ObjectProperty<Object> userData = new SimpleObjectProperty<>(this, "userData");
 
-    public NavigationItem(String text, String icon) {
+    public NavigationItem(@NamedArg("text") String text, @NamedArg("icon") String icon) {
         this(Kind.DESTINATION, text, icon);
     }
 
-    private NavigationItem(Kind kind, String text, String icon) {
+    /**
+     * An item of any kind. In FXML, {@code <NavigationItem kind="HEADLINE" text="Mail"/>} or
+     * {@code <NavigationItem kind="DIVIDER"/>}; destinations need only {@code text} and {@code icon}.
+     */
+    public NavigationItem(@NamedArg(value = "kind", defaultValue = "DESTINATION") Kind kind,
+                          @NamedArg("text") String text, @NamedArg("icon") String icon) {
         this.kind = kind;
         this.text.set(text);
         this.icon.set(icon);

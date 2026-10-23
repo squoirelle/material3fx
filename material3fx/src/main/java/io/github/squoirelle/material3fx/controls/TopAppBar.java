@@ -1,5 +1,6 @@
 package io.github.squoirelle.material3fx.controls;
 
+import javafx.beans.DefaultProperty;
 import io.github.squoirelle.material3fx.skins.TopAppBarSkin;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ObjectProperty;
@@ -21,6 +22,7 @@ import javafx.scene.control.Skin;
  * When the content below is scrolled, the bar switches to its "scrolled" color (surface
  * container); link it to a scroll pane with {@link #bindScroll(ScrollPane)}.
  */
+@DefaultProperty("actions")
 public class TopAppBar extends Control {
 
     public enum Variant { SMALL, CENTER_ALIGNED, MEDIUM, LARGE }

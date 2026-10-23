@@ -1,5 +1,6 @@
 package io.github.squoirelle.material3fx.controls;
 
+import javafx.beans.DefaultProperty;
 import io.github.squoirelle.material3fx.skins.CarouselSkin;
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.SimpleDoubleProperty;
@@ -16,6 +17,7 @@ import javafx.scene.control.Skin;
  * content, and scrolling snaps to item boundaries. Scroll with the mouse wheel, by dragging, or
  * with the keyboard (Left / Right, Home / End).
  */
+@DefaultProperty("items")
 public class Carousel extends Control {
 
     private final ObservableList<Node> items = FXCollections.observableArrayList();

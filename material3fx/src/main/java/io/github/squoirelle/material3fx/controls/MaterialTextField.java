@@ -248,10 +248,16 @@ public class MaterialTextField extends TextField implements Validatable {
         trailing.set(value);
     }
 
+    /** Whether the trailing element is the clear button added by {@link #setClearable(boolean)}. */
+    public final boolean isClearable() {
+        return getTrailing() != null && getTrailing().getStyleClass().contains("clear-button");
+    }
+
     /** Convenience: a trailing icon button clearing the text, visible when there is text. */
     public final void setClearable(boolean clearable) {
         if (clearable) {
             IconButton clear = new IconButton("cancel");
+            clear.getStyleClass().add("clear-button");
             clear.setFocusTraversable(false);
             clear.setAccessibleText("Clear");
             clear.setOnAction(e -> {

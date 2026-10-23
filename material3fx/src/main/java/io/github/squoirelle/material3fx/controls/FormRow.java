@@ -1,5 +1,6 @@
 package io.github.squoirelle.material3fx.controls;
 
+import javafx.beans.DefaultProperty;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleBooleanProperty;
@@ -13,12 +14,18 @@ import javafx.scene.layout.Region;
  * One row of a {@link FormPane}: an optional label and a field. Positioned by the form, which
  * decides whether the label sits beside or above the field.
  */
+@DefaultProperty("field")
 public class FormRow extends Region {
 
     private final Label label = new Label();
     private final Label requiredMarker = new Label("*");
     private final ObjectProperty<Node> field = new SimpleObjectProperty<>(this, "field");
     private final BooleanProperty required = new SimpleBooleanProperty(this, "required");
+
+    /** A row without label or field yet (for FXML: {@code <FormRow label="Name"><TextField/></FormRow>}). */
+    public FormRow() {
+        this(null, null);
+    }
 
     public FormRow(String label, Node field) {
         getStyleClass().add("form-row");
@@ -37,6 +44,7 @@ public class FormRow extends Region {
         getChildren().add(this.label);
         this.field.set(field);
         required.addListener(o -> updateLabel());
+        this.label.textProperty().addListener(o -> updateLabel());
         updateLabel();
     }
 
@@ -123,12 +131,21 @@ public class FormRow extends Region {
         }
     }
 
+    /** The label text; empty or null for a full-width row. */
     public final StringProperty labelProperty() {
         return label.textProperty();
     }
 
     public final ObjectProperty<Node> fieldProperty() {
         return field;
+    }
+
+    public final String getLabel() {
+        return label.getText();
+    }
+
+    public final void setLabel(String value) {
+        label.setText(value);
     }
 
     public final Node getField() {

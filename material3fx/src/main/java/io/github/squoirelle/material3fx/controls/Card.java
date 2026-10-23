@@ -1,5 +1,6 @@
 package io.github.squoirelle.material3fx.controls;
 
+import javafx.beans.DefaultProperty;
 import io.github.squoirelle.material3fx.skins.CardSkin;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
@@ -21,6 +22,7 @@ import javafx.scene.layout.VBox;
  * to remove the padding). Setting an {@link #onActionProperty() action} makes the whole card
  * clickable, with hover, focus and ripple feedback, Enter and Space.
  */
+@DefaultProperty("content")
 public class Card extends Control {
 
     public enum Variant { ELEVATED, FILLED, OUTLINED }

@@ -198,6 +198,11 @@ public class ListItem extends Control {
         setLeading(icon == null ? null : new Icon(icon));
     }
 
+    /** The name of the leading icon, or null when the leading element is not an {@link Icon}. */
+    public final String getLeadingIcon() {
+        return getLeading() instanceof Icon icon ? icon.getName() : null;
+    }
+
     /** Trailing element: an {@link Icon}, checkbox, {@link Switch}... */
     public final ObjectProperty<Node> trailingProperty() {
         return trailing;

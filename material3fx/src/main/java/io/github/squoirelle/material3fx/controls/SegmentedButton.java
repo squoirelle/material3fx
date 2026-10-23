@@ -1,5 +1,6 @@
 package io.github.squoirelle.material3fx.controls;
 
+import javafx.beans.DefaultProperty;
 import io.github.squoirelle.material3fx.skins.SegmentedButtonSkin;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ObjectProperty;
@@ -26,6 +27,7 @@ import javafx.scene.control.ToggleGroup;
  * view.getButtons().get(1).setSelected(true);
  * }</pre>
  */
+@DefaultProperty("buttons")
 public class SegmentedButton extends Control {
 
     private final ObservableList<ToggleButton> buttons = FXCollections.observableArrayList();
@@ -39,6 +41,11 @@ public class SegmentedButton extends Control {
             old.setSelected(true);
         }
     };
+
+    /** No segments yet (for FXML: nest {@code ToggleButton}s, they become the segments). */
+    public SegmentedButton() {
+        this(new String[0]);
+    }
 
     public SegmentedButton(String... labels) {
         getStyleClass().add("segmented-button");

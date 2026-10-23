@@ -1,5 +1,6 @@
 package io.github.squoirelle.material3fx.controls;
 
+import javafx.beans.DefaultProperty;
 import io.github.squoirelle.material3fx.skins.BannerSkin;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ObjectProperty;
@@ -29,6 +30,7 @@ import java.util.Locale;
  * offline.addAction("Dismiss", () -> offline.setShowing(false));
  * }</pre>
  */
+@DefaultProperty("actions")
 public class Banner extends Control {
 
     public enum Severity { INFO, SUCCESS, WARNING, ERROR }

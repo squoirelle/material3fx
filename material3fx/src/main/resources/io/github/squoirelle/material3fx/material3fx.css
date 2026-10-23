@@ -953,6 +953,16 @@
     -fx-background-color: -md-sys-color-on-surface-a08;
 }
 
+/* Menus in a menu bar have no dropdown arrow (as in Modena). */
+.menu-bar > .container > .menu-button > .arrow-button {
+    -fx-padding: 0;
+}
+
+.menu-bar > .container > .menu-button > .arrow-button > .arrow {
+    -fx-padding: 0;
+    -fx-background-color: transparent;
+}
+
 .menu-bar > .container > .menu-button > .label,
 .menu-bar > .container > .menu-button:hover > .label,
 .menu-bar > .container > .menu-button:showing > .label {

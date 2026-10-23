@@ -19,6 +19,11 @@ public class MenuHeader extends CustomMenuItem {
 
     private final Label label = new Label();
 
+    /** A header without text yet (for FXML: {@code <MenuHeader title="Edit"/>}). */
+    public MenuHeader() {
+        this(null);
+    }
+
     public MenuHeader(String text) {
         getStyleClass().add("menu-header");
         label.getStyleClass().add("menu-header-label");

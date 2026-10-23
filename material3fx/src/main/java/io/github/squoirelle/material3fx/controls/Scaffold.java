@@ -1,5 +1,6 @@
 package io.github.squoirelle.material3fx.controls;
 
+import javafx.beans.DefaultProperty;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.geometry.Insets;
@@ -16,6 +17,7 @@ import javafx.scene.layout.StackPane;
  * sheets}, {@link SideSheet side sheets}, {@link Snackbar snackbars} and modal
  * {@link NavigationDrawer drawers} shown from any node inside it.
  */
+@DefaultProperty("content")
 public class Scaffold extends StackPane {
 
     public enum FabPosition { END, CENTER }
