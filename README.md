@@ -10,8 +10,18 @@ theme.setDensity(Density.COMPACT);      // desktop-friendly sizes
 theme.applyGlobally();                  // every window: stages, dialogs, menus, tooltips
 ```
 
-Requires Java 21+ and JavaFX 22+ (built and tested with JDK 25 / JavaFX 25). No dependencies;
-Roboto and the Material Icons fonts are bundled.
+Requires **Java 21+ and JavaFX 21+** (both LTS). No dependencies; Roboto and the Material Icons
+fonts are bundled. Following the system dark mode (`ThemeMode.SYSTEM`) and accent color needs
+JavaFX 22+; on JavaFX 21 the system is treated as light.
+
+The whole test suite passes on every combination the JavaFX releases themselves support:
+
+| | JavaFX 21 | 22 | 23 | 24 | 25 | 26 | 27 |
+|---|---|---|---|---|---|---|---|
+| **JDK 21** | ✅ | ✅ | ✅ | needs JDK 22 | needs JDK 23 | needs JDK 24 | needs JDK 25 |
+| **JDK 25** | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
+
+To test a combination: `./gradlew :m3fx-core:test -Pjdk=21 -Pjavafx=22.0.2`.
 
 ## Run the demo
 

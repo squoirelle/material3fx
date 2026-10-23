@@ -3,7 +3,8 @@ plugins {
 }
 
 javafx {
-    version = libs.versions.javafx.get()
+    // -Pjavafx=21.0.13 builds and tests against another JavaFX release.
+    version = providers.gradleProperty("javafx").getOrElse(libs.versions.javafxMin.get())
     modules("javafx.controls")
 }
 

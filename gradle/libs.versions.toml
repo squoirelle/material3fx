@@ -1,4 +1,7 @@
 [versions]
+# The library compiles against the oldest supported JavaFX, so newer APIs cannot slip in.
+javafxMin = "21.0.13"
+# The demo runs on a current JavaFX.
 javafx = "25"
 junit = "5.13.4"
 

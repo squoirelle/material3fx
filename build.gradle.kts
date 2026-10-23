@@ -1,3 +1,8 @@
+// Minimum supported Java version: class files target it whatever JDK builds them.
+val minimumJava = 21
+// -Pjdk=21 builds and tests with another JDK (default: 25); see also -Pjavafx in the modules.
+val buildJdk = providers.gradleProperty("jdk").map { it.toInt() }.getOrElse(25)
+
 subprojects {
     apply(plugin = "java-library")
 
@@ -10,12 +15,13 @@ subprojects {
 
     extensions.configure<JavaPluginExtension> {
         toolchain {
-            languageVersion = JavaLanguageVersion.of(25)
+            languageVersion = JavaLanguageVersion.of(buildJdk)
         }
     }
 
     tasks.withType<JavaCompile>().configureEach {
         options.encoding = "UTF-8"
+        options.release = minimumJava
         options.compilerArgs.addAll(listOf("-Xlint:all", "-Xlint:-serial", "-Xlint:-this-escape", "-Xlint:-requires-transitive-automatic"))
     }
 

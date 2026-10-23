@@ -108,13 +108,12 @@ public final class MaterialTheme {
         harmonizeCustomColors.addListener(rebuild);
         customColors.addListener((javafx.collections.MapChangeListener<String, Color>) c -> rebuild());
         density.addListener(o -> scenes.keySet().forEach(this::updateRootClasses));
-        Platform.Preferences preferences = Platform.getPreferences();
-        preferences.colorSchemeProperty().addListener(o -> {
+        SystemPreferences.onColorSchemeChange(o -> {
             if (getMode() == ThemeMode.SYSTEM) {
                 rebuild();
             }
         });
-        preferences.accentColorProperty().addListener(o -> {
+        SystemPreferences.onAccentColorChange(o -> {
             if (isUseSystemAccent()) {
                 rebuild();
             }
@@ -303,11 +302,11 @@ public final class MaterialTheme {
         boolean isDark = switch (getMode()) {
             case LIGHT -> false;
             case DARK -> true;
-            case SYSTEM -> Platform.getPreferences().getColorScheme() == javafx.application.ColorScheme.DARK;
+            case SYSTEM -> SystemPreferences.isDark();
         };
         Color seed = getSeedColor();
-        if (isUseSystemAccent() && Platform.getPreferences().getAccentColor() != null) {
-            seed = Platform.getPreferences().getAccentColor();
+        if (isUseSystemAccent() && SystemPreferences.accentColor() != null) {
+            seed = SystemPreferences.accentColor();
         }
         ColorScheme newScheme = ColorScheme.builder(seed)
                 .dark(isDark)
@@ -453,7 +452,7 @@ public final class MaterialTheme {
         density.set(Objects.requireNonNull(value));
     }
 
-    /** Uses the operating system accent color as seed when the platform provides one. */
+    /** Uses the operating system accent color as seed when the platform provides one (JavaFX 22 and later). */
     public BooleanProperty useSystemAccentProperty() {
         return useSystemAccent;
     }
