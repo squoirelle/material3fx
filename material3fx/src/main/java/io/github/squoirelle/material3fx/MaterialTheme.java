@@ -266,7 +266,9 @@ public final class MaterialTheme {
                 popup.setAnchorY(anchor[0].getY());
             }
         };
-        ChangeListener<Number> resized = (o, old, now) -> reanchor.run();
+        // Later, not now: the size changes inside JavaFX's own popup update, which then stores its
+        // (pushed) anchor and would undo ours (it does on Windows).
+        ChangeListener<Number> resized = (o, old, now) -> Platform.runLater(reanchor);
         InvalidationListener windowMoved = o -> {
             if (window[0] != null && !windowPosition[0].equals(new Point2D(window[0].getX(), window[0].getY()))) {
                 popup.hide();
