@@ -122,8 +122,13 @@ class PopupFollowTest {
             return null;
         });
         Thread.sleep(300);
-        if (needsFocus) {
-            org.junit.jupiter.api.Assertions.assertTrue(FxTestSupport.focus(control), "the control gets the focus");
+        if (needsFocus && !FxTestSupport.focus(control)) {
+            FxTestSupport.onFx(() -> {
+                stage[0].close();
+                return null;
+            });
+            // Some systems (the macOS CI runners) never give a test window the keyboard focus.
+            Assumptions.abort("the window cannot get the keyboard focus here");
         }
         FxTestSupport.onFx(() -> {
             open.accept(control);

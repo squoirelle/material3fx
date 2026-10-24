@@ -20,6 +20,7 @@ import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import javafx.stage.Window;
+import org.junit.jupiter.api.Assumptions;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -439,7 +440,8 @@ class NewComponentsTest {
             return null;
         });
         // Suggestions only show for a focused bar.
-        assertTrue(FxTestSupport.focus(bar[0]), "the search bar gets the focus");
+        // Some systems (the macOS CI runners) never give a test window the keyboard focus.
+        Assumptions.assumeTrue(FxTestSupport.focus(bar[0]), "the window cannot get the keyboard focus here");
         FxTestSupport.onFx(() -> {
             bar[0].setText("c");
             return null;

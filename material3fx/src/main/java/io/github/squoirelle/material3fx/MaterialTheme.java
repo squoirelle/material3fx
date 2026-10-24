@@ -257,6 +257,16 @@ public final class MaterialTheme {
         Point2D[] windowPosition = new Point2D[1];
         Node[] node = new Node[1];
         Point2D[] nodePosition = new Point2D[1];
+        // Where the popup belongs. The anchor can differ: a popup pushed back on screen while it
+        // still had its old size keeps that pushed anchor once it shrinks.
+        Point2D[] anchor = new Point2D[1];
+        Runnable reanchor = () -> {
+            if (anchor[0] != null) {
+                popup.setAnchorX(anchor[0].getX());
+                popup.setAnchorY(anchor[0].getY());
+            }
+        };
+        ChangeListener<Number> resized = (o, old, now) -> reanchor.run();
         InvalidationListener windowMoved = o -> {
             if (window[0] != null && !windowPosition[0].equals(new Point2D(window[0].getX(), window[0].getY()))) {
                 popup.hide();
@@ -272,8 +282,8 @@ public final class MaterialTheme {
             Point2D delta = now.subtract(nodePosition[0]);
             nodePosition[0] = now;
             if (delta.getX() != 0 || delta.getY() != 0) {
-                popup.setAnchorX(popup.getAnchorX() + delta.getX());
-                popup.setAnchorY(popup.getAnchorY() + delta.getY());
+                anchor[0] = anchor[0].add(delta);
+                reanchor.run();
             }
         };
         popup.addEventHandler(WindowEvent.WINDOW_SHOWN, e -> {
@@ -287,6 +297,9 @@ public final class MaterialTheme {
             if (node[0] != null) {
                 node[0].localToSceneTransformProperty().addListener(nodeMoved);
                 nodePosition[0] = node[0].getLocalToSceneTransform().transform(0, 0);
+                anchor[0] = new Point2D(popup.getAnchorX(), popup.getAnchorY());
+                popup.widthProperty().addListener(resized);
+                popup.heightProperty().addListener(resized);
             }
         });
         popup.addEventHandler(WindowEvent.WINDOW_HIDDEN, e -> {
@@ -296,9 +309,12 @@ public final class MaterialTheme {
             }
             if (node[0] != null) {
                 node[0].localToSceneTransformProperty().removeListener(nodeMoved);
+                popup.widthProperty().removeListener(resized);
+                popup.heightProperty().removeListener(resized);
             }
             window[0] = null;
             node[0] = null;
+            anchor[0] = null;
         });
     }
 
